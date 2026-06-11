@@ -1,0 +1,132 @@
+import type { Metadata } from "next";
+import { Container, Eyebrow, PageHero, SectionHeading } from "../components/ui";
+import { ContactCta, Stats } from "../components/sections";
+import { team, values } from "../lib/content";
+
+export const metadata: Metadata = {
+  title: "About",
+  description:
+    "A partner-led chartered accountancy practice with a deliberately short client list. Meet the team behind CA Farm.",
+};
+
+const credentials = [
+  "ICAEW registered firm",
+  "Xero Platinum Partner",
+  "QuickBooks ProAdvisor",
+  "ACCA approved employer",
+];
+
+export default function AboutPage() {
+  return (
+    <>
+      <PageHero
+        eyebrow="The firm"
+        title="Accountants who act like partners."
+        lede="CA Farm was founded on a simple complaint: most firms only call when the invoice is due. We built the practice we wished existed — close to the numbers, ahead of the deadlines, honest about the fees."
+      />
+
+      <Container className="grid gap-14 py-16 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+        <div>
+          <SectionHeading
+            eyebrow="Our story"
+            title="Twenty years of tending other people's numbers."
+          />
+          <div className="mt-6 flex flex-col gap-5 text-[15px] leading-7 text-sage-700">
+            <p>
+              We started in a single room above a farm shop — which is where
+              the name comes from. The first clients were rural businesses
+              that needed more than a year-end filing: they needed someone who
+              understood seasonality, capital spend and what a bad harvest
+              does to cash flow.
+            </p>
+            <p>
+              The practice has grown into six service lines and five hundred
+              clients, but the operating principle is unchanged: every client
+              gets a partner who knows their business, books that are never
+              out of date, and advice in plain English before decisions are
+              made — not after.
+            </p>
+            <p>
+              We cap each partner’s client list on purpose. Growth that costs
+              the existing clients their service is not growth we want.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-5">
+          {values.map((value) => (
+            <div
+              key={value.title}
+              className="rounded-2xl border border-line bg-surface p-6"
+            >
+              <h3 className="font-display text-lg font-medium tracking-tight">
+                {value.title}
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-sage-600">
+                {value.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </Container>
+
+      <section className="border-y border-line bg-surface">
+        <Container className="py-16 sm:py-20">
+          <SectionHeading
+            eyebrow="The team"
+            title="Small team. Senior people."
+            lede="No juniors learning on your books. Every client team is led by a qualified accountant with a decade or more in practice."
+          />
+          <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {team.map((member) => (
+              <li
+                key={member.name}
+                className="rounded-2xl border border-line bg-parchment p-6"
+              >
+                <span
+                  aria-hidden="true"
+                  className="grid h-14 w-14 place-items-center rounded-full bg-forest-950 font-display text-lg font-semibold text-brass-300"
+                >
+                  {member.name
+                    .split(" ")
+                    .map((part) => part[0])
+                    .join("")}
+                </span>
+                <h3 className="mt-4 font-display text-lg font-medium tracking-tight">
+                  {member.name}
+                </h3>
+                <p className="mt-1 text-sm text-sage-600">
+                  {member.role}
+                  <span className="mt-0.5 block text-xs font-semibold uppercase tracking-wide text-brass-600">
+                    {member.credential}
+                  </span>
+                </p>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      <section>
+        <Container className="py-16 sm:py-20">
+          <div className="flex flex-col items-center gap-6 text-center">
+            <Eyebrow>Credentials</Eyebrow>
+            <ul className="flex flex-wrap items-center justify-center gap-3">
+              {credentials.map((credential) => (
+                <li
+                  key={credential}
+                  className="rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-medium text-sage-700"
+                >
+                  {credential}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Container>
+      </section>
+
+      <Stats />
+      <ContactCta />
+    </>
+  );
+}

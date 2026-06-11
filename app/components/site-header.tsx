@@ -1,16 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { href: "#services", label: "Services" },
-  { href: "#process", label: "Process" },
-  { href: "#testimonials", label: "Client stories" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/services", label: "Services" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
+
+function isActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-40 border-b border-line/80 bg-parchment/85 backdrop-blur-md">
@@ -18,8 +25,8 @@ export function SiteHeader() {
         aria-label="Main"
         className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:px-8"
       >
-        <a
-          href="#top"
+        <Link
+          href="/"
           className="flex items-center gap-2.5"
           onClick={() => setMenuOpen(false)}
         >
@@ -29,27 +36,35 @@ export function SiteHeader() {
           <span className="font-display text-lg font-semibold tracking-tight">
             CA Farm
           </span>
-        </a>
+        </Link>
 
         <div className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-sage-700 transition-colors duration-200 hover:text-forest-700"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            const active = isActive(pathname, link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={`text-sm font-medium transition-colors duration-200 ${
+                  active
+                    ? "font-semibold text-forest-700"
+                    : "text-sage-700 hover:text-forest-700"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
         <div className="flex items-center gap-3">
-          <a
-            href="#contact"
+          <Link
+            href="/contact"
             className="hidden h-10 cursor-pointer items-center rounded-full bg-forest-950 px-5 text-sm font-medium text-parchment transition-colors duration-200 hover:bg-forest-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-700 sm:inline-flex"
           >
             Book a consultation
-          </a>
+          </Link>
           <button
             type="button"
             className="grid h-10 w-10 cursor-pointer place-items-center rounded-lg border border-line text-ink transition-colors duration-200 hover:bg-surface md:hidden"
@@ -86,22 +101,27 @@ export function SiteHeader() {
         >
           <div className="flex flex-col gap-1">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-lg px-3 py-2.5 text-[15px] font-medium text-sage-700 transition-colors duration-200 hover:bg-surface"
+                aria-current={isActive(pathname, link.href) ? "page" : undefined}
+                className={`rounded-lg px-3 py-2.5 text-[15px] font-medium transition-colors duration-200 ${
+                  isActive(pathname, link.href)
+                    ? "bg-surface font-semibold text-forest-700"
+                    : "text-sage-700 hover:bg-surface"
+                }`}
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
-            <a
-              href="#contact"
+            <Link
+              href="/contact"
               className="mt-2 inline-flex h-11 items-center justify-center rounded-full bg-forest-950 px-5 text-sm font-medium text-parchment"
               onClick={() => setMenuOpen(false)}
             >
               Book a consultation
-            </a>
+            </Link>
           </div>
         </div>
       )}

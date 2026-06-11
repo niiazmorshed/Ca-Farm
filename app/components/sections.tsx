@@ -1,58 +1,6 @@
-import type { ReactNode } from "react";
-
-/* ---------- shared primitives ---------- */
-
-function Container({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`mx-auto w-full max-w-6xl px-5 sm:px-8 ${className}`}>
-      {children}
-    </div>
-  );
-}
-
-function Eyebrow({
-  children,
-  tone = "light",
-}: {
-  children: ReactNode;
-  tone?: "light" | "dark";
-}) {
-  return (
-    <p
-      className={`text-xs font-semibold uppercase tracking-[0.22em] ${
-        tone === "dark" ? "text-brass-300" : "text-brass-600"
-      }`}
-    >
-      {children}
-    </p>
-  );
-}
-
-function SectionHeading({
-  eyebrow,
-  title,
-  lede,
-}: {
-  eyebrow: string;
-  title: ReactNode;
-  lede?: string;
-}) {
-  return (
-    <div className="max-w-2xl">
-      <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-balance sm:text-4xl">
-        {title}
-      </h2>
-      {lede && <p className="mt-4 text-lg leading-8 text-sage-600">{lede}</p>}
-    </div>
-  );
-}
+import Link from "next/link";
+import { Container, Eyebrow, SectionHeading } from "./ui";
+import { industries, services, site } from "../lib/content";
 
 /* ---------- hero ---------- */
 
@@ -64,10 +12,7 @@ const heroFigures: [string, string][] = [
 
 export function Hero() {
   return (
-    <section
-      id="top"
-      className="relative isolate overflow-hidden bg-forest-950 text-parchment"
-    >
+    <section className="relative isolate overflow-hidden bg-forest-950 text-parchment">
       <div aria-hidden="true" className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(70rem_45rem_at_12%_-12%,rgba(203,167,93,0.16),transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(50rem_35rem_at_100%_110%,rgba(39,115,90,0.35),transparent_65%)]" />
@@ -89,18 +34,18 @@ export function Hero() {
             ready for what comes next.
           </p>
           <div className="animate-fade-up flex flex-col gap-3 [animation-delay:180ms] sm:flex-row">
-            <a
-              href="#contact"
+            <Link
+              href="/contact"
               className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full bg-brass-400 px-7 text-sm font-semibold text-forest-950 transition-colors duration-200 hover:bg-brass-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass-300"
             >
               Book a free consultation
-            </a>
-            <a
-              href="#services"
+            </Link>
+            <Link
+              href="/services"
               className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full border border-parchment/25 px-7 text-sm font-medium text-parchment transition-colors duration-200 hover:border-parchment/50 hover:bg-parchment/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-parchment/60"
             >
               Explore services
-            </a>
+            </Link>
           </div>
           <ul className="animate-fade-up mt-2 flex flex-wrap gap-x-7 gap-y-2 border-t border-parchment/15 pt-5 text-sm text-parchment/60 [animation-delay:240ms]">
             <li>ICAEW-registered practice</li>
@@ -148,7 +93,7 @@ export function Hero() {
   );
 }
 
-/* ---------- client strip ---------- */
+/* ---------- client strip (marquee) ---------- */
 
 const clients = [
   "Northfield & Co",
@@ -166,13 +111,26 @@ export function LogoStrip() {
         <p className="text-center text-xs font-medium uppercase tracking-[0.18em] text-sage-500">
           Trusted by founders, family firms and growing teams
         </p>
-        <ul className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
+        <ul className="sr-only">
           {clients.map((name) => (
-            <li key={name} className="font-display text-lg font-medium text-ink/35">
-              {name}
-            </li>
+            <li key={name}>{name}</li>
           ))}
         </ul>
+        <div
+          aria-hidden="true"
+          className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]"
+        >
+          <div className="flex w-max animate-marquee">
+            {[...clients, ...clients].map((name, index) => (
+              <span
+                key={index}
+                className="mr-14 whitespace-nowrap font-display text-lg font-medium text-ink/35"
+              >
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
       </Container>
     </section>
   );
@@ -180,53 +138,29 @@ export function LogoStrip() {
 
 /* ---------- services ---------- */
 
-const services = [
-  {
-    title: "Audit & Assurance",
-    description:
-      "Statutory and voluntary audits that stand up to scrutiny — and give lenders, boards and buyers confidence in your numbers.",
-  },
-  {
-    title: "Tax Planning & Compliance",
-    description:
-      "Corporation tax, VAT, self-assessment and R&D relief. Planned ahead, filed on time, never more than you owe.",
-  },
-  {
-    title: "Bookkeeping & Cloud Accounting",
-    description:
-      "Clean, current books on Xero or QuickBooks, with monthly management accounts you can actually read.",
-  },
-  {
-    title: "Payroll & Pensions",
-    description:
-      "Accurate payslips, RTI submissions and auto-enrolment handled — your team paid right, every cycle.",
-  },
-  {
-    title: "Advisory & Virtual CFO",
-    description:
-      "Forecasting, cash-flow planning and board-level advice from people who already know your numbers.",
-  },
-  {
-    title: "Company Formation & Secretarial",
-    description:
-      "Incorporation, registrations and statutory filings to get you trading fast and keep Companies House happy.",
-  },
-];
-
 export function Services() {
   return (
     <section id="services" className="scroll-mt-24">
       <Container className="py-20 sm:py-24">
-        <SectionHeading
-          eyebrow="What we do"
-          title="Full-service accounting, from seed to scale."
-          lede="One firm for the whole journey — whether you need year-end accounts done properly or a finance function without the headcount."
-        />
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <SectionHeading
+            eyebrow="What we do"
+            title="Full-service accounting, from seed to scale."
+            lede="One firm for the whole journey — whether you need year-end accounts done properly or a finance function without the headcount."
+          />
+          <Link
+            href="/services"
+            className="text-sm font-semibold text-forest-700 transition-colors duration-200 hover:text-forest-600"
+          >
+            All services <span aria-hidden="true">→</span>
+          </Link>
+        </div>
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service, index) => (
-            <article
-              key={service.title}
-              className="group relative flex flex-col rounded-2xl border border-line bg-surface p-7 transition-all duration-300 hover:-translate-y-1 hover:border-brass-400/50 hover:shadow-xl hover:shadow-forest-950/5"
+            <Link
+              key={service.slug}
+              href={`/services/${service.slug}`}
+              className="group relative flex flex-col rounded-2xl border border-line bg-surface p-7 transition-all duration-300 hover:-translate-y-1 hover:border-brass-400/50 hover:shadow-xl hover:shadow-forest-950/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-700"
             >
               <span className="font-display text-sm font-semibold text-brass-600">
                 {String(index + 1).padStart(2, "0")}
@@ -235,15 +169,43 @@ export function Services() {
                 {service.title}
               </h3>
               <p className="mt-2.5 text-[15px] leading-7 text-sage-600">
-                {service.description}
+                {service.blurb}
               </p>
-              <span
-                aria-hidden="true"
-                className="mt-auto pt-5 text-sm font-medium text-forest-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              >
-                Talk to us →
+              <span className="mt-auto pt-5 text-sm font-medium text-forest-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+                Learn more <span aria-hidden="true">→</span>
               </span>
-            </article>
+            </Link>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+/* ---------- industries ---------- */
+
+export function Industries() {
+  return (
+    <section className="border-t border-line">
+      <Container className="py-20 sm:py-24">
+        <SectionHeading
+          eyebrow="Who we serve"
+          title="Deep benches in the sectors we know best."
+          lede="Every industry has its own tax quirks and rhythms. These are the ones we work in every day."
+        />
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {industries.map((industry) => (
+            <div
+              key={industry.name}
+              className="rounded-2xl border border-line bg-surface p-6"
+            >
+              <h3 className="font-display text-lg font-medium tracking-tight">
+                {industry.name}
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-sage-600">
+                {industry.note}
+              </p>
+            </div>
           ))}
         </div>
       </Container>
@@ -396,146 +358,6 @@ export function Testimonials() {
   );
 }
 
-/* ---------- why us ---------- */
-
-function IconBanknote() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-5 w-5"
-      aria-hidden="true"
-    >
-      <rect x="2" y="6" width="20" height="12" rx="2" />
-      <circle cx="12" cy="12" r="2" />
-      <path d="M6 12h.01M18 12h.01" />
-    </svg>
-  );
-}
-
-function IconUser() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-5 w-5"
-      aria-hidden="true"
-    >
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function IconCloud() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-5 w-5"
-      aria-hidden="true"
-    >
-      <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a4 4 0 0 0 0-8z" />
-    </svg>
-  );
-}
-
-function IconBell() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-5 w-5"
-      aria-hidden="true"
-    >
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-    </svg>
-  );
-}
-
-const features = [
-  {
-    icon: <IconBanknote />,
-    title: "Fixed, transparent fees",
-    description:
-      "One monthly price, agreed upfront. No hourly billing, no surprise invoices in April.",
-  },
-  {
-    icon: <IconUser />,
-    title: "A dedicated accountant",
-    description:
-      "A direct line to someone who knows your business — not a call centre or a shared inbox.",
-  },
-  {
-    icon: <IconCloud />,
-    title: "Cloud-first, paper-never",
-    description:
-      "Certified on Xero and QuickBooks. Receipts snapped, bank feeds live, books always current.",
-  },
-  {
-    icon: <IconBell />,
-    title: "Deadline radar",
-    description:
-      "Every filing tracked and chased before it’s due. Penalties are for other people’s accountants.",
-  },
-];
-
-export function WhyUs() {
-  return (
-    <section className="border-t border-line">
-      <Container className="grid gap-14 py-20 sm:py-24 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-        <div>
-          <SectionHeading
-            eyebrow="Why CA Farm"
-            title="Built like a partner. Priced like a subscription."
-            lede="Good advice comes from knowing the whole picture, not just the year-end accounts. We stay close to your numbers all year — and charge a flat fee for it."
-          />
-          <a
-            href="#contact"
-            className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-forest-700 transition-colors duration-200 hover:text-forest-600"
-          >
-            Book a consultation
-            <span aria-hidden="true">→</span>
-          </a>
-        </div>
-        <div className="grid gap-5 sm:grid-cols-2">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="rounded-2xl border border-line bg-surface p-6"
-            >
-              <span className="grid h-10 w-10 place-items-center rounded-lg bg-forest-950 text-brass-300">
-                {feature.icon}
-              </span>
-              <h3 className="mt-4 text-base font-semibold">{feature.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-sage-600">
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </Container>
-    </section>
-  );
-}
-
 /* ---------- faq ---------- */
 
 const faqs = [
@@ -623,17 +445,17 @@ export function ContactCta() {
             what it costs and what you’d get back. No obligation, no jargon.
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a
-              href="mailto:hello@cafarm.co"
+            <Link
+              href="/contact"
               className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full bg-brass-400 px-7 text-sm font-semibold text-forest-950 transition-colors duration-200 hover:bg-brass-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass-300"
             >
-              hello@cafarm.co
-            </a>
+              Start the conversation
+            </Link>
             <a
-              href="tel:+441234567890"
+              href={site.phoneHref}
               className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full border border-parchment/25 px-7 text-sm font-medium text-parchment transition-colors duration-200 hover:border-parchment/50 hover:bg-parchment/5"
             >
-              +44 (0)1234 567 890
+              {site.phone}
             </a>
           </div>
           <p className="mt-6 text-sm text-parchment/50">

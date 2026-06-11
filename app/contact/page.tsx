@@ -1,0 +1,77 @@
+import type { Metadata } from "next";
+import { Container, PageHero } from "../components/ui";
+import { ContactForm } from "../components/contact-form";
+import { site } from "../lib/content";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Book a free 30-minute consultation with a chartered accountant. We reply within one business day.",
+};
+
+const nextSteps = [
+  "We reply within one business day to arrange a call.",
+  "A free 30-minute conversation about where things stand.",
+  "A fixed-fee proposal in writing — take it or leave it.",
+];
+
+export default function ContactPage() {
+  return (
+    <>
+      <PageHero
+        eyebrow="Contact"
+        title="Start the conversation."
+        lede="Tell us where your books stand. A partner reads every enquiry — you will not be handed to a sales team."
+      />
+
+      <Container className="grid gap-14 py-16 sm:py-20 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="rounded-2xl border border-line bg-surface p-6 sm:p-8">
+          <ContactForm />
+        </div>
+
+        <aside className="flex flex-col gap-8">
+          <div className="rounded-2xl border border-line bg-surface p-6">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-sage-500">
+              What happens next
+            </h2>
+            <ol className="mt-4 flex flex-col gap-4">
+              {nextSteps.map((step, index) => (
+                <li key={step} className="flex items-start gap-3">
+                  <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-forest-950 font-display text-xs font-semibold text-brass-300">
+                    {index + 1}
+                  </span>
+                  <span className="text-sm leading-6 text-sage-700">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div className="rounded-2xl border border-line bg-surface p-6">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-sage-500">
+              Prefer to call or visit?
+            </h2>
+            <address className="mt-4 text-sm not-italic leading-7 text-sage-700">
+              {site.address[0]}
+              <br />
+              {site.address[1]}
+              <br />
+              <a
+                href={`mailto:${site.email}`}
+                className="mt-3 block font-medium text-forest-700 transition-colors duration-200 hover:text-forest-600"
+              >
+                {site.email}
+              </a>
+              <a
+                href={site.phoneHref}
+                className="font-medium text-forest-700 transition-colors duration-200 hover:text-forest-600"
+              >
+                {site.phone}
+              </a>
+            </address>
+            <p className="mt-3 text-sm text-sage-600">{site.hours}</p>
+          </div>
+        </aside>
+      </Container>
+    </>
+  );
+}
