@@ -31,7 +31,7 @@ export default function AboutPage() {
             eyebrow="Our story"
             title="Twenty years of tending other people's numbers."
           />
-          <div className="mt-6 flex flex-col gap-5 text-[15px] leading-7 text-sage-700">
+          <div className="mt-6 flex flex-col gap-5 text-[15px] leading-7 text-ink-body">
             <p>
               We started in a single room above a farm shop — which is where
               the name comes from. The first clients were rural businesses
@@ -59,10 +59,10 @@ export default function AboutPage() {
               key={value.title}
               className="rounded-2xl border border-line bg-surface p-6"
             >
-              <h3 className="font-display text-lg font-medium tracking-tight">
+              <h3 className="font-display text-lg font-medium tracking-tight text-ink">
                 {value.title}
               </h3>
-              <p className="mt-2 text-sm leading-6 text-sage-600">
+              <p className="mt-2 text-sm leading-6 text-muted">
                 {value.description}
               </p>
             </div>
@@ -70,7 +70,7 @@ export default function AboutPage() {
         </div>
       </Container>
 
-      <section className="border-y border-line bg-surface">
+      <section className="border-y border-line bg-surface-muted">
         <Container className="py-16 sm:py-20">
           <SectionHeading
             eyebrow="The team"
@@ -81,23 +81,23 @@ export default function AboutPage() {
             {team.map((member) => (
               <li
                 key={member.name}
-                className="rounded-2xl border border-line bg-parchment p-6"
+                className="rounded-2xl border border-line bg-surface p-6"
               >
                 <span
                   aria-hidden="true"
-                  className="grid h-14 w-14 place-items-center rounded-full bg-forest-950 font-display text-lg font-semibold text-brass-300"
+                  className="grid h-14 w-14 place-items-center rounded-full bg-navy-900 font-display text-lg font-semibold text-primary-400"
                 >
                   {member.name
                     .split(" ")
                     .map((part) => part[0])
                     .join("")}
                 </span>
-                <h3 className="mt-4 font-display text-lg font-medium tracking-tight">
+                <h3 className="mt-4 font-display text-lg font-medium tracking-tight text-ink">
                   {member.name}
                 </h3>
-                <p className="mt-1 text-sm text-sage-600">
+                <p className="mt-1 text-sm text-muted">
                   {member.role}
-                  <span className="mt-0.5 block text-xs font-semibold uppercase tracking-wide text-brass-600">
+                  <span className="mt-0.5 block text-xs font-semibold uppercase tracking-wide text-primary-500">
                     {member.credential}
                   </span>
                 </p>
@@ -115,7 +115,7 @@ export default function AboutPage() {
               {credentials.map((credential) => (
                 <li
                   key={credential}
-                  className="rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-medium text-sage-700"
+                  className="rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-medium text-ink-body"
                 >
                   {credential}
                 </li>

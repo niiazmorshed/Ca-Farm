@@ -24,7 +24,7 @@ export function Eyebrow({
   return (
     <p
       className={`text-xs font-semibold uppercase tracking-[0.22em] ${
-        tone === "dark" ? "text-brass-300" : "text-brass-600"
+        tone === "dark" ? "text-primary-400" : "text-secondary-500"
       }`}
     >
       {children}
@@ -44,10 +44,10 @@ export function SectionHeading({
   return (
     <div className="max-w-2xl">
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-balance sm:text-4xl">
+      <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-balance text-ink sm:text-4xl">
         {title}
       </h2>
-      {lede && <p className="mt-4 text-lg leading-8 text-sage-600">{lede}</p>}
+      {lede && <p className="mt-4 text-lg leading-8 text-muted">{lede}</p>}
     </div>
   );
 }
@@ -65,18 +65,18 @@ export function PageHero({
     <section className="relative isolate overflow-hidden border-b border-line bg-surface">
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[radial-gradient(50rem_20rem_at_85%_-40%,rgba(203,167,93,0.12),transparent_60%)]"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(50rem_20rem_at_85%_-40%,rgba(134,172,178,0.15),transparent_60%)]"
       />
       <Container className="py-16 sm:py-20">
         <div className="max-w-2xl">
           <span className="animate-fade-up block">
             <Eyebrow>{eyebrow}</Eyebrow>
           </span>
-          <h1 className="animate-fade-up mt-4 font-display text-4xl font-medium tracking-tight text-balance [animation-delay:60ms] sm:text-5xl">
+          <h1 className="animate-fade-up mt-4 font-display text-4xl font-medium tracking-tight text-balance text-ink [animation-delay:60ms] sm:text-5xl">
             {title}
           </h1>
           {lede && (
-            <p className="animate-fade-up mt-5 text-lg leading-8 text-sage-600 [animation-delay:120ms]">
+            <p className="animate-fade-up mt-5 text-lg leading-8 text-muted [animation-delay:120ms]">
               {lede}
             </p>
           )}

@@ -7,7 +7,7 @@ import { services } from "../lib/content";
 const initialState: EnquiryState = { status: "idle" };
 
 const inputClasses =
-  "w-full rounded-xl border border-line bg-parchment px-4 py-3 text-[15px] text-ink placeholder:text-sage-500 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-forest-700";
+  "w-full rounded-xl border border-line bg-canvas px-4 py-3 text-[15px] text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-secondary-400";
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
@@ -26,8 +26,8 @@ export function ContactForm() {
 
   if (state.status === "success") {
     return (
-      <div className="flex flex-col items-start gap-4 rounded-2xl border border-forest-700/30 bg-surface p-8">
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-forest-950 text-brass-300">
+      <div className="flex flex-col items-start gap-4 rounded-2xl border border-secondary-400/30 bg-surface p-8">
+        <span className="grid h-12 w-12 place-items-center rounded-full bg-navy-900 text-primary-400">
           <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5" aria-hidden="true">
             <path
               d="M4 10.5l4 4L16 6"
@@ -38,10 +38,10 @@ export function ContactForm() {
             />
           </svg>
         </span>
-        <h2 className="font-display text-2xl font-medium tracking-tight">
+        <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
           Thank you — we’ve got it.
         </h2>
-        <p className="text-[15px] leading-7 text-sage-600">
+        <p className="text-[15px] leading-7 text-muted">
           Your enquiry is in. A partner — not an autoresponder — will reply
           within one business day.
         </p>
@@ -56,7 +56,7 @@ export function ContactForm() {
     <form action={formAction} noValidate className="flex flex-col gap-5">
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <label htmlFor="name" className="mb-1.5 block text-sm font-medium">
+          <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-ink">
             Your name
           </label>
           <input
@@ -74,7 +74,7 @@ export function ContactForm() {
           <FieldError id="name-error" message={errors.name} />
         </div>
         <div>
-          <label htmlFor="email" className="mb-1.5 block text-sm font-medium">
+          <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-ink">
             Email
           </label>
           <input
@@ -95,8 +95,8 @@ export function ContactForm() {
 
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <label htmlFor="company" className="mb-1.5 block text-sm font-medium">
-            Company <span className="font-normal text-sage-500">(optional)</span>
+          <label htmlFor="company" className="mb-1.5 block text-sm font-medium text-ink">
+            Company <span className="font-normal text-muted">(optional)</span>
           </label>
           <input
             id="company"
@@ -109,7 +109,7 @@ export function ContactForm() {
           />
         </div>
         <div>
-          <label htmlFor="service" className="mb-1.5 block text-sm font-medium">
+          <label htmlFor="service" className="mb-1.5 block text-sm font-medium text-ink">
             What do you need?
           </label>
           <select
@@ -127,7 +127,7 @@ export function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="message" className="mb-1.5 block text-sm font-medium">
+        <label htmlFor="message" className="mb-1.5 block text-sm font-medium text-ink">
           How can we help?
         </label>
         <textarea
@@ -148,7 +148,7 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-brass-400 px-7 text-sm font-semibold text-forest-950 transition-colors duration-200 hover:bg-brass-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass-600 disabled:cursor-default disabled:opacity-60"
+          className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-primary-400 px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400 disabled:cursor-default disabled:opacity-60"
         >
           {isPending && (
             <svg
@@ -175,7 +175,7 @@ export function ContactForm() {
           )}
           {isPending ? "Sending…" : "Send enquiry"}
         </button>
-        <p className="text-xs text-sage-500">
+        <p className="text-xs text-muted">
           We reply within one business day. No newsletters, no spam.
         </p>
       </div>

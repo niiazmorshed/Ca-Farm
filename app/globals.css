@@ -6,27 +6,28 @@
 }
 
 @theme {
-  /* Brand — warm parchment, deep forest, brass. "Cultivated finance." */
-  --color-parchment: #f5f1e8;
-  --color-surface: #fcfaf4;
-  --color-ink: #182721;
-  --color-line: #e3dcc9;
+  /* Dark Horse–inspired palette: orange, teal, navy, warm neutrals */
+  --color-canvas: #f7f5ef;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f4f4f4;
+  --color-ink: #304251;
+  --color-ink-body: #485159;
+  --color-muted: #6e797a;
+  --color-line: #e8f3f5;
 
-  --color-sage-500: #6b7a6e;
-  --color-sage-600: #57675c;
-  --color-sage-700: #46544a;
+  --color-primary-50: #ffeddd;
+  --color-primary-300: #ffb366;
+  --color-primary-400: #ff9a3f;
+  --color-primary-500: #e8872a;
+  --color-primary-600: #c46f1a;
 
-  --color-forest-600: #27735a;
-  --color-forest-700: #1c5942;
-  --color-forest-800: #154434;
-  --color-forest-900: #103428;
-  --color-forest-950: #0b231b;
+  --color-secondary-50: #f0f8f9;
+  --color-secondary-400: #86acb2;
+  --color-secondary-500: #6b959c;
 
-  --color-brass-300: #dcc18f;
-  --color-brass-400: #cba75d;
-  --color-brass-500: #b98f45;
-  --color-brass-600: #93702f;
-  --color-brass-700: #75581f;
+  --color-navy-700: #485e70;
+  --color-navy-800: #304251;
+  --color-navy-900: #1e2a33;
 
   --animate-fade-up: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-marquee: marquee 32s linear infinite;
@@ -56,13 +57,13 @@
 }
 
 body {
-  background-color: var(--color-parchment);
-  color: var(--color-ink);
+  background-color: var(--color-canvas);
+  color: var(--color-ink-body);
 }
 
 ::selection {
-  background-color: var(--color-brass-300);
-  color: var(--color-forest-950);
+  background-color: var(--color-primary-50);
+  color: var(--color-navy-900);
 }
 
 summary::-webkit-details-marker {

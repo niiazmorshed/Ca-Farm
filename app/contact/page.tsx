@@ -31,44 +31,44 @@ export default function ContactPage() {
 
         <aside className="flex flex-col gap-8">
           <div className="rounded-2xl border border-line bg-surface p-6">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-sage-500">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               What happens next
             </h2>
             <ol className="mt-4 flex flex-col gap-4">
               {nextSteps.map((step, index) => (
                 <li key={step} className="flex items-start gap-3">
-                  <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-forest-950 font-display text-xs font-semibold text-brass-300">
+                  <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-navy-900 text-xs font-semibold text-primary-400">
                     {index + 1}
                   </span>
-                  <span className="text-sm leading-6 text-sage-700">{step}</span>
+                  <span className="text-sm leading-6 text-ink-body">{step}</span>
                 </li>
               ))}
             </ol>
           </div>
 
           <div className="rounded-2xl border border-line bg-surface p-6">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-sage-500">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               Prefer to call or visit?
             </h2>
-            <address className="mt-4 text-sm not-italic leading-7 text-sage-700">
+            <address className="mt-4 text-sm not-italic leading-7 text-ink-body">
               {site.address[0]}
               <br />
               {site.address[1]}
               <br />
               <a
                 href={`mailto:${site.email}`}
-                className="mt-3 block font-medium text-forest-700 transition-colors duration-200 hover:text-forest-600"
+                className="mt-3 block font-medium text-secondary-500 transition-colors duration-200 hover:text-secondary-400"
               >
                 {site.email}
               </a>
               <a
                 href={site.phoneHref}
-                className="font-medium text-forest-700 transition-colors duration-200 hover:text-forest-600"
+                className="font-medium text-secondary-500 transition-colors duration-200 hover:text-secondary-400"
               >
                 {site.phone}
               </a>
             </address>
-            <p className="mt-3 text-sm text-sage-600">{site.hours}</p>
+            <p className="mt-3 text-sm text-muted">{site.hours}</p>
           </div>
         </aside>
       </Container>

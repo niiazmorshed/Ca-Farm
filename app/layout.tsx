@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b231b",
+  themeColor: "#1e2a33",
 };
 
 export default function RootLayout({
@@ -43,12 +43,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${fraunces.variable} ${geistSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-parchment font-sans text-ink">
+      <body className="min-h-full flex flex-col bg-canvas font-sans text-ink-body">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-forest-950 focus:px-5 focus:py-3 focus:text-sm focus:text-parchment"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-navy-900 focus:px-5 focus:py-3 focus:text-sm focus:text-white"
         >
           Skip to content
         </a>

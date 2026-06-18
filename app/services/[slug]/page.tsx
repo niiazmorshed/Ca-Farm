@@ -39,7 +39,7 @@ export default async function ServicePage({
       <section className="relative isolate overflow-hidden border-b border-line bg-surface">
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-[radial-gradient(50rem_20rem_at_85%_-40%,rgba(203,167,93,0.12),transparent_60%)]"
+          className="absolute inset-0 -z-10 bg-[radial-gradient(50rem_20rem_at_85%_-40%,rgba(134,172,178,0.15),transparent_60%)]"
         />
         <Container className="py-16 sm:py-20">
           <div className="max-w-2xl">
@@ -47,23 +47,23 @@ export default async function ServicePage({
               <Eyebrow>
                 <Link
                   href="/services"
-                  className="transition-colors duration-200 hover:text-brass-700"
+                  className="transition-colors duration-200 hover:text-secondary-400"
                 >
                   Services
                 </Link>{" "}
                 / {String(index + 1).padStart(2, "0")}
               </Eyebrow>
             </span>
-            <h1 className="animate-fade-up mt-4 font-display text-4xl font-medium tracking-tight text-balance [animation-delay:60ms] sm:text-5xl">
+            <h1 className="animate-fade-up mt-4 font-display text-4xl font-medium tracking-tight text-balance text-ink [animation-delay:60ms] sm:text-5xl">
               {service.title}
             </h1>
-            <p className="animate-fade-up mt-5 text-lg leading-8 text-sage-600 [animation-delay:120ms]">
+            <p className="animate-fade-up mt-5 text-lg leading-8 text-muted [animation-delay:120ms]">
               {service.overview}
             </p>
             <div className="animate-fade-up mt-7 [animation-delay:180ms]">
               <Link
                 href="/contact"
-                className="inline-flex h-12 items-center justify-center rounded-full bg-brass-400 px-7 text-sm font-semibold text-forest-950 transition-colors duration-200 hover:bg-brass-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass-600"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-primary-400 px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400"
               >
                 Talk to us about {service.title.toLowerCase()}
               </Link>
@@ -74,16 +74,16 @@ export default async function ServicePage({
 
       <Container className="grid gap-14 py-16 sm:py-20 lg:grid-cols-[1.2fr_0.8fr]">
         <div>
-          <h2 className="font-display text-2xl font-medium tracking-tight">
+          <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
             What’s included
           </h2>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2">
             {service.included.map((item) => (
               <li
                 key={item}
-                className="flex items-start gap-3 rounded-xl border border-line bg-surface p-4 text-sm leading-6 text-sage-700"
+                className="flex items-start gap-3 rounded-xl border border-line bg-surface p-4 text-sm leading-6 text-ink-body"
               >
-                <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-forest-950 text-brass-300">
+                <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-navy-900 text-primary-400">
                   <CheckIcon className="h-3 w-3" />
                 </span>
                 {item}
@@ -94,14 +94,14 @@ export default async function ServicePage({
 
         <aside className="flex flex-col gap-8">
           <div className="rounded-2xl border border-line bg-surface p-6">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-sage-500">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               Best for
             </h2>
             <ul className="mt-4 flex flex-col gap-3">
               {service.bestFor.map((item) => (
                 <li
                   key={item}
-                  className="border-l-2 border-brass-400 pl-3 text-sm leading-6 text-sage-700"
+                  className="border-l-2 border-primary-400 pl-3 text-sm leading-6 text-ink-body"
                 >
                   {item}
                 </li>
@@ -109,7 +109,7 @@ export default async function ServicePage({
             </ul>
           </div>
           <div className="rounded-2xl border border-line bg-surface p-6">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-sage-500">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               Often paired with
             </h2>
             <ul className="mt-4 flex flex-col gap-3">
@@ -117,7 +117,7 @@ export default async function ServicePage({
                 <li key={item.slug}>
                   <Link
                     href={`/services/${item.slug}`}
-                    className="text-sm font-medium text-forest-700 transition-colors duration-200 hover:text-forest-600"
+                    className="text-sm font-medium text-secondary-500 transition-colors duration-200 hover:text-secondary-400"
                   >
                     {item.title} <span aria-hidden="true">→</span>
                   </Link>

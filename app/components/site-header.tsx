@@ -20,7 +20,7 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line/80 bg-parchment/85 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-line bg-white/90 backdrop-blur-md">
       <nav
         aria-label="Main"
         className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:px-8"
@@ -30,10 +30,10 @@ export function SiteHeader() {
           className="flex items-center gap-2.5"
           onClick={() => setMenuOpen(false)}
         >
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-forest-950 font-display text-sm font-semibold text-brass-300">
+          <span className="grid h-9 w-9 place-items-center rounded-lg bg-navy-900 font-display text-sm font-semibold text-primary-400">
             CA
           </span>
-          <span className="font-display text-lg font-semibold tracking-tight">
+          <span className="font-display text-lg font-semibold tracking-tight text-ink">
             CA Farm
           </span>
         </Link>
@@ -48,8 +48,8 @@ export function SiteHeader() {
                 aria-current={active ? "page" : undefined}
                 className={`text-sm font-medium transition-colors duration-200 ${
                   active
-                    ? "font-semibold text-forest-700"
-                    : "text-sage-700 hover:text-forest-700"
+                    ? "font-semibold text-secondary-500"
+                    : "text-ink-body hover:text-secondary-500"
                 }`}
               >
                 {link.label}
@@ -61,13 +61,13 @@ export function SiteHeader() {
         <div className="flex items-center gap-3">
           <Link
             href="/contact"
-            className="hidden h-10 cursor-pointer items-center rounded-full bg-forest-950 px-5 text-sm font-medium text-parchment transition-colors duration-200 hover:bg-forest-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-700 sm:inline-flex"
+            className="hidden h-10 cursor-pointer items-center rounded-full bg-primary-400 px-5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400 sm:inline-flex"
           >
             Book a consultation
           </Link>
           <button
             type="button"
-            className="grid h-10 w-10 cursor-pointer place-items-center rounded-lg border border-line text-ink transition-colors duration-200 hover:bg-surface md:hidden"
+            className="grid h-10 w-10 cursor-pointer place-items-center rounded-lg border border-line text-ink transition-colors duration-200 hover:bg-secondary-50 md:hidden"
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -97,7 +97,7 @@ export function SiteHeader() {
       {menuOpen && (
         <div
           id="mobile-menu"
-          className="border-t border-line bg-parchment px-5 py-4 md:hidden"
+          className="border-t border-line bg-white px-5 py-4 md:hidden"
         >
           <div className="flex flex-col gap-1">
             {navLinks.map((link) => (
@@ -107,8 +107,8 @@ export function SiteHeader() {
                 aria-current={isActive(pathname, link.href) ? "page" : undefined}
                 className={`rounded-lg px-3 py-2.5 text-[15px] font-medium transition-colors duration-200 ${
                   isActive(pathname, link.href)
-                    ? "bg-surface font-semibold text-forest-700"
-                    : "text-sage-700 hover:bg-surface"
+                    ? "bg-secondary-50 font-semibold text-secondary-500"
+                    : "text-ink-body hover:bg-secondary-50"
                 }`}
                 onClick={() => setMenuOpen(false)}
               >
@@ -117,7 +117,7 @@ export function SiteHeader() {
             ))}
             <Link
               href="/contact"
-              className="mt-2 inline-flex h-11 items-center justify-center rounded-full bg-forest-950 px-5 text-sm font-medium text-parchment"
+              className="mt-2 inline-flex h-11 items-center justify-center rounded-full bg-primary-400 px-5 text-sm font-semibold text-white"
               onClick={() => setMenuOpen(false)}
             >
               Book a consultation

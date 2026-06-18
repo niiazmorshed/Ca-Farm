@@ -12,7 +12,7 @@ export function PricingTable({ tiers }: { tiers: PricingTier[] }) {
     <div>
       <div className="flex items-center justify-center gap-3">
         <span
-          className={`text-sm font-medium ${annual ? "text-sage-600" : "text-ink"}`}
+          className={`text-sm font-medium ${annual ? "text-muted" : "text-ink"}`}
         >
           Monthly
         </span>
@@ -22,21 +22,21 @@ export function PricingTable({ tiers }: { tiers: PricingTier[] }) {
           aria-checked={annual}
           aria-label="Bill annually"
           onClick={() => setAnnual((value) => !value)}
-          className={`relative h-7 w-12 cursor-pointer rounded-full transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-700 ${
-            annual ? "bg-forest-800" : "bg-line"
+          className={`relative h-7 w-12 cursor-pointer rounded-full transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary-400 ${
+            annual ? "bg-navy-700" : "bg-line"
           }`}
         >
           <span
-            className={`absolute top-1 h-5 w-5 rounded-full bg-parchment shadow transition-all duration-200 ${
+            className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all duration-200 ${
               annual ? "left-6" : "left-1"
             }`}
           />
         </button>
         <span
-          className={`text-sm font-medium ${annual ? "text-ink" : "text-sage-600"}`}
+          className={`text-sm font-medium ${annual ? "text-ink" : "text-muted"}`}
         >
           Annual
-          <span className="ml-1.5 rounded-full bg-brass-400/20 px-2 py-0.5 text-xs font-semibold text-brass-700">
+          <span className="ml-1.5 rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-600">
             2 months free
           </span>
         </span>
@@ -48,36 +48,36 @@ export function PricingTable({ tiers }: { tiers: PricingTier[] }) {
             key={tier.name}
             className={`relative flex flex-col rounded-2xl border bg-surface p-8 ${
               tier.popular
-                ? "border-brass-400 shadow-xl shadow-forest-950/5"
+                ? "border-primary-400 shadow-lg shadow-navy-900/5"
                 : "border-line"
             }`}
           >
             {tier.popular && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brass-400 px-3 py-1 text-xs font-semibold whitespace-nowrap text-forest-950">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary-400 px-3 py-1 text-xs font-semibold whitespace-nowrap text-white">
                 Most popular
               </span>
             )}
-            <h2 className="font-display text-xl font-medium tracking-tight">
+            <h2 className="font-display text-xl font-medium tracking-tight text-ink">
               {tier.name}
             </h2>
-            <p className="mt-2 text-sm leading-6 text-sage-600">{tier.blurb}</p>
+            <p className="mt-2 text-sm leading-6 text-muted">{tier.blurb}</p>
             <p className="mt-6 flex items-baseline gap-1.5">
-              <span className="text-sm text-sage-600">from</span>
-              <span className="font-display text-4xl font-medium tracking-tight">
+              <span className="text-sm text-muted">from</span>
+              <span className="font-display text-4xl font-medium tracking-tight text-ink">
                 £{annual ? tier.annualMonthly : tier.monthly}
               </span>
-              <span className="text-sm text-sage-600">/mo + VAT</span>
+              <span className="text-sm text-muted">/mo + VAT</span>
             </p>
-            <p className="mt-1 text-xs text-sage-500">
+            <p className="mt-1 text-xs text-muted">
               {annual ? "billed annually" : "billed monthly, cancel any time"}
             </p>
             <ul className="mt-7 flex flex-1 flex-col gap-3 border-t border-line pt-6">
               {tier.features.map((feature) => (
                 <li
                   key={feature}
-                  className="flex items-start gap-2.5 text-sm leading-6 text-sage-700"
+                  className="flex items-start gap-2.5 text-sm leading-6 text-ink-body"
                 >
-                  <span className="mt-1 text-brass-600">
+                  <span className="mt-1 text-primary-500">
                     <CheckIcon className="h-3.5 w-3.5" />
                   </span>
                   {feature}
@@ -88,8 +88,8 @@ export function PricingTable({ tiers }: { tiers: PricingTier[] }) {
               href="/contact"
               className={`mt-8 inline-flex h-11 cursor-pointer items-center justify-center rounded-full px-6 text-sm font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 ${
                 tier.popular
-                  ? "bg-brass-400 text-forest-950 hover:bg-brass-300 focus-visible:outline-brass-600"
-                  : "bg-forest-950 text-parchment hover:bg-forest-800 focus-visible:outline-forest-700"
+                  ? "bg-primary-400 text-white hover:bg-primary-500 focus-visible:outline-primary-400"
+                  : "bg-navy-900 text-white hover:bg-navy-700 focus-visible:outline-secondary-400"
               }`}
             >
               Get started

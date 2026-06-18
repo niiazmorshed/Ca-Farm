@@ -27,34 +27,34 @@ export default function ServicesPage() {
               className="flex flex-col rounded-2xl border border-line bg-surface p-8"
             >
               <div className="flex items-baseline justify-between gap-4">
-                <span className="font-display text-sm font-semibold text-brass-600">
+                <span className="font-display text-sm font-semibold text-primary-500">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <Link
                   href={`/services/${service.slug}`}
-                  className="text-sm font-semibold text-forest-700 transition-colors duration-200 hover:text-forest-600"
+                  className="text-sm font-semibold text-secondary-500 transition-colors duration-200 hover:text-secondary-400"
                 >
                   Details <span aria-hidden="true">→</span>
                 </Link>
               </div>
-              <h2 className="mt-3 font-display text-2xl font-medium tracking-tight">
+              <h2 className="mt-3 font-display text-2xl font-medium tracking-tight text-ink">
                 <Link
                   href={`/services/${service.slug}`}
-                  className="transition-colors duration-200 hover:text-forest-700"
+                  className="transition-colors duration-200 hover:text-secondary-500"
                 >
                   {service.title}
                 </Link>
               </h2>
-              <p className="mt-3 text-[15px] leading-7 text-sage-600">
+              <p className="mt-3 text-[15px] leading-7 text-muted">
                 {service.blurb}
               </p>
               <ul className="mt-5 grid gap-2.5 border-t border-line pt-5 sm:grid-cols-2">
                 {service.included.slice(0, 4).map((item) => (
                   <li
                     key={item}
-                    className="flex items-start gap-2.5 text-sm text-sage-700"
+                    className="flex items-start gap-2.5 text-sm text-ink-body"
                   >
-                    <span className="mt-1 text-brass-600">
+                    <span className="mt-1 text-primary-500">
                       <CheckIcon className="h-3.5 w-3.5" />
                     </span>
                     {item}
@@ -66,16 +66,16 @@ export default function ServicesPage() {
         </div>
 
         <div className="mt-14 flex flex-col items-center gap-3 rounded-2xl border border-line bg-surface px-8 py-10 text-center">
-          <h2 className="font-display text-2xl font-medium tracking-tight">
+          <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
             Not sure what you need?
           </h2>
-          <p className="max-w-md text-[15px] leading-7 text-sage-600">
+          <p className="max-w-md text-[15px] leading-7 text-muted">
             Start with a free discovery call. We’ll look at where things stand
             and recommend only what earns its fee.
           </p>
           <Link
             href="/contact"
-            className="mt-3 inline-flex h-11 items-center justify-center rounded-full bg-forest-950 px-6 text-sm font-medium text-parchment transition-colors duration-200 hover:bg-forest-800"
+            className="mt-3 inline-flex h-11 items-center justify-center rounded-full bg-primary-400 px-6 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-500"
           >
             Book a discovery call
           </Link>
