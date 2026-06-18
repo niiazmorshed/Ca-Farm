@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { services, site } from "./lib/content";
+import { serviceCategories, site } from "./lib/content";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = ["", "/services", "/pricing", "/about", "/contact"].map(
@@ -11,12 +11,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
-  const servicePages = services.map((service) => ({
-    url: `${site.url}/services/${service.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
-  }));
+  const servicePages = serviceCategories.flatMap((category) => [
+    {
+      url: `${site.url}/services/${category.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    },
+    ...category.items.map((item) => ({
+      url: `${site.url}/services/${category.slug}/${item.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
+  ]);
 
   return [...staticPages, ...servicePages];
 }

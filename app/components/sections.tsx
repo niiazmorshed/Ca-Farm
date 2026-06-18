@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Container, Eyebrow, SectionHeading } from "./ui";
-import { industries, services, site } from "../lib/content";
+import { industries, serviceCategories, site } from "../lib/content";
 
 /* ---------- hero ---------- */
 
@@ -28,9 +28,9 @@ export function Hero() {
             <em className="text-primary-400 not-italic">growing</em> businesses.
           </h1>
           <p className="animate-fade-up max-w-xl text-lg leading-8 text-white/75 [animation-delay:120ms]">
-            CA Farm pairs partner-led accounting with modern cloud tools —
-            audit, tax, payroll and advisory that keep you compliant today and
-            ready for what comes next.
+            CA Farm pairs partner-led accounting with modern cloud tools and AI
+            — tax, advisory, digital transformation and more for businesses
+            across the UK and Ireland.
           </p>
           <div className="animate-fade-up flex flex-col gap-3 [animation-delay:180ms] sm:flex-row">
             <Link
@@ -155,20 +155,25 @@ export function Services() {
           </Link>
         </div>
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((service, index) => (
+          {serviceCategories.map((category, index) => (
             <Link
-              key={service.slug}
-              href={`/services/${service.slug}`}
+              key={category.slug}
+              href={`/services/${category.slug}`}
               className="group relative flex flex-col rounded-2xl border border-line bg-surface p-7 transition-all duration-300 hover:-translate-y-1 hover:border-secondary-400/50 hover:shadow-lg hover:shadow-navy-900/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary-400"
             >
               <span className="font-display text-sm font-semibold text-primary-500">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <h3 className="mt-4 font-display text-xl font-medium tracking-tight text-ink">
-                {service.title}
+              <h3 className="mt-4 flex flex-wrap items-center gap-2 font-display text-xl font-medium tracking-tight text-ink">
+                {category.title}
+                {category.status === "coming-soon" && (
+                  <span className="rounded-full bg-secondary-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-secondary-500">
+                    Soon
+                  </span>
+                )}
               </h3>
               <p className="mt-2.5 text-[15px] leading-7 text-muted">
-                {service.blurb}
+                {category.blurb}
               </p>
               <span className="mt-auto pt-5 text-sm font-medium text-secondary-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
                 Learn more <span aria-hidden="true">→</span>

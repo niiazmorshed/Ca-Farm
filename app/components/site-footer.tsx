@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { services, site } from "../lib/content";
+import { serviceCategories, site } from "../lib/content";
 
 const firmLinks = [
   { label: "Services", href: "/services" },
@@ -35,13 +35,13 @@ export function SiteFooter() {
               Services
             </h3>
             <ul className="mt-4 flex flex-col gap-2.5 text-sm text-ink-body">
-              {services.map((service) => (
-                <li key={service.slug}>
+              {serviceCategories.map((category) => (
+                <li key={category.slug}>
                   <Link
-                    href={`/services/${service.slug}`}
+                    href={`/services/${category.slug}`}
                     className="transition-colors duration-200 hover:text-secondary-500"
                   >
-                    {service.title}
+                    {category.title}
                   </Link>
                 </li>
               ))}

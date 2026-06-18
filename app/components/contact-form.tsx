@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { submitEnquiry, type EnquiryState } from "../contact/actions";
-import { services } from "../lib/content";
+import { serviceCategories } from "../lib/content";
 
 const initialState: EnquiryState = { status: "idle" };
 
@@ -119,8 +119,8 @@ export function ContactForm() {
             className={`${inputClasses} cursor-pointer`}
           >
             <option>Not sure yet</option>
-            {services.map((service) => (
-              <option key={service.slug}>{service.title}</option>
+            {serviceCategories.map((category) => (
+              <option key={category.slug}>{category.title}</option>
             ))}
           </select>
         </div>
