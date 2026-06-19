@@ -6,6 +6,9 @@ AGENT.md
 .agents/
 /docs
 .docs/
+
+.env.local
+
 # dependencies
 /node_modules
 /.pnp
