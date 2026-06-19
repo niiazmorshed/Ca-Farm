@@ -1,7 +1,9 @@
 import {
   Hero,
+  QuickEntry,
   LogoStrip,
   Services,
+  HarvestBand,
   Industries,
   Process,
   Stats,
@@ -14,8 +16,10 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <QuickEntry />
       <LogoStrip />
       <Services />
+      <HarvestBand />
       <Industries />
       <Process />
       <Stats />

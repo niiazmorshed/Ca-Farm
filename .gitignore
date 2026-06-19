@@ -2,7 +2,10 @@ CLAUDE.md
 AGENT.md
 /claude
 .claude/
-
+/agents
+.agents/
+/docs
+.docs/
 # dependencies
 /node_modules
 /.pnp

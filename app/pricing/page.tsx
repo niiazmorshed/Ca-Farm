@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Container, PageHero } from "../components/ui";
+import { Button, Container, PageHero } from "../components/ui";
 import { ContactCta } from "../components/sections";
+import { Accordion } from "../components/accordion";
 import { PricingTable } from "../components/pricing-table";
-import { pricingAddons, pricingTiers } from "../lib/content";
+import { pricingAddons, pricingTiers, site } from "../lib/content";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -36,76 +37,80 @@ export default function PricingPage() {
         eyebrow="Pricing"
         title="Fixed fees. No surprises."
         lede="One monthly price agreed upfront, reviewed once a year. The meter never runs — call us as often as you like."
+        image="architecture"
       />
 
       <Container className="py-16 sm:py-20">
         <PricingTable tiers={pricingTiers} />
 
-        <div className="mt-16 rounded-2xl border border-line bg-surface p-8">
-          <h2 className="font-display text-xl font-medium tracking-tight text-ink">
-            Add-ons and one-off work
-          </h2>
-          <dl className="mt-6 grid gap-x-10 gap-y-4 sm:grid-cols-2">
-            {pricingAddons.map((addon) => (
-              <div
-                key={addon.name}
-                className="flex items-baseline justify-between gap-4 border-b border-line pb-3"
-              >
-                <dt className="text-sm font-medium text-ink">{addon.name}</dt>
-                <dd className="text-sm whitespace-nowrap text-muted">
-                  {addon.note}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-
-        <div className="mx-auto mt-16 max-w-3xl">
-          <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
-            Pricing questions
-          </h2>
-          <div className="mt-6">
-            {pricingFaqs.map((faq) => (
-              <details key={faq.question} className="group border-b border-line py-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[17px] font-medium text-ink">
-                  {faq.question}
-                  <svg
-                    className="h-4 w-4 shrink-0 text-primary-500 transition-transform duration-300 group-open:rotate-45"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    aria-hidden="true"
+        <div className="mt-16 grid items-start gap-12 lg:grid-cols-[1fr_22rem]">
+          <div>
+            <div className="rounded-sm border border-line bg-surface p-8">
+              <h2 className="font-display text-xl font-medium tracking-tight text-ink">
+                Add-ons and one-off work
+              </h2>
+              <dl className="mt-6 grid gap-x-10 gap-y-4 sm:grid-cols-2">
+                {pricingAddons.map((addon) => (
+                  <div
+                    key={addon.name}
+                    className="flex items-baseline justify-between gap-4 border-b border-line pb-3"
                   >
-                    <path
-                      d="M8 2v12M2 8h12"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </summary>
-                <p className="mt-3 max-w-[60ch] text-[15px] leading-7 text-muted">
-                  {faq.answer}
-                </p>
-              </details>
-            ))}
+                    <dt className="text-sm font-medium text-ink">{addon.name}</dt>
+                    <dd className="text-sm whitespace-nowrap text-muted">
+                      {addon.note}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            <div className="mt-12">
+              <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
+                Pricing questions
+              </h2>
+              <div className="mt-6">
+                <Accordion items={pricingFaqs} />
+              </div>
+              <p className="mt-8 text-sm text-muted">
+                More questions? See the{" "}
+                <Link
+                  href="/#faq"
+                  className="font-medium text-primary-500 transition-colors duration-200 hover:text-primary-600"
+                >
+                  full FAQ
+                </Link>{" "}
+                or{" "}
+                <Link
+                  href="/contact"
+                  className="font-medium text-primary-500 transition-colors duration-200 hover:text-primary-600"
+                >
+                  ask us directly
+                </Link>
+                .
+              </p>
+            </div>
           </div>
-          <p className="mt-8 text-sm text-muted">
-            More questions? See the{" "}
-            <Link
-              href="/#faq"
-              className="font-medium text-secondary-500 transition-colors duration-200 hover:text-secondary-400"
-            >
-              full FAQ
-            </Link>{" "}
-            or{" "}
-            <Link
-              href="/contact"
-              className="font-medium text-secondary-500 transition-colors duration-200 hover:text-secondary-400"
-            >
-              ask us directly
-            </Link>
-            .
-          </p>
+
+          <aside className="lg:sticky lg:top-28">
+            <div className="rounded-sm bg-navy-900 p-7 text-white">
+              <h2 className="font-display text-lg font-medium tracking-tight">
+                Not sure which plan fits?
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-white/70">
+                Book a free call. We’ll look at your size and needs and recommend
+                the plan that fits — or scope a custom one.
+              </p>
+              <Button href="/contact" className="mt-5 w-full">
+                Book a free call
+              </Button>
+              <a
+                href={site.phoneHref}
+                className="mt-3 flex items-center justify-center gap-2 text-sm font-medium text-primary-300 transition-colors duration-200 hover:text-primary-400"
+              >
+                {site.phone}
+              </a>
+            </div>
+          </aside>
         </div>
       </Container>
 

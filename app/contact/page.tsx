@@ -22,22 +22,23 @@ export default function ContactPage() {
         eyebrow="Contact"
         title="Start the conversation."
         lede="Tell us where your books stand. A partner reads every enquiry — you will not be handed to a sales team."
+        image="teamMeeting"
       />
 
-      <Container className="grid gap-14 py-16 sm:py-20 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-2xl border border-line bg-surface p-6 sm:p-8">
+      <Container className="grid items-start gap-14 py-16 sm:py-20 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="rounded-sm border border-line bg-surface p-6 sm:p-8">
           <ContactForm />
         </div>
 
-        <aside className="flex flex-col gap-8">
-          <div className="rounded-2xl border border-line bg-surface p-6">
+        <aside className="flex flex-col gap-8 lg:sticky lg:top-28">
+          <div className="rounded-sm border-t-2 border-primary-400 bg-surface p-6 shadow-sm shadow-navy-900/5">
             <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               What happens next
             </h2>
             <ol className="mt-4 flex flex-col gap-4">
               {nextSteps.map((step, index) => (
                 <li key={step} className="flex items-start gap-3">
-                  <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-navy-900 text-xs font-semibold text-primary-400">
+                  <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-sm bg-navy-900 text-xs font-semibold text-primary-300">
                     {index + 1}
                   </span>
                   <span className="text-sm leading-6 text-ink-body">{step}</span>
@@ -46,7 +47,7 @@ export default function ContactPage() {
             </ol>
           </div>
 
-          <div className="rounded-2xl border border-line bg-surface p-6">
+          <div className="rounded-sm border border-line bg-surface p-6">
             <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               Prefer to call or visit?
             </h2>
@@ -57,13 +58,13 @@ export default function ContactPage() {
               <br />
               <a
                 href={`mailto:${site.email}`}
-                className="mt-3 block font-medium text-secondary-500 transition-colors duration-200 hover:text-secondary-400"
+                className="mt-3 block font-medium text-primary-500 transition-colors duration-200 hover:text-primary-600"
               >
                 {site.email}
               </a>
               <a
                 href={site.phoneHref}
-                className="font-medium text-secondary-500 transition-colors duration-200 hover:text-secondary-400"
+                className="font-medium text-primary-500 transition-colors duration-200 hover:text-primary-600"
               >
                 {site.phone}
               </a>

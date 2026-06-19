@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist } from "next/font/google";
 import { SiteHeader } from "./components/site-header";
 import { SiteFooter } from "./components/site-footer";
+import { BackToTop } from "./components/back-to-top";
 import { site } from "./lib/content";
 import "./globals.css";
 
@@ -49,7 +50,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-canvas font-sans text-ink-body">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-navy-900 focus:px-5 focus:py-3 focus:text-sm focus:text-white"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-navy-900 focus:px-5 focus:py-3 focus:text-sm focus:text-white"
         >
           Skip to content
         </a>
@@ -58,6 +59,7 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        <BackToTop />
       </body>
     </html>
   );

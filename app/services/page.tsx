@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Container, PageHero, CheckIcon } from "../components/ui";
+import { Button, Container, PageHero, CheckIcon } from "../components/ui";
 import { ContactCta } from "../components/sections";
+import { Reveal } from "../components/reveal";
 import { serviceCategories } from "../lib/content";
 
 export const metadata: Metadata = {
@@ -17,10 +18,12 @@ export default function ServicesPage() {
         eyebrow="Services"
         title="Everything your finance function needs."
         lede="From day-to-day bookkeeping to AI and international expansion — built for businesses across the UK and Ireland. Take one service or the whole stack, scoped upfront."
+        image="tower"
       />
 
       <Container className="py-16 sm:py-20">
-        <div className="grid gap-5 lg:grid-cols-2">
+        <Reveal>
+        <div className="grid gap-px overflow-hidden border border-line bg-line lg:grid-cols-2">
           {serviceCategories.map((category, index) => {
             const comingSoon = category.status === "coming-soon";
             const previews =
@@ -30,15 +33,19 @@ export default function ServicesPage() {
             return (
               <article
                 key={category.slug}
-                className="flex flex-col rounded-2xl border border-line bg-surface p-8"
+                className="group relative flex flex-col bg-surface p-8 transition-colors duration-200 hover:bg-secondary-50/50"
               >
+                <span
+                  aria-hidden="true"
+                  className="absolute left-0 top-0 h-0.5 w-0 bg-primary-400 transition-all duration-300 group-hover:w-full"
+                />
                 <div className="flex items-baseline justify-between gap-4">
                   <span className="font-display text-sm font-semibold text-primary-500">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <Link
                     href={`/services/${category.slug}`}
-                    className="text-sm font-semibold text-secondary-500 transition-colors duration-200 hover:text-secondary-400"
+                    className="text-sm font-semibold text-primary-500 transition-colors duration-200 hover:text-primary-600"
                   >
                     {comingSoon ? "Learn more" : "Explore"}{" "}
                     <span aria-hidden="true">→</span>
@@ -47,12 +54,12 @@ export default function ServicesPage() {
                 <h2 className="mt-3 flex flex-wrap items-center gap-2.5 font-display text-2xl font-medium tracking-tight text-ink">
                   <Link
                     href={`/services/${category.slug}`}
-                    className="transition-colors duration-200 hover:text-secondary-500"
+                    className="transition-colors duration-200 hover:text-primary-500"
                   >
                     {category.title}
                   </Link>
                   {comingSoon && (
-                    <span className="rounded-full bg-secondary-50 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-500">
+                    <span className="rounded-sm bg-secondary-50 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-500">
                       Soon
                     </span>
                   )}
@@ -79,8 +86,10 @@ export default function ServicesPage() {
             );
           })}
         </div>
+        </Reveal>
 
-        <div className="mt-14 flex flex-col items-center gap-3 rounded-2xl border border-line bg-surface px-8 py-10 text-center">
+        <Reveal>
+        <div className="mt-14 flex flex-col items-center gap-3 rounded-sm border-t-2 border-primary-400 bg-surface px-8 py-12 text-center shadow-sm shadow-navy-900/5">
           <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
             Not sure what you need?
           </h2>
@@ -88,13 +97,11 @@ export default function ServicesPage() {
             Start with a free discovery call. We’ll look at where things stand
             and recommend only what earns its fee.
           </p>
-          <Link
-            href="/contact"
-            className="mt-3 inline-flex h-11 items-center justify-center rounded-full bg-primary-400 px-6 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-500"
-          >
+          <Button href="/contact" className="mt-3">
             Book a discovery call
-          </Link>
+          </Button>
         </div>
+        </Reveal>
       </Container>
 
       <ContactCta />
