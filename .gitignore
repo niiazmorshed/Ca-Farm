@@ -3,6 +3,8 @@ AGENT.md
 /claude
 .claude/
 
+.env.local
+
 # dependencies
 /node_modules
 /.pnp
