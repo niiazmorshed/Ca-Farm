@@ -123,6 +123,7 @@ export const values = [
 
 /* ──────────────────────────────────────────────────────────────────────────
    Service taxonomy (UK & Ireland)
+   Figures current for 2025/26 — UK and Ireland. Verify at point of advice.
    Two levels: ServiceCategory → SubService.
    `kind` controls how a category renders:
      - "services"  → landing page lists sub-services, each with a detail page
@@ -173,19 +174,19 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Corporation tax, VAT, income tax and reliefs — planned ahead, filed on time, never more than you owe, in the UK and Ireland.",
         overview:
-          "Good tax work happens before the year ends, not after. We plan reliefs and timing in advance, file everything on schedule with HMRC and Revenue, and put your claims in writing so there are no surprises if questions come.",
+          "Good tax work happens before the year ends, not after. UK corporation tax now runs at 19% on profits up to £50,000 and 25% above £250,000, with marginal relief (an effective ~26.5%) on the slice between — and those limits are shared across associated companies. Ireland holds its 12.5% trading rate, with a 15% effective minimum (QDTT) only for groups turning over more than €750m. We plan reliefs and timing around all of it, file on schedule with HMRC and Revenue, and put your positions in writing.",
         included: [
-          "Corporation tax returns — CT600 (UK) and CT1 (Ireland)",
-          "VAT registration and returns in both jurisdictions",
+          "Corporation tax returns — CT600 (UK) and CT1 via ROS (Ireland)",
+          "Marginal relief and associated-company planning (UK)",
+          "R&D tax relief — UK merged scheme (20% credit) and Ireland (30%, rising to 35% from January 2026)",
+          "Capital allowances and full-expensing reviews",
           "Self-assessment and income tax for directors and owners",
-          "R&D tax credits (UK and Ireland)",
-          "Capital allowances reviews",
           "HMRC and Revenue enquiry handling",
         ],
         bestFor: [
           "Owner-managed companies trading in the UK or Ireland",
-          "Businesses with R&D or capital spend",
-          "Anyone who has had a filing surprise before",
+          "Businesses with R&D, capital spend or innovation grants",
+          "Groups managing associated-company or Pillar Two exposure",
         ],
       },
       {
@@ -194,35 +195,35 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Accurate VAT registration and returns on both sides of the Irish Sea — MTD-compliant in the UK, ROS-filed in Ireland.",
         overview:
-          "VAT is where small mistakes get expensive fast. We handle registration, scheme selection and periodic returns — Making Tax Digital in the UK and ROS filings in Ireland — and reconcile every return to your books before it goes in.",
+          "VAT is where small mistakes get expensive fast. The UK registration threshold is £90,000 and all returns must be filed under Making Tax Digital; Ireland registers at €85,000 for goods and €42,500 for services, files bi-monthly through ROS, and adds an annual Return of Trading Details. We handle registration, scheme selection and every return — and reconcile each one to your books before it goes in.",
         included: [
-          "VAT registration in the UK and/or Ireland",
-          "Making Tax Digital (MTD) compliant filing",
-          "Quarterly (UK) and bi-monthly (Ireland) returns",
-          "VIES and Intrastat for cross-border trade",
-          "Annual Return of Trading Details (RTD) in Ireland",
-          "Scheme advice — flat rate, cash accounting, margin",
+          "VAT registration in the UK (£90k) and/or Ireland (€85k goods, €42.5k services)",
+          "Making Tax Digital (MTD) compliant filing in the UK",
+          "Bi-monthly Irish returns and annual Return of Trading Details (RTD)",
+          "VIES and Intrastat for cross-border and post-Brexit trade",
+          "Scheme advice — flat rate, cash accounting, margin, OSS/IOSS",
+          "Reconciliation of every return to your ledger before submission",
         ],
         bestFor: [
           "Businesses trading across the UK and Ireland",
           "E-commerce and cross-border sellers",
-          "Anyone near or over the VAT threshold",
+          "Anyone near or over either registration threshold",
         ],
       },
       {
         slug: "annual-accounts",
         title: "Annual Accounts",
         blurb:
-          "Year-end statutory accounts prepared under FRS 102 and filed with Companies House or the CRO — done early, not at the deadline.",
+          "Year-end statutory accounts under FRS 102 / FRS 105, filed with Companies House or the CRO — done early, not at the deadline.",
         overview:
-          "Year-end accounts should tell you something, not just satisfy a filing. We prepare statutory accounts under FRS 102, agree them with you in plain English, and submit to Companies House (UK) or the CRO (Ireland) well ahead of the deadline.",
+          "Year-end accounts should tell you something, not just satisfy a filing. We prepare statutory accounts under FRS 102 (or FRS 105 for micro-entities), agree them with you in plain English, and submit on time — UK private company accounts are due nine months after year-end at Companies House; Irish accounts go to the CRO with the annual return (Form B1), tagged in iXBRL. With the 2025 threshold uplift, many more companies (turnover up to £15m, balance sheet up to £7.5m, 50 staff) now qualify as small and skip audit.",
         included: [
           "Statutory accounts under FRS 102 / FRS 105",
-          "Filing with Companies House (UK) and the CRO (Ireland)",
-          "Directors' report and annual/confirmation return",
-          "Corporation tax computation alongside accounts",
-          "iXBRL tagging where required",
-          "Plain-English review meeting before filing",
+          "Filing with Companies House (UK) and the CRO via Form B1 (Ireland)",
+          "iXBRL tagging for Revenue and CRO requirements",
+          "Directors' report and confirmation statement / annual return",
+          "Corporation tax computation prepared alongside",
+          "Small-company and audit-exemption assessment (2025 thresholds)",
         ],
         bestFor: [
           "Limited companies in the UK or Ireland",
@@ -236,18 +237,18 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Clean, current books on Xero or QuickBooks, with monthly management accounts you can actually read.",
         overview:
-          "Books that are three months behind are books you cannot run a business on. We keep yours current on Xero or QuickBooks — bank feeds live, receipts captured, queries chased — and close each month with accounts in plain English.",
+          "Books that are three months behind are books you cannot run a business on. We keep yours current on Xero or QuickBooks — bank feeds live, receipts captured, queries chased — and close each month with accounts in plain English. It also gets you ready for Making Tax Digital for Income Tax, which lands for sole traders and landlords earning over £50,000 from April 2026 (£30,000 from 2027, £20,000 from 2028).",
         included: [
           "Full bookkeeping on Xero or QuickBooks",
           "Bank feeds, receipt capture and reconciliation",
           "Monthly close with management accounts",
+          "Making Tax Digital–ready digital records",
           "Debtor and creditor reporting",
-          "Migration from spreadsheets or legacy software",
-          "Team training on your cloud stack",
+          "Migration from spreadsheets or legacy software, with team training",
         ],
         bestFor: [
           "Founders doing their own books at midnight",
-          "Teams switching from spreadsheets",
+          "Sole traders and landlords preparing for MTD for Income Tax",
           "Businesses that want monthly numbers, not annual",
         ],
       },
@@ -257,19 +258,19 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Accurate payslips, real-time submissions and auto-enrolment handled — your team paid right in the UK and Ireland, every cycle.",
         overview:
-          "Payroll is unforgiving: one late submission or a missed pension upload and you are writing to regulators. We run the whole cycle — payslips, RTI (UK) and PAYE Modernisation (Ireland) submissions, pensions, year-end forms — so payday is a non-event.",
+          "Payroll is unforgiving: one late submission or a missed pension upload and you are writing to regulators. We run the whole cycle — payslips, RTI (UK) and PAYE Modernisation (Ireland) submissions, pensions and year-end forms. We also keep you ahead of cost changes: UK employer National Insurance is now 15% on earnings above a £5,000 secondary threshold (with Employment Allowance up to £10,500), while Irish employee PRSI rose to 4.2% from October 2025.",
         included: [
           "Weekly or monthly payroll runs",
           "RTI submissions to HMRC and PAYE Modernisation to Revenue",
-          "PRSI, USC (Ireland) and NICs (UK) handled",
-          "Auto-enrolment pension administration",
-          "P45s, P60s, P11Ds and Irish equivalents",
-          "Payroll journals posted to your books",
+          "Employer NIC (15% over £5k) and Employment Allowance optimisation (UK)",
+          "PRSI, USC and PAYE handled (Ireland)",
+          "Auto-enrolment and occupational pension administration",
+          "P45s, P60s, P11Ds and Irish equivalents, posted to your books",
         ],
         bestFor: [
           "Companies hiring their first employees",
           "Teams of 1 to 100 on the payroll",
-          "Directors taking salary and dividends",
+          "Directors balancing salary and dividends",
         ],
       },
       {
@@ -278,17 +279,17 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Statutory and voluntary audits that stand up to scrutiny — and give lenders, boards and buyers confidence in your numbers.",
         overview:
-          "An audit should do more than satisfy a legal requirement. Ours are planned around your risks, run with minimal disruption to your team, and end with a management letter you will actually act on — not a PDF that goes in a drawer.",
+          "An audit should do more than satisfy a legal requirement. From financial years beginning on or after 6 April 2025, the UK small-company thresholds rose to £15m turnover, £7.5m balance sheet and 50 employees — so the first question we answer is whether you even need one. When you do, ours are planned around your risks, run under ISA (UK and Ireland) with minimal disruption, and end with a management letter you will actually act on.",
         included: [
           "Statutory audits under ISA (UK and Ireland)",
+          "Audit-exemption and group-size assessment (2025 thresholds)",
           "Voluntary audits for lenders or investors",
           "Internal audit and controls review",
           "Grant and charity (SORP) audits",
           "Due-diligence support on acquisitions",
-          "Clear management letter with practical fixes",
         ],
         bestFor: [
-          "Companies past the audit threshold",
+          "Companies above the revised audit threshold",
           "Businesses raising debt or equity",
           "Boards that want assurance, not theatre",
         ],
@@ -310,13 +311,13 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Incorporation, registrations and statutory filings to get you trading fast and keep Companies House and the CRO happy.",
         overview:
-          "Starting a company involves a dozen small registrations that are easy to get wrong and tedious to fix. We incorporate, register you for the right taxes, and keep the statutory book maintained from day one — in the UK or Ireland.",
+          "Starting a company involves a dozen small registrations that are easy to get wrong and tedious to fix. We incorporate at Companies House (UK) or the CRO (Ireland), register you for the right taxes, and keep the statutory book maintained — including the UK confirmation statement and the Irish annual return (Form B1), which falls due within six months of incorporation and every year after.",
         included: [
           "Company incorporation at Companies House or the CRO",
           "PAYE, VAT and corporation tax registration",
-          "Confirmation statements, annual returns and registers",
-          "Share issues and transfers",
-          "Registered office address service",
+          "Confirmation statements (UK) and annual returns / Form B1 (Ireland)",
+          "Statutory registers, including persons of significant control",
+          "Share issues, transfers and registered office service",
           "Dividend paperwork and board minutes",
         ],
         bestFor: [
@@ -352,14 +353,14 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Cross-border setup and tax structuring for businesses moving between the UK, Ireland and beyond.",
         overview:
-          "Expanding into a new country multiplies your obligations. We map the tax, entity and compliance landscape before you commit, then set up the structure and keep it compliant on both sides of the border.",
+          "Expanding into a new country multiplies your obligations. The UK–Ireland corridor is the most common move we handle — and post-Brexit it means import VAT, customs and the Northern Ireland Protocol on goods, plus permanent-establishment and transfer-pricing questions. Large groups also need to watch the 15% global minimum tax (Pillar Two). We map the landscape before you commit, then set up the structure and keep it compliant on both sides.",
         included: [
           "UK–Ireland cross-border structuring",
           "Entity setup in new jurisdictions",
           "Permanent establishment and transfer-pricing review",
-          "Cross-border VAT and customs (post-Brexit)",
+          "Post-Brexit VAT, customs and Northern Ireland Protocol guidance",
           "Withholding tax and double-tax treaty planning",
-          "Local compliance coordination",
+          "Pillar Two / global minimum tax assessment for large groups",
         ],
         bestFor: [
           "UK firms expanding into Ireland (and vice versa)",
@@ -375,7 +376,7 @@ export const serviceCategories: ServiceCategory[] = [
     blurb:
       "Modernise the finance function — cloud systems, ERP migration and AI built into the way you actually work.",
     overview:
-      "Technology should take work off your plate, not add to it. We modernise finance operations end to end — migrating systems, automating the manual, and embedding AI where it earns its place.",
+      "Technology should take work off your plate, not add to it. We modernise finance operations end to end — migrating systems, automating the manual, and embedding AI where it earns its place. With Making Tax Digital widening and e-invoicing spreading across Europe, digital records are fast becoming the baseline, not the upgrade.",
     kind: "services",
     items: [
       {
@@ -405,13 +406,13 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Plan and run your move to a modern ERP — Xero, NetSuite, Dynamics or Sage — without losing your data or your mind.",
         overview:
-          "An ERP migration done badly can set you back a year. We scope the move, map and clean the data, run the migration in parallel, and stay on through go-live so the numbers reconcile from day one.",
+          "An ERP migration done badly can set you back a year. We scope the move, map and clean the data, run the migration in parallel, and stay on through go-live so the numbers reconcile from day one — with MTD-ready digital record-keeping built in.",
         included: [
           "ERP selection and fit assessment",
           "Data mapping, cleansing and migration",
           "Chart of accounts redesign",
           "Parallel running and reconciliation",
-          "Integration with existing tools",
+          "Integration with existing tools and e-invoicing",
           "Go-live support and training",
         ],
         bestFor: [
@@ -479,14 +480,14 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Pensions annual allowance, private practice income and locum structuring for medics in the UK and Ireland.",
         overview:
-          "Medical careers create tax problems other professions never see — the pensions annual allowance taper, mixed NHS/HSE and private income, locum work. We handle the specifics so a good year doesn't turn into a tax-bill shock.",
+          "Medical careers create tax problems other professions never see — the pensions annual allowance (£60,000, tapered for high earners) and its interaction with the NHS scheme, mixed NHS/HSE and private income, and locum work. We handle the specifics so a good year doesn't turn into a tax-bill shock.",
         included: [
-          "Pensions annual allowance and taper planning",
+          "Pensions annual allowance and taper planning (£60k limit)",
+          "NHS / HSE pension interaction and annual allowance charges",
           "Private practice and locum income",
           "Sole trader vs limited company structuring",
           "Self-assessment and income tax",
-          "Expense and capital allowance claims",
-          "Retirement and pension planning",
+          "Expense, capital allowance and retirement planning",
         ],
         bestFor: [
           "Consultants with NHS/HSE and private income",
@@ -500,13 +501,13 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Contractor structuring, IR35 and share-option taxation for tech workers and contractors.",
         overview:
-          "Tech pay comes in forms HMRC and Revenue treat very differently — contract income, RSUs, share options. We structure it properly, navigate IR35, and make sure equity doesn't catch you out.",
+          "Tech pay comes in forms HMRC and Revenue treat very differently — contract income, RSUs, share options. We structure it properly, navigate IR35, and plan around capital gains (now 18% / 24% in the UK after the October 2024 change) so equity doesn't catch you out.",
         included: [
           "Limited company and contractor structuring",
           "IR35 status review (UK)",
           "RSU and share-option tax planning",
-          "Self-assessment and income tax",
-          "Expense and home-office claims",
+          "Capital gains planning on share disposals (18% / 24% UK)",
+          "Self-assessment, income tax and home-office claims",
           "Pension and investment planning",
         ],
         bestFor: [
@@ -521,14 +522,14 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "End-to-end tax and bookkeeping for self-employed contractors — CIS, expenses and the right trading structure.",
         overview:
-          "When you work for yourself, the admin is on you too. We take it off your plate — bookkeeping, expenses, returns — and make sure you are trading in the most tax-efficient way for your situation.",
+          "When you work for yourself, the admin is on you too. We take it off your plate — bookkeeping, expenses, returns — and get you ready for Making Tax Digital for Income Tax, which starts for sole traders earning over £50,000 from April 2026. Construction contractors also get full CIS handling and offset.",
         included: [
           "Sole trader vs limited company advice",
-          "CIS returns and offsetting (construction)",
+          "CIS returns, deductions and offsetting (construction)",
+          "Making Tax Digital for Income Tax readiness (from April 2026)",
           "Bookkeeping and expense tracking",
           "Self-assessment / income tax returns",
           "VAT registration and returns",
-          "Deadline tracking and reminders",
         ],
         bestFor: [
           "Self-employed trades and freelancers",
@@ -542,14 +543,14 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Personal tax strategy for founders — remuneration, share schemes, reliefs and the path to exit.",
         overview:
-          "Building a business and your personal wealth are the same project. We plan remuneration, equity and reliefs across both — salary vs dividends, EMI/KEEP schemes, and the reliefs that matter when you exit.",
+          "Building a business and your personal wealth are the same project. We plan remuneration, equity and reliefs across both — salary vs dividends, share schemes, and the exit reliefs that matter. UK Business Asset Disposal Relief now charges 18% on qualifying gains up to a £1m lifetime limit, while Irish Entrepreneur Relief stays at 10% up to €1m — so timing and structure are worth real money.",
         included: [
           "Salary, dividend and remuneration planning",
           "EMI (UK) and KEEP (Ireland) share schemes",
-          "Business Asset Disposal / Entrepreneur Relief",
+          "Business Asset Disposal Relief (18%, £1m) and Irish Entrepreneur Relief (10%, €1m)",
+          "Capital gains and exit-timing planning",
           "Personal and business tax alignment",
-          "Investment and wealth structuring",
-          "Exit and succession planning",
+          "Investment, wealth and succession planning",
         ],
         bestFor: [
           "Founders of growing companies",
@@ -565,7 +566,7 @@ export const serviceCategories: ServiceCategory[] = [
     blurb:
       "AI-powered finance, automation and tax services — practical applications, not hype.",
     overview:
-      "We put AI to work on real finance problems. Where it adds genuine value — forecasting, automation, tax analysis — we deploy it; where it doesn't, we say so. Practical applications, measurable results.",
+      "We put AI to work on real finance problems. Where it adds genuine value — forecasting, automation, tax analysis — we deploy it; where it doesn't, we say so. Practical applications, measurable results, with a chartered accountant on every output.",
     kind: "services",
     items: [
       {
@@ -616,7 +617,7 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "AI-assisted tax analysis and optimisation — spot reliefs, model scenarios and cut compliance time.",
         overview:
-          "Tax is full of patterns AI is good at finding. We use it to scan for reliefs you're missing, model the tax impact of decisions, and speed up compliance — always with a chartered accountant signing off the output.",
+          "Tax is full of patterns AI is good at finding. We use it to scan for reliefs you're missing, model the tax impact of decisions, and speed up compliance across UK and Irish regimes — always with a chartered accountant signing off the output.",
         included: [
           "AI-assisted relief and allowance discovery",
           "Tax scenario modelling",
@@ -683,12 +684,24 @@ export const serviceCategories: ServiceCategory[] = [
     slug: "crypto",
     title: "Crypto & Digital Assets",
     blurb:
-      "Tax and accounting for crypto and digital assets across the UK and Ireland.",
+      "Tax, accounting and reporting for crypto and digital assets across the UK and Ireland — ahead of the 2026 reporting rules.",
     overview:
-      "Crypto tax is complex, fast-moving and easy to get wrong. We are building a dedicated service for digital-asset accounting and compliance in the UK and Ireland. Get in touch to be first in line.",
+      "Crypto tax is complex, fast-moving and easy to get wrong — and the days of it going unnoticed are over. HMRC treats cryptoassets as property subject to Capital Gains Tax (18% or 24% in 2025/26, on gains above the £3,000 annual exemption), and Ireland charges its standard 33% CGT above a €1,270 exemption. Under the OECD Crypto-Asset Reporting Framework (CARF), exchanges begin collecting data in 2026 and reporting it to tax authorities from 2027 — so accurate records are no longer optional. We calculate, report and plan it properly.",
     kind: "single",
-    status: "coming-soon",
     items: [],
+    included: [
+      "Capital gains calculation across wallets and exchanges",
+      "UK CGT reporting via self-assessment (18% / 24%, £3,000 exemption)",
+      "Irish CGT reporting via ROS / Form CG1 (33%, €1,270 exemption)",
+      "Income vs capital treatment — staking, mining, airdrops and DeFi",
+      "CARF readiness ahead of 2026/27 exchange reporting",
+      "Record reconstruction and portfolio reconciliation",
+    ],
+    bestFor: [
+      "Investors and traders with multi-exchange activity",
+      "Businesses accepting or holding digital assets",
+      "Anyone facing CARF reporting or an HMRC / Revenue nudge letter",
+    ],
   },
 ];
 

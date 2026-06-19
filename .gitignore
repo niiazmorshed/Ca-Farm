@@ -2,6 +2,10 @@ CLAUDE.md
 AGENT.md
 /claude
 .claude/
+/agents
+.agents/
+/docs
+.docs/
 
 .env.local
 

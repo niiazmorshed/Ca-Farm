@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Container, Eyebrow, PageHero, SectionHeading } from "../components/ui";
 import { ContactCta, Stats } from "../components/sections";
+import { Reveal } from "../components/reveal";
+import { ClipReveal } from "../components/clip-reveal";
 import { team, values } from "../lib/content";
+import { images } from "../lib/images";
 
 export const metadata: Metadata = {
   title: "About",
@@ -23,10 +26,11 @@ export default function AboutPage() {
         eyebrow="The firm"
         title="Accountants who act like partners."
         lede="CA Farm was founded on a simple complaint: most firms only call when the invoice is due. We built the practice we wished existed — close to the numbers, ahead of the deadlines, honest about the fees."
+        image="office"
       />
 
       <Container className="grid gap-14 py-16 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-        <div>
+        <Reveal>
           <SectionHeading
             eyebrow="Our story"
             title="Twenty years of tending other people's numbers."
@@ -51,13 +55,17 @@ export default function AboutPage() {
               the existing clients their service is not growth we want.
             </p>
           </div>
-        </div>
+        </Reveal>
 
-        <div className="flex flex-col gap-5">
+        <Reveal delay={120} className="flex flex-col gap-5">
+          <ClipReveal
+            url={images.teamLaptops}
+            className="h-48 w-full rounded-sm"
+          />
           {values.map((value) => (
             <div
               key={value.title}
-              className="rounded-2xl border border-line bg-surface p-6"
+              className="border-l-2 border-primary-400 bg-surface py-1 pl-5"
             >
               <h3 className="font-display text-lg font-medium tracking-tight text-ink">
                 {value.title}
@@ -67,11 +75,12 @@ export default function AboutPage() {
               </p>
             </div>
           ))}
-        </div>
+        </Reveal>
       </Container>
 
       <section className="border-y border-line bg-surface-muted">
         <Container className="py-16 sm:py-20">
+          <Reveal>
           <SectionHeading
             eyebrow="The team"
             title="Small team. Senior people."
@@ -81,11 +90,11 @@ export default function AboutPage() {
             {team.map((member) => (
               <li
                 key={member.name}
-                className="rounded-2xl border border-line bg-surface p-6"
+                className="rounded-sm border border-line bg-surface p-6"
               >
                 <span
                   aria-hidden="true"
-                  className="grid h-14 w-14 place-items-center rounded-full bg-navy-900 font-display text-lg font-semibold text-primary-400"
+                  className="grid h-14 w-14 place-items-center rounded-sm bg-navy-900 font-display text-lg font-semibold text-primary-300"
                 >
                   {member.name
                     .split(" ")
@@ -104,6 +113,7 @@ export default function AboutPage() {
               </li>
             ))}
           </ul>
+          </Reveal>
         </Container>
       </section>
 
@@ -115,7 +125,7 @@ export default function AboutPage() {
               {credentials.map((credential) => (
                 <li
                   key={credential}
-                  className="rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-medium text-ink-body"
+                  className="rounded-sm border border-line bg-surface px-5 py-2.5 text-sm font-medium text-ink-body"
                 >
                   {credential}
                 </li>

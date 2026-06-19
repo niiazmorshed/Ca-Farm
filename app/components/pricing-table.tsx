@@ -22,8 +22,8 @@ export function PricingTable({ tiers }: { tiers: PricingTier[] }) {
           aria-checked={annual}
           aria-label="Bill annually"
           onClick={() => setAnnual((value) => !value)}
-          className={`relative h-7 w-12 cursor-pointer rounded-full transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary-400 ${
-            annual ? "bg-navy-700" : "bg-line"
+          className={`relative h-7 w-12 cursor-pointer rounded-full transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
+            annual ? "bg-primary-500" : "bg-line"
           }`}
         >
           <span
@@ -36,7 +36,7 @@ export function PricingTable({ tiers }: { tiers: PricingTier[] }) {
           className={`text-sm font-medium ${annual ? "text-ink" : "text-muted"}`}
         >
           Annual
-          <span className="ml-1.5 rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-600">
+          <span className="ml-1.5 rounded-sm bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-600">
             2 months free
           </span>
         </span>
@@ -46,14 +46,14 @@ export function PricingTable({ tiers }: { tiers: PricingTier[] }) {
         {tiers.map((tier) => (
           <div
             key={tier.name}
-            className={`relative flex flex-col rounded-2xl border bg-surface p-8 ${
+            className={`relative flex flex-col rounded-sm border bg-surface p-8 ${
               tier.popular
-                ? "border-primary-400 shadow-lg shadow-navy-900/5"
+                ? "border-line border-t-2 border-t-primary-400 shadow-lg shadow-navy-900/5"
                 : "border-line"
             }`}
           >
             {tier.popular && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary-400 px-3 py-1 text-xs font-semibold whitespace-nowrap text-white">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-sm bg-primary-500 px-3 py-1 text-xs font-semibold whitespace-nowrap text-white">
                 Most popular
               </span>
             )}
@@ -86,10 +86,10 @@ export function PricingTable({ tiers }: { tiers: PricingTier[] }) {
             </ul>
             <Link
               href="/contact"
-              className={`mt-8 inline-flex h-11 cursor-pointer items-center justify-center rounded-full px-6 text-sm font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 ${
+              className={`mt-8 inline-flex h-11 cursor-pointer items-center justify-center rounded-md px-6 text-sm font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 ${
                 tier.popular
-                  ? "bg-primary-400 text-white hover:bg-primary-500 focus-visible:outline-primary-400"
-                  : "bg-navy-900 text-white hover:bg-navy-700 focus-visible:outline-secondary-400"
+                  ? "bg-primary-500 text-white hover:bg-primary-600 focus-visible:outline-primary-500"
+                  : "bg-navy-900 text-white hover:bg-navy-700 focus-visible:outline-navy-700"
               }`}
             >
               Get started

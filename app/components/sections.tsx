@@ -1,98 +1,179 @@
+import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
-import { Container, Eyebrow, SectionHeading } from "./ui";
+import { Button, Container, Eyebrow, SectionHeading } from "./ui";
+import { Reveal } from "./reveal";
+import { CountUp } from "./count-up";
+import { ClipReveal } from "./clip-reveal";
+import { Accordion } from "./accordion";
+import { images } from "../lib/images";
 import { industries, serviceCategories, site } from "../lib/content";
 
-/* ---------- hero ---------- */
+function bg(url: string): CSSProperties {
+  return { backgroundImage: `url(${url})` };
+}
 
-const heroFigures: [string, string][] = [
-  ["Client tax saved", "£612k"],
-  ["Filings submitted on time", "100%"],
-  ["Median reply time", "< 1 business day"],
-];
+/* ---------- hero ---------- */
 
 export function Hero() {
   return (
     <section className="relative isolate overflow-hidden bg-navy-900 text-white">
-      <div aria-hidden="true" className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(70rem_45rem_at_12%_-12%,rgba(255,154,63,0.12),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(50rem_35rem_at_100%_110%,rgba(134,172,178,0.2),transparent_65%)]" />
-      </div>
-
-      <Container className="grid gap-14 py-20 sm:py-24 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-32">
-        <div className="flex max-w-2xl flex-col items-start gap-6">
-          <div className="animate-fade-up">
-            <Eyebrow tone="dark">Chartered Accountants &amp; Business Advisors</Eyebrow>
-          </div>
-          <h1 className="animate-fade-up font-display text-4xl font-medium leading-[1.06] tracking-tight text-balance [animation-delay:60ms] sm:text-5xl lg:text-6xl">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-20 bg-cover bg-center"
+        style={bg(images.heroHandshake)}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-gradient-to-r from-navy-900 via-navy-900/90 to-navy-900/40"
+      />
+      <Container className="py-24 sm:py-28 lg:py-36">
+        <div className="max-w-2xl border-l-2 border-primary-400 pl-6 sm:pl-8">
+          <span className="animate-fade-up block">
+            <Eyebrow tone="dark">
+              Chartered Accountants &amp; Advisors · UK &amp; Ireland
+            </Eyebrow>
+          </span>
+          <h1 className="animate-fade-up mt-6 font-display text-4xl font-medium leading-[1.05] tracking-tight text-balance [animation-delay:80ms] sm:text-5xl lg:text-6xl">
             Solid ground for{" "}
-            <em className="text-primary-400 not-italic">growing</em> businesses.
+            <em className="text-primary-300 not-italic">growing</em> businesses.
           </h1>
-          <p className="animate-fade-up max-w-xl text-lg leading-8 text-white/75 [animation-delay:120ms]">
-            CA Farm pairs partner-led accounting with modern cloud tools and AI
-            — tax, advisory, digital transformation and more for businesses
-            across the UK and Ireland.
+          <p className="animate-fade-up mt-6 max-w-xl text-lg leading-8 text-white/80 [animation-delay:150ms]">
+            Partner-led accounting, tax and advisory — backed by modern cloud
+            tools and AI. We keep you compliant, ahead of every deadline, and
+            never paying more tax than you owe.
           </p>
-          <div className="animate-fade-up flex flex-col gap-3 [animation-delay:180ms] sm:flex-row">
-            <Link
-              href="/contact"
-              className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full bg-primary-400 px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400"
-            >
-              Book a free consultation
-            </Link>
-            <Link
-              href="/services"
-              className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full border border-white/25 px-7 text-sm font-medium text-white transition-colors duration-200 hover:border-white/50 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
-            >
-              Explore services
-            </Link>
+          <div className="animate-fade-up mt-9 flex flex-col gap-3 [animation-delay:220ms] sm:flex-row">
+            <Button href="/contact">Book a free consultation</Button>
+            <Button href="/services" variant="outlineLight">
+              Explore our services
+            </Button>
           </div>
-          <ul className="animate-fade-up mt-2 flex flex-wrap gap-x-7 gap-y-2 border-t border-white/15 pt-5 text-sm text-white/60 [animation-delay:240ms]">
+          <ul className="animate-fade-up mt-10 flex flex-wrap gap-x-8 gap-y-2 border-t border-white/15 pt-6 text-sm text-white/65 [animation-delay:290ms]">
             <li>ICAEW-registered practice</li>
             <li>20+ years in practice</li>
             <li>500+ clients served</li>
           </ul>
-        </div>
-
-        <div className="animate-fade-up relative [animation-delay:200ms] lg:justify-self-end">
-          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white p-6 shadow-xl shadow-black/20 sm:p-7">
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-sm font-medium text-ink-body">
-                This quarter, across our clients
-              </p>
-              <span className="rounded-full bg-secondary-50 px-3 py-1 text-xs font-medium whitespace-nowrap text-secondary-500">
-                On track
-              </span>
-            </div>
-            <div className="mt-6 flex h-28 items-end gap-2" aria-hidden="true">
-              {[38, 52, 34, 64, 48, 74, 60, 88].map((height, index) => (
-                <div
-                  key={index}
-                  className="flex-1 rounded-t-md bg-gradient-to-t from-primary-500/70 to-primary-400"
-                  style={{ height: `${height}%` }}
-                />
-              ))}
-            </div>
-            <dl className="mt-6 divide-y divide-line border-t border-line">
-              {heroFigures.map(([label, value]) => (
-                <div
-                  key={label}
-                  className="flex items-center justify-between py-3"
-                >
-                  <dt className="text-sm text-muted">{label}</dt>
-                  <dd className="font-display text-base font-semibold text-ink">
-                    {value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
         </div>
       </Container>
     </section>
   );
 }
 
-/* ---------- client strip (marquee) ---------- */
+/* ---------- quick entry (dark strip) ---------- */
+
+type EntryIcon = "user" | "building" | "compass" | "chip";
+
+function EntryGlyph({ name }: { name: EntryIcon }) {
+  const common = {
+    width: 22,
+    height: 22,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.6,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true,
+  };
+  switch (name) {
+    case "user":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="8" r="3.5" />
+          <path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6" />
+        </svg>
+      );
+    case "building":
+      return (
+        <svg {...common}>
+          <path d="M4 21h16M6 21V5l7-2v18M18 21V9l-5-1.5" />
+          <path d="M9 8h0M9 11h0M9 14h0" />
+        </svg>
+      );
+    case "compass":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M15.5 8.5l-2 5-5 2 2-5 5-2z" />
+        </svg>
+      );
+    case "chip":
+      return (
+        <svg {...common}>
+          <rect x="7" y="7" width="10" height="10" rx="1.5" />
+          <path d="M10 4v3M14 4v3M10 17v3M14 17v3M4 10h3M4 14h3M17 10h3M17 14h3" />
+        </svg>
+      );
+  }
+}
+
+const quickEntries: {
+  icon: EntryIcon;
+  title: string;
+  note: string;
+  href: string;
+}[] = [
+  {
+    icon: "user",
+    title: "For individuals",
+    note: "Tax planning built around your profession.",
+    href: "/services/personal-finance",
+  },
+  {
+    icon: "building",
+    title: "For business",
+    note: "Books, VAT, payroll and accounts, handled.",
+    href: "/services/account-bookkeeping",
+  },
+  {
+    icon: "compass",
+    title: "Advisory & CFO",
+    note: "A finance leader on call, without the headcount.",
+    href: "/services/cfo-service",
+  },
+  {
+    icon: "chip",
+    title: "Digital & AI",
+    note: "Modernise and automate the finance function.",
+    href: "/services/digital-transformation",
+  },
+];
+
+export function QuickEntry() {
+  return (
+    <section className="bg-navy-800 text-white">
+      <Container className="grid grid-cols-1 gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
+        {quickEntries.map((entry) => (
+          <Link
+            key={entry.title}
+            href={entry.href}
+            className="group flex items-start gap-4 bg-navy-800 px-5 py-7 transition-colors duration-200 hover:bg-navy-700"
+          >
+            <span className="mt-0.5 text-primary-300 transition-colors duration-200 group-hover:text-primary-400">
+              <EntryGlyph name={entry.icon} />
+            </span>
+            <span className="flex flex-col">
+              <span className="flex items-center gap-1.5 font-display text-base font-semibold tracking-tight text-white">
+                {entry.title}
+                <span
+                  aria-hidden="true"
+                  className="translate-x-0 text-primary-300 transition-transform duration-200 group-hover:translate-x-1"
+                >
+                  →
+                </span>
+              </span>
+              <span className="mt-1 text-sm leading-6 text-white/60">
+                {entry.note}
+              </span>
+            </span>
+          </Link>
+        ))}
+      </Container>
+    </section>
+  );
+}
+
+/* ---------- client strip ---------- */
 
 const clients = [
   "Northfield & Co",
@@ -106,24 +187,26 @@ const clients = [
 export function LogoStrip() {
   return (
     <section className="border-b border-line bg-white">
-      <Container className="flex flex-col items-center gap-5 py-10">
+      <Container className="flex flex-col items-center gap-7 py-12">
         <p className="text-center text-xs font-medium uppercase tracking-[0.18em] text-muted">
           Trusted by founders, family firms and growing teams
         </p>
+        {/* accessible static list for screen readers */}
         <ul className="sr-only">
           {clients.map((name) => (
             <li key={name}>{name}</li>
           ))}
         </ul>
+        {/* animated marquee — linear, pauses on hover, masked at the edges */}
         <div
           aria-hidden="true"
-          className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]"
+          className="group relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]"
         >
-          <div className="flex w-max animate-marquee">
+          <div className="flex w-max animate-marquee items-center group-hover:[animation-play-state:paused]">
             {[...clients, ...clients].map((name, index) => (
               <span
                 key={index}
-                className="mr-14 whitespace-nowrap font-display text-lg font-medium text-ink/30"
+                className="mx-7 whitespace-nowrap font-display text-lg font-medium text-ink/35 transition-colors duration-200 hover:text-ink/60 sm:mx-10"
               >
                 {name}
               </span>
@@ -140,34 +223,39 @@ export function LogoStrip() {
 export function Services() {
   return (
     <section id="services" className="scroll-mt-24 bg-canvas">
-      <Container className="py-20 sm:py-24">
+      <Container className="py-20 sm:py-28">
+        <Reveal>
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
             eyebrow="What we do"
-            title="Full-service accounting, from seed to scale."
-            lede="One firm for the whole journey — whether you need year-end accounts done properly or a finance function without the headcount."
+            title="One firm for the whole journey."
+            lede="From year-end accounts done properly to a finance function without the headcount — across the UK and Ireland."
           />
           <Link
             href="/services"
-            className="text-sm font-semibold text-secondary-500 transition-colors duration-200 hover:text-secondary-400"
+            className="text-sm font-semibold text-primary-500 transition-colors duration-200 hover:text-primary-600"
           >
             All services <span aria-hidden="true">→</span>
           </Link>
         </div>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-14 grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
           {serviceCategories.map((category, index) => (
             <Link
               key={category.slug}
               href={`/services/${category.slug}`}
-              className="group relative flex flex-col rounded-2xl border border-line bg-surface p-7 transition-all duration-300 hover:-translate-y-1 hover:border-secondary-400/50 hover:shadow-lg hover:shadow-navy-900/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary-400"
+              className="group relative flex flex-col bg-surface p-8 transition-colors duration-200 hover:bg-secondary-50/60 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500"
             >
+              <span
+                aria-hidden="true"
+                className="absolute left-0 top-0 h-0.5 w-0 bg-primary-400 transition-all duration-300 group-hover:w-full"
+              />
               <span className="font-display text-sm font-semibold text-primary-500">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <h3 className="mt-4 flex flex-wrap items-center gap-2 font-display text-xl font-medium tracking-tight text-ink">
                 {category.title}
                 {category.status === "coming-soon" && (
-                  <span className="rounded-full bg-secondary-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-secondary-500">
+                  <span className="rounded-sm bg-secondary-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-secondary-500">
                     Soon
                   </span>
                 )}
@@ -175,12 +263,57 @@ export function Services() {
               <p className="mt-2.5 text-[15px] leading-7 text-muted">
                 {category.blurb}
               </p>
-              <span className="mt-auto pt-5 text-sm font-medium text-secondary-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+              <span className="mt-auto pt-6 text-sm font-semibold text-primary-500">
                 Learn more <span aria-hidden="true">→</span>
               </span>
             </Link>
           ))}
         </div>
+        </Reveal>
+      </Container>
+    </section>
+  );
+}
+
+/* ---------- harvest band (signature) ---------- */
+
+export function HarvestBand() {
+  return (
+    <section className="relative isolate overflow-hidden bg-navy-900 text-white">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-20 bg-cover bg-center"
+        style={bg(images.fields)}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-gradient-to-t from-navy-900 via-navy-900/80 to-navy-900/55"
+      />
+      <Container className="py-24 sm:py-32">
+        <Reveal className="max-w-3xl">
+        <div>
+          <Eyebrow tone="dark">Why CA Farm</Eyebrow>
+          <p className="mt-6 font-display text-3xl font-medium leading-[1.18] tracking-tight text-balance sm:text-4xl">
+            We don’t just file your accounts. We help you understand the numbers
+            behind them — and grow what they measure.
+          </p>
+          <div className="mt-10 grid max-w-2xl grid-cols-1 gap-px overflow-hidden rounded-sm border border-white/15 bg-white/15 sm:grid-cols-3">
+            {[
+              ["£40m+", "saved for clients in tax"],
+              ["100%", "filings in on time"],
+              ["< 1 day", "median reply time"],
+            ].map(([value, label]) => (
+              <div key={label} className="bg-navy-900/40 px-6 py-7 backdrop-blur-sm">
+                <CountUp
+                  value={value}
+                  className="block font-display text-3xl font-medium tracking-tight text-primary-300"
+                />
+                <div className="mt-1 text-sm leading-6 text-white/70">{label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        </Reveal>
       </Container>
     </section>
   );
@@ -191,27 +324,30 @@ export function Services() {
 export function Industries() {
   return (
     <section className="border-t border-line bg-white">
-      <Container className="py-20 sm:py-24">
-        <SectionHeading
-          eyebrow="Who we serve"
-          title="Deep benches in the sectors we know best."
-          lede="Every industry has its own tax quirks and rhythms. These are the ones we work in every day."
-        />
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <Container className="grid gap-14 py-20 sm:py-28 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+        <Reveal>
+          <SectionHeading
+            eyebrow="Who we serve"
+            title="Deep benches in the sectors we know best."
+            lede="Every industry has its own tax quirks and rhythms. These are the ones we work in every day."
+          />
+          <ClipReveal
+            url={images.meeting}
+            className="mt-10 hidden h-64 w-full rounded-sm lg:block"
+          />
+        </Reveal>
+        <Reveal delay={120}>
+        <ul className="grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-2">
           {industries.map((industry) => (
-            <div
-              key={industry.name}
-              className="rounded-2xl border border-line bg-surface p-6"
-            >
+            <li key={industry.name} className="bg-surface p-6">
               <h3 className="font-display text-lg font-medium tracking-tight text-ink">
                 {industry.name}
               </h3>
-              <p className="mt-2 text-sm leading-6 text-muted">
-                {industry.note}
-              </p>
-            </div>
+              <p className="mt-2 text-sm leading-6 text-muted">{industry.note}</p>
+            </li>
           ))}
-        </div>
+        </ul>
+        </Reveal>
       </Container>
     </section>
   );
@@ -244,21 +380,25 @@ const steps = [
 
 export function Process() {
   return (
-    <section id="process" className="scroll-mt-24 border-y border-line bg-surface-muted">
-      <Container className="py-20 sm:py-24">
+    <section
+      id="process"
+      className="scroll-mt-24 border-y border-line bg-surface-muted"
+    >
+      <Container className="py-20 sm:py-28">
+        <Reveal>
         <SectionHeading
           eyebrow="How we work"
           title="A simple path to tidy books."
           lede="Switching accountants sounds painful. We’ve made it four steps, and we do the heavy lifting."
         />
-        <ol className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="mt-14 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, index) => (
-            <li key={step.title} className="relative border-t border-line pt-6">
+            <li key={step.title} className="relative border-t-2 border-ink/10 pt-6">
               <span
                 aria-hidden="true"
-                className="absolute -top-px left-0 h-px w-12 bg-primary-400"
+                className="absolute -top-0.5 left-0 h-0.5 w-14 bg-primary-400"
               />
-              <span className="font-display text-3xl font-medium text-primary-400">
+              <span className="font-display text-3xl font-medium text-primary-500">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <h3 className="mt-3 font-display text-lg font-medium text-ink">
@@ -270,6 +410,7 @@ export function Process() {
             </li>
           ))}
         </ol>
+        </Reveal>
       </Container>
     </section>
   );
@@ -286,22 +427,23 @@ const stats = [
 
 export function Stats() {
   return (
-    <section className="relative isolate overflow-hidden bg-navy-900 text-white">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[radial-gradient(60rem_30rem_at_85%_120%,rgba(255,154,63,0.1),transparent_60%)]"
-      />
+    <section className="bg-navy-900 text-white">
       <Container className="py-16 sm:py-20">
-        <dl className="grid gap-x-8 gap-y-10 text-center sm:grid-cols-2 lg:grid-cols-4">
+        <Reveal>
+        <dl className="grid grid-cols-1 gap-px overflow-hidden border border-white/15 bg-white/15 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
-            <div key={stat.label} className="flex flex-col gap-2">
-              <dd className="order-1 font-display text-4xl font-medium tracking-tight text-primary-400 sm:text-5xl">
-                {stat.value}
+            <div
+              key={stat.label}
+              className="flex flex-col gap-2 bg-navy-900 px-6 py-8 text-center"
+            >
+              <dd className="order-1 font-display text-4xl font-medium tracking-tight text-primary-300 sm:text-5xl">
+                <CountUp value={stat.value} />
               </dd>
               <dt className="order-2 text-sm text-white/65">{stat.label}</dt>
             </div>
           ))}
         </dl>
+        </Reveal>
       </Container>
     </section>
   );
@@ -333,17 +475,18 @@ const testimonials = [
 export function Testimonials() {
   return (
     <section id="testimonials" className="scroll-mt-24 bg-canvas">
-      <Container className="py-20 sm:py-24">
+      <Container className="py-20 sm:py-28">
+        <Reveal>
         <SectionHeading eyebrow="Client stories" title="Don’t take our word for it." />
-        <div className="mt-12 grid gap-5 lg:grid-cols-3">
+        <div className="mt-14 grid gap-5 lg:grid-cols-3">
           {testimonials.map((testimonial) => (
             <figure
               key={testimonial.name}
-              className="flex flex-col rounded-2xl border border-line bg-surface p-8"
+              className="flex flex-col border-t-2 border-primary-400 bg-surface p-8 shadow-sm shadow-navy-900/5"
             >
               <span
                 aria-hidden="true"
-                className="font-display text-5xl leading-none text-secondary-400/60"
+                className="font-display text-5xl leading-none text-primary-400/40"
               >
                 “
               </span>
@@ -357,6 +500,7 @@ export function Testimonials() {
             </figure>
           ))}
         </div>
+        </Reveal>
       </Container>
     </section>
   );
@@ -395,35 +539,69 @@ const faqs = [
 export function Faq() {
   return (
     <section id="faq" className="scroll-mt-24 border-t border-line bg-white">
-      <Container className="py-20 sm:py-24">
-        <div className="mx-auto max-w-3xl">
+      <Container className="py-20 sm:py-28">
+        <Reveal className="mx-auto max-w-3xl">
           <SectionHeading eyebrow="FAQ" title="Questions, answered straight." />
           <div className="mt-10">
-            {faqs.map((faq) => (
-              <details key={faq.question} className="group border-b border-line py-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[17px] font-medium text-ink">
-                  {faq.question}
-                  <svg
-                    className="h-4 w-4 shrink-0 text-primary-500 transition-transform duration-300 group-open:rotate-45"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M8 2v12M2 8h12"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </summary>
-                <p className="mt-3 max-w-[60ch] text-[15px] leading-7 text-muted">
-                  {faq.answer}
-                </p>
-              </details>
-            ))}
+            <Accordion items={faqs} />
           </div>
+        </Reveal>
+      </Container>
+    </section>
+  );
+}
+
+/* ---------- related services rail ---------- */
+
+export function RelatedServices({
+  currentSlug,
+  heading = "Explore other services",
+}: {
+  currentSlug?: string;
+  heading?: string;
+}) {
+  const others = serviceCategories
+    .filter((category) => category.slug !== currentSlug)
+    .slice(0, 4);
+  return (
+    <section className="border-t border-line bg-canvas">
+      <Container className="py-16 sm:py-20">
+        <Reveal>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
+            {heading}
+          </h2>
+          <Link
+            href="/services"
+            className="text-sm font-semibold text-primary-500 transition-colors duration-200 hover:text-primary-600"
+          >
+            All services <span aria-hidden="true">→</span>
+          </Link>
         </div>
+        <div className="mt-8 grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+          {others.map((category) => (
+            <Link
+              key={category.slug}
+              href={`/services/${category.slug}`}
+              className="group relative flex flex-col bg-surface p-6 transition-colors duration-200 hover:bg-secondary-50/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute left-0 top-0 h-0.5 w-0 bg-primary-400 transition-all duration-300 group-hover:w-full"
+              />
+              <h3 className="font-display text-base font-semibold tracking-tight text-ink">
+                {category.title}
+              </h3>
+              <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted">
+                {category.blurb}
+              </p>
+              <span className="mt-auto pt-4 text-sm font-semibold text-primary-500">
+                Learn more <span aria-hidden="true">→</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+        </Reveal>
       </Container>
     </section>
   );
@@ -431,39 +609,41 @@ export function Faq() {
 
 /* ---------- contact cta ---------- */
 
-export function ContactCta() {
+export function ContactCta({ children }: { children?: ReactNode }) {
   return (
     <section id="contact" className="scroll-mt-24 bg-canvas">
       <Container className="py-20 sm:py-24">
-        <div className="relative isolate overflow-hidden rounded-3xl bg-navy-900 px-6 py-16 text-center text-white sm:px-16 sm:py-20">
-          <div aria-hidden="true" className="absolute inset-0 -z-10">
-            <div className="absolute inset-0 bg-[radial-gradient(45rem_25rem_at_50%_-20%,rgba(255,154,63,0.15),transparent_60%)]" />
+        <div className="relative isolate overflow-hidden rounded-sm bg-navy-900 text-white">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-20 bg-cover bg-center opacity-40"
+            style={bg(images.teamMeeting)}
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 bg-gradient-to-r from-navy-900 via-navy-900/95 to-navy-900/70"
+          />
+          <div className="px-6 py-16 text-center sm:px-16 sm:py-20">
+            <Eyebrow tone="dark" align="center">
+              Free 30-minute consultation
+            </Eyebrow>
+            <h2 className="mx-auto mt-5 max-w-2xl font-display text-3xl font-medium leading-[1.12] tracking-tight text-balance sm:text-4xl">
+              {children ?? "Ready to put your books on solid ground?"}
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl leading-7 text-white/75">
+              Tell us where things stand — we’ll tell you exactly what we’d do,
+              what it costs and what you’d get back. No obligation, no jargon.
+            </p>
+            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button href="/contact">Start the conversation</Button>
+              <Button href={site.phoneHref} variant="outlineLight" external>
+                {site.phone}
+              </Button>
+            </div>
+            <p className="mt-6 text-sm text-white/50">
+              We reply within one business day.
+            </p>
           </div>
-          <Eyebrow tone="dark">Free 30-minute consultation</Eyebrow>
-          <h2 className="mx-auto mt-4 max-w-2xl font-display text-3xl font-medium tracking-tight text-balance sm:text-4xl">
-            Ready to put your books on solid ground?
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl leading-7 text-white/70">
-            Tell us where things stand — we’ll tell you exactly what we’d do,
-            what it costs and what you’d get back. No obligation, no jargon.
-          </p>
-          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/contact"
-              className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full bg-primary-400 px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400"
-            >
-              Start the conversation
-            </Link>
-            <a
-              href={site.phoneHref}
-              className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full border border-white/25 px-7 text-sm font-medium text-white transition-colors duration-200 hover:border-white/50 hover:bg-white/5"
-            >
-              {site.phone}
-            </a>
-          </div>
-          <p className="mt-6 text-sm text-white/50">
-            We reply within one business day.
-          </p>
         </div>
       </Container>
     </section>

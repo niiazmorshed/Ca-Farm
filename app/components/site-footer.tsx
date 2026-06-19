@@ -12,34 +12,35 @@ const firmLinks = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-line bg-canvas">
+    <footer className="bg-navy-900 text-white">
       <div className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-8">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-navy-900 font-display text-sm font-semibold text-primary-400">
+              <span className="grid h-9 w-9 place-items-center rounded-sm bg-white/10 font-display text-sm font-semibold text-primary-300">
                 CA
               </span>
-              <span className="font-display text-lg font-semibold tracking-tight text-ink">
+              <span className="font-display text-lg font-semibold tracking-tight text-white">
                 CA Farm
               </span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-6 text-muted">
+            <p className="mt-4 max-w-xs text-sm leading-6 text-white/60">
               A partner-led chartered accountancy practice helping founders and
-              family businesses grow on solid financial ground.
+              family businesses across the UK and Ireland grow on solid
+              financial ground.
             </p>
           </div>
 
           <nav aria-label="Services">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-300">
               Services
             </h3>
-            <ul className="mt-4 flex flex-col gap-2.5 text-sm text-ink-body">
+            <ul className="mt-4 flex flex-col gap-2.5 text-sm text-white/70">
               {serviceCategories.map((category) => (
                 <li key={category.slug}>
                   <Link
                     href={`/services/${category.slug}`}
-                    className="transition-colors duration-200 hover:text-secondary-500"
+                    className="transition-colors duration-200 hover:text-white"
                   >
                     {category.title}
                   </Link>
@@ -49,15 +50,15 @@ export function SiteFooter() {
           </nav>
 
           <nav aria-label="Firm">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-300">
               Firm
             </h3>
-            <ul className="mt-4 flex flex-col gap-2.5 text-sm text-ink-body">
+            <ul className="mt-4 flex flex-col gap-2.5 text-sm text-white/70">
               {firmLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="transition-colors duration-200 hover:text-secondary-500"
+                    className="transition-colors duration-200 hover:text-white"
                   >
                     {link.label}
                   </Link>
@@ -67,10 +68,10 @@ export function SiteFooter() {
           </nav>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-300">
               Get in touch
             </h3>
-            <address className="mt-4 text-sm not-italic leading-6 text-ink-body">
+            <address className="mt-4 text-sm not-italic leading-6 text-white/70">
               {site.address.map((line) => (
                 <span key={line} className="block">
                   {line}
@@ -78,22 +79,22 @@ export function SiteFooter() {
               ))}
               <a
                 href={`mailto:${site.email}`}
-                className="mt-3 block transition-colors duration-200 hover:text-secondary-500"
+                className="mt-3 block transition-colors duration-200 hover:text-white"
               >
                 {site.email}
               </a>
               <a
                 href={site.phoneHref}
-                className="transition-colors duration-200 hover:text-secondary-500"
+                className="transition-colors duration-200 hover:text-white"
               >
                 {site.phone}
               </a>
             </address>
-            <p className="mt-3 text-sm text-muted">{site.hours}</p>
+            <p className="mt-3 text-sm text-white/45">{site.hours}</p>
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-2 border-t border-line pt-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-14 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} CA Farm. All rights reserved.</p>
           <p>ICAEW registered practice · York, UK</p>
         </div>

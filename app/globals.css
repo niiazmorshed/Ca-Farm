@@ -6,36 +6,44 @@
 }
 
 @theme {
-  /* Dark Horse–inspired palette: orange, teal, navy, warm neutrals */
-  --color-canvas: #f7f5ef;
+  /* CA Farm — The Practice: navy ink, harvest amber, field olive, warm paper */
+  --color-canvas: #f7f5f0;
   --color-surface: #ffffff;
-  --color-surface-muted: #f4f4f4;
-  --color-ink: #304251;
-  --color-ink-body: #485159;
-  --color-muted: #6e797a;
-  --color-line: #e8f3f5;
+  --color-surface-muted: #efece4;
+  --color-ink: #14212e;
+  --color-ink-body: #3c4651;
+  --color-muted: #6c7480;
+  --color-line: #e4e0d6;
 
-  --color-primary-50: #ffeddd;
-  --color-primary-300: #ffb366;
-  --color-primary-400: #ff9a3f;
-  --color-primary-500: #e8872a;
-  --color-primary-600: #c46f1a;
+  /* harvest amber — the one bold accent */
+  --color-primary-50: #f6e9d6;
+  --color-primary-300: #d79f57;
+  --color-primary-400: #c07a2a;
+  --color-primary-500: #a5641d;
+  --color-primary-600: #854f16;
 
-  --color-secondary-50: #f0f8f9;
-  --color-secondary-400: #86acb2;
-  --color-secondary-500: #6b959c;
+  /* field olive — secondary, grounds the brand */
+  --color-secondary-50: #eef0e8;
+  --color-secondary-400: #7d8a6a;
+  --color-secondary-500: #566049;
+  --color-secondary-600: #3f4734;
 
-  --color-navy-700: #485e70;
-  --color-navy-800: #304251;
-  --color-navy-900: #1e2a33;
+  /* navy ink — dark sections */
+  --color-navy-700: #2c3a48;
+  --color-navy-800: #1c2935;
+  --color-navy-900: #122029;
 
-  --animate-fade-up: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-marquee: marquee 32s linear infinite;
+  /* Strong custom easing (Emil Kowalski) — built-in curves are too weak */
+  --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-fluid: cubic-bezier(0.77, 0, 0.175, 1);
+
+  --animate-fade-up: fade-up 0.7s var(--ease-snappy) both;
+  --animate-marquee: marquee 40s linear infinite;
 
   @keyframes fade-up {
     from {
       opacity: 0;
-      transform: translateY(18px);
+      transform: translateY(14px);
     }
     to {
       opacity: 1;

@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Container, Eyebrow, CheckIcon } from "../../components/ui";
-import { ContactCta } from "../../components/sections";
-import { serviceCategories, getCategory } from "../../lib/content";
+import {
+  Breadcrumbs,
+  Button,
+  Container,
+  Eyebrow,
+  PageHero,
+  CheckIcon,
+} from "../../components/ui";
+import { ContactCta, RelatedServices } from "../../components/sections";
+import { Reveal } from "../../components/reveal";
+import { serviceCategories, getCategory, site } from "../../lib/content";
 
 export function generateStaticParams() {
   return serviceCategories.map(({ slug }) => ({ category: slug }));
@@ -35,124 +43,158 @@ export default async function CategoryPage({
 
   return (
     <>
-      <section className="relative isolate overflow-hidden border-b border-line bg-surface">
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-[radial-gradient(50rem_20rem_at_85%_-40%,rgba(134,172,178,0.15),transparent_60%)]"
-        />
-        <Container className="py-16 sm:py-20">
-          <div className="max-w-2xl">
-            <span className="animate-fade-up block">
-              <Eyebrow>
-                <Link
-                  href="/services"
-                  className="transition-colors duration-200 hover:text-secondary-400"
-                >
-                  Services
-                </Link>{" "}
-                / {cat.title}
-              </Eyebrow>
-            </span>
-            <h1 className="animate-fade-up mt-4 flex flex-wrap items-center gap-3 font-display text-4xl font-medium tracking-tight text-balance text-ink [animation-delay:60ms] sm:text-5xl">
-              {cat.title}
-              {comingSoon && (
-                <span className="rounded-full bg-secondary-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-secondary-500">
-                  Coming soon
-                </span>
-              )}
-            </h1>
-            <p className="animate-fade-up mt-5 text-lg leading-8 text-muted [animation-delay:120ms]">
-              {cat.overview}
-            </p>
-            <div className="animate-fade-up mt-7 [animation-delay:180ms]">
-              <Link
-                href="/contact"
-                className="inline-flex h-12 items-center justify-center rounded-full bg-primary-400 px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400"
-              >
-                {comingSoon ? "Register your interest" : `Talk to us about ${cat.title.toLowerCase()}`}
-              </Link>
-            </div>
-          </div>
-        </Container>
-      </section>
+      <PageHero
+        image="office"
+        breadcrumb={
+          <Breadcrumbs
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Services", href: "/services" },
+              { label: cat.title },
+            ]}
+          />
+        }
+        title={
+          <>
+            {cat.title}
+            {comingSoon && (
+              <span className="rounded-sm bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary-300">
+                Coming soon
+              </span>
+            )}
+          </>
+        }
+        lede={cat.overview}
+        action={
+          <Button href="/contact">
+            {comingSoon
+              ? "Register your interest"
+              : `Talk to us about ${cat.title.toLowerCase()}`}
+          </Button>
+        }
+      />
 
       {/* services / personas: grid of sub-service cards */}
       {!comingSoon && !isSingle && (
         <Container className="py-16 sm:py-20">
-          <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
-            {isPersona ? "Who we help" : "What this covers"}
+          <Reveal>
+          <Eyebrow>{isPersona ? "Who we help" : "What this covers"}</Eyebrow>
+          <h2 className="mt-4 font-display text-2xl font-medium tracking-tight text-ink sm:text-3xl">
+            {isPersona
+              ? "Specialist support by profession"
+              : `${cat.items.length} ways we help`}
           </h2>
-          <div className="mt-8 grid gap-5 sm:grid-cols-2">
+          <div className="mt-10 grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-2">
             {cat.items.map((item, index) => (
-              <article
+              <Link
                 key={item.slug}
-                className="flex flex-col rounded-2xl border border-line bg-surface p-7"
+                href={`/services/${cat.slug}/${item.slug}`}
+                className="group relative flex flex-col bg-surface p-7 transition-colors duration-200 hover:bg-secondary-50/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500"
               >
+                <span
+                  aria-hidden="true"
+                  className="absolute left-0 top-0 h-0.5 w-0 bg-primary-400 transition-all duration-300 group-hover:w-full"
+                />
                 <div className="flex items-baseline justify-between gap-4">
                   <span className="font-display text-sm font-semibold text-primary-500">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <Link
-                    href={`/services/${cat.slug}/${item.slug}`}
-                    className="text-sm font-semibold text-secondary-500 transition-colors duration-200 hover:text-secondary-400"
-                  >
-                    Details <span aria-hidden="true">→</span>
-                  </Link>
+                  <span className="text-sm font-semibold text-primary-500">
+                    Details{" "}
+                    <span
+                      aria-hidden="true"
+                      className="inline-block transition-transform duration-200 group-hover:translate-x-1"
+                    >
+                      →
+                    </span>
+                  </span>
                 </div>
-                <h3 className="mt-3 font-display text-xl font-medium tracking-tight text-ink">
-                  <Link
-                    href={`/services/${cat.slug}/${item.slug}`}
-                    className="transition-colors duration-200 hover:text-secondary-500"
-                  >
-                    {item.title}
-                  </Link>
+                <h3 className="mt-3 font-display text-xl font-medium tracking-tight text-ink transition-colors duration-200 group-hover:text-primary-500">
+                  {item.title}
                 </h3>
                 <p className="mt-2.5 text-[15px] leading-7 text-muted">
                   {item.blurb}
                 </p>
-              </article>
+                {item.included.length > 0 && (
+                  <ul className="mt-5 flex flex-col gap-2 border-t border-line pt-5">
+                    {item.included.slice(0, 3).map((entry) => (
+                      <li
+                        key={entry}
+                        className="flex items-start gap-2.5 text-sm leading-6 text-ink-body"
+                      >
+                        <span className="mt-1 text-primary-500">
+                          <CheckIcon className="h-3.5 w-3.5" />
+                        </span>
+                        {entry}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Link>
             ))}
           </div>
+          </Reveal>
         </Container>
       )}
 
-      {/* single: render included / best-for inline like a detail page */}
+      {/* single: included list + sticky CTA / best-for aside */}
       {!comingSoon && isSingle && (
-        <Container className="grid gap-14 py-16 sm:py-20 lg:grid-cols-[1.2fr_0.8fr]">
-          <div>
-            <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
-              What’s included
+        <Container className="grid items-start gap-12 py-16 sm:py-20 lg:grid-cols-[1fr_22rem]">
+          <Reveal>
+            <Eyebrow>What’s included</Eyebrow>
+            <h2 className="mt-4 font-display text-2xl font-medium tracking-tight text-ink sm:text-3xl">
+              Everything {cat.title.toLowerCase()} covers
             </h2>
-            <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+            <ul className="mt-8 grid gap-3 sm:grid-cols-2">
               {(cat.included ?? []).map((entry) => (
                 <li
                   key={entry}
-                  className="flex items-start gap-3 rounded-xl border border-line bg-surface p-4 text-sm leading-6 text-ink-body"
+                  className="flex items-start gap-3 rounded-sm border border-line bg-surface p-4 text-sm leading-6 text-ink-body transition-colors duration-200 hover:border-primary-300"
                 >
-                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-navy-900 text-primary-400">
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-sm bg-navy-900 text-primary-300">
                     <CheckIcon className="h-3 w-3" />
                   </span>
                   {entry}
                 </li>
               ))}
             </ul>
-          </div>
-          <aside>
-            <div className="rounded-2xl border border-line bg-surface p-6">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-                Best for
+          </Reveal>
+          <aside className="flex flex-col gap-6 lg:sticky lg:top-28">
+            <div className="rounded-sm bg-navy-900 p-7 text-white">
+              <h2 className="font-display text-lg font-medium tracking-tight">
+                Talk to us about {cat.title.toLowerCase()}
               </h2>
-              <ul className="mt-4 flex flex-col gap-3">
-                {(cat.bestFor ?? []).map((entry) => (
-                  <li
-                    key={entry}
-                    className="border-l-2 border-primary-400 pl-3 text-sm leading-6 text-ink-body"
-                  >
-                    {entry}
-                  </li>
-                ))}
-              </ul>
+              <p className="mt-2 text-sm leading-6 text-white/70">
+                A partner-led conversation, scoped to your situation. No pitch,
+                no obligation.
+              </p>
+              <Button href="/contact" className="mt-5 w-full">
+                Book a free consultation
+              </Button>
+              <a
+                href={site.phoneHref}
+                className="mt-3 flex items-center justify-center gap-2 text-sm font-medium text-primary-300 transition-colors duration-200 hover:text-primary-400"
+              >
+                {site.phone}
+              </a>
             </div>
+            {(cat.bestFor ?? []).length > 0 && (
+              <div className="rounded-sm border-t-2 border-primary-400 bg-surface p-6 shadow-sm shadow-navy-900/5">
+                <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+                  Best for
+                </h2>
+                <ul className="mt-4 flex flex-col gap-3">
+                  {(cat.bestFor ?? []).map((entry) => (
+                    <li
+                      key={entry}
+                      className="border-l-2 border-primary-400 pl-3 text-sm leading-6 text-ink-body"
+                    >
+                      {entry}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </aside>
         </Container>
       )}
@@ -160,7 +202,7 @@ export default async function CategoryPage({
       {/* coming soon: simple reassurance block */}
       {comingSoon && (
         <Container className="py-16 sm:py-20">
-          <div className="mx-auto flex max-w-xl flex-col items-center gap-3 rounded-2xl border border-line bg-surface px-8 py-12 text-center">
+          <Reveal className="mx-auto flex max-w-xl flex-col items-center gap-3 rounded-sm border-t-2 border-primary-400 bg-surface px-8 py-12 text-center shadow-sm shadow-navy-900/5">
             <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
               We’re building this service
             </h2>
@@ -168,15 +210,14 @@ export default async function CategoryPage({
               Tell us what you need and we’ll be in touch the moment it launches —
               or sooner, if we can already help.
             </p>
-            <Link
-              href="/contact"
-              className="mt-3 inline-flex h-11 items-center justify-center rounded-full bg-primary-400 px-6 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-500"
-            >
+            <Button href="/contact" className="mt-3">
               Register your interest
-            </Link>
-          </div>
+            </Button>
+          </Reveal>
         </Container>
       )}
+
+      <RelatedServices currentSlug={cat.slug} heading="Other service areas" />
 
       <ContactCta />
     </>
