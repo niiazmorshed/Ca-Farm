@@ -1,5 +1,7 @@
 "use server";
 
+import { query } from "../lib/db";
+
 export interface EnquiryState {
   status: "idle" | "success" | "error";
   errors?: Partial<Record<"name" | "email" | "message", string>>;
@@ -31,12 +33,24 @@ export async function submitEnquiry(
     return { status: "error", errors, values };
   }
 
-  // No mailbox wired up yet: log server-side so enquiries are visible in
-  // hosting logs. Swap for an email/CRM call before go-live.
-  console.log("[enquiry]", {
-    ...values,
-    message: values.message.slice(0, 1000),
-  });
+  // Save to Postgres (Supabase). Parameterised query ($1..$5) — never string
+  // interpolation — so user input can't be used for SQL injection.
+  try {
+    await query(
+      `insert into enquiries (name, email, company, service, message)
+       values ($1, $2, $3, $4, $5)`,
+      [
+        values.name,
+        values.email,
+        values.company || null,
+        values.service || null,
+        values.message.slice(0, 4000),
+      ],
+    );
+  } catch (err) {
+    console.error("[enquiry] failed to save:", err);
+    return { status: "error", values };
+  }
 
   return { status: "success" };
 }
