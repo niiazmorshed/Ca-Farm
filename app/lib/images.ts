@@ -4,9 +4,10 @@
 
 const BASE = "https://images.unsplash.com/photo-";
 
-/** Build a sized, cropped Unsplash URL. */
-function u(id: string, w = 1600, q = 70) {
-  return `${BASE}${id}?auto=format&fit=crop&w=${w}&q=${q}`;
+/** Build a sized, cropped Unsplash URL. Pass `h` for a fixed landscape crop. */
+function u(id: string, w = 1600, q = 70, h?: number) {
+  const size = h ? `w=${w}&h=${h}` : `w=${w}`;
+  return `${BASE}${id}?auto=format&fit=crop&${size}&q=${q}`;
 }
 
 export const images = {
@@ -30,6 +31,8 @@ export const images = {
   fields: u("1444858291040-58f756a3bdd6", 1920),
   /** Misty forest path — quiet brand atmosphere. */
   forest: u("1507537297725-24a1c029d3ca", 1600),
+  /** Westminster / Big Ben at moody sunset — UK footer backdrop (wide crop). */
+  londonDusk: u("1529655683826-aba9b3e77383", 1920, 70, 720),
 } as const;
 
 export type ImageKey = keyof typeof images;
