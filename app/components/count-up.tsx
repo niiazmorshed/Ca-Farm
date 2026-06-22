@@ -1,7 +1,7 @@
 "use client";
 
 import { animate, useInView, useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 /**
  * Counts a stat value up to its target once, when scrolled into view.
@@ -30,30 +30,33 @@ export function CountUp({
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.4 });
   const reduce = useReducedMotion();
-  const [display, setDisplay] = useState(value);
 
+  // Drive the text via the DOM node directly — no per-frame React state.
   useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
     const parsed = parse(value);
     if (!parsed || reduce) {
-      setDisplay(value);
+      node.textContent = value;
       return;
     }
     if (!inView) {
-      setDisplay(`${parsed.prefix}0${parsed.suffix}`);
+      node.textContent = `${parsed.prefix}0${parsed.suffix}`;
       return;
     }
     const controls = animate(0, parsed.target, {
       duration,
       ease: [0.23, 1, 0.32, 1],
-      onUpdate: (v) =>
-        setDisplay(`${parsed.prefix}${Math.round(v)}${parsed.suffix}`),
+      onUpdate: (v) => {
+        node.textContent = `${parsed.prefix}${Math.round(v)}${parsed.suffix}`;
+      },
     });
     return () => controls.stop();
   }, [inView, value, duration, reduce]);
 
   return (
     <span ref={ref} className={className}>
-      {display}
+      {value}
     </span>
   );
 }

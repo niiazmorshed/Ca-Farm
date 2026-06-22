@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { serviceCategories, site } from "../lib/content";
@@ -65,8 +65,29 @@ function Logo({ onClick }: { onClick?: () => void }) {
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
   const pathname = usePathname();
   const servicesActive = isActive(pathname, "/services");
+
+  // Auto-hide: slide the header away on scroll-down, reveal it on scroll-up.
+  useEffect(() => {
+    lastY.current = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 24);
+      const goingDown = y > lastY.current;
+      // ignore tiny jitter; never hide near the very top or while the menu is open
+      if (Math.abs(y - lastY.current) > 6) {
+        setHidden(goingDown && y > 120 && !menuOpen);
+      }
+      lastY.current = y;
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [menuOpen]);
 
   function closeMobile() {
     setMenuOpen(false);
@@ -74,7 +95,11 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="relative z-40">
+    <header
+      className={`sticky top-0 z-50 transition-transform duration-300 ease-snappy ${
+        hidden ? "-translate-y-full" : "translate-y-0"
+      }`}
+    >
       {/* utility bar */}
       <div className="hidden bg-navy-900 text-white/70 md:block">
         <div className="mx-auto flex h-10 w-full max-w-6xl items-center justify-between px-5 text-xs sm:px-8">
@@ -105,7 +130,11 @@ export function SiteHeader() {
       </div>
 
       {/* main nav */}
-      <div className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur-md">
+      <div
+        className={`border-b border-line bg-white/95 backdrop-blur-md transition-shadow duration-300 ease-snappy ${
+          scrolled ? "shadow-lg shadow-navy-900/10" : ""
+        }`}
+      >
         <nav
           aria-label="Main"
           className="mx-auto flex h-[4.5rem] w-full max-w-6xl items-center justify-between px-5 sm:px-8"

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { serviceCategories, site } from "../lib/content";
+import { images } from "../lib/images";
 
 const firmLinks = [
   { label: "Services", href: "/services" },
@@ -12,7 +13,23 @@ const firmLinks = [
 
 export function SiteFooter() {
   return (
-    <footer className="bg-navy-900 text-white">
+    <footer className="relative isolate overflow-hidden bg-navy-900 text-white">
+      {/* photographic backdrop — Westminster at dusk (UK) */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-20 bg-cover bg-center bg-no-repeat opacity-55"
+        style={{ backgroundImage: `url(${images.londonDusk})` }}
+      />
+      {/* navy scrim keeps text legible while letting the photo read through */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-gradient-to-b from-navy-900/85 via-navy-900/65 to-navy-900/90"
+      />
+      {/* harvest hairline at the seam */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-primary-400/60 to-transparent"
+      />
       <div className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-8">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>

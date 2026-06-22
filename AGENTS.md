@@ -15,6 +15,7 @@ Marketing site for **CA Farm** — a partner-led chartered accountancy practice 
 - **Next.js 16** (App Router)
 - **React 19**, **TypeScript**
 - **Tailwind CSS v4** (`app/globals.css` with `@theme` tokens)
+- **Framer Motion** (`motion` package, import from `motion/react`) — scroll reveals, count-up, accordion
 - **Fonts:** Fraunces (display), Geist (body) — loaded in `app/layout.tsx`
 
 Commands: `npm run dev` · `npm run build` · `npm run lint`
@@ -26,10 +27,15 @@ Commands: `npm run dev` · `npm run build` · `npm run lint`
 ```
 app/
   page.tsx, about/, contact/, pricing/, services/   # routes
-  components/     # UI, layout, sections
-  lib/content.ts  # site config, services, pricing, copy data
-  globals.css     # brand tokens and base styles
+  components/      # UI, layout, sections + motion primitives
+  lib/content.ts   # site config, services, pricing, copy data
+  lib/images.ts    # curated Unsplash URLs (used as CSS background-image)
+  globals.css      # brand tokens, easing/animation tokens, base styles
 ```
+
+- **Motion primitives** (client components, all reduced-motion safe):
+  `reveal.tsx` (scroll fade-up), `count-up.tsx` (stats), `clip-reveal.tsx`
+  (image clip), `accordion.tsx` (FAQ), `back-to-top.tsx`.
 
 - **Pages** compose section components; keep pages thin.
 - **Copy and structured data** live in `app/lib/content.ts` — edit there instead of hardcoding in components.
@@ -47,6 +53,21 @@ app/
 - SEO: use `metadata` exports on pages; site URL and defaults in `app/layout.tsx`.
 - Minimize scope — match existing patterns; don't refactor unrelated files.
 - No new dependencies unless the task clearly needs them.
+
+### Motion & imagery
+
+- Animate with **Framer Motion** (`motion/react`) — never hand-rolled
+  IntersectionObserver. Reuse the primitives in `app/components/` before adding new ones.
+- Animate `transform` / `opacity` only; custom ease-out is the `ease-snappy`
+  token (`cubic-bezier(0.23,1,0.32,1)`); UI ≤300ms, reveals ~600–900ms.
+- Every motion must respect `prefers-reduced-motion` (drop movement, keep content);
+  SSR must render the final/visible state for SEO + JS-off.
+- **`transform` on an ancestor breaks `position: sticky` on descendants** — never
+  wrap a sticky-aside grid in `Reveal` (or any transformed element).
+- The header is **`sticky top-0` on the `<header>` element itself** (not an inner
+  div — an inner sticky child fills its short parent and can't stick).
+- Photos are CSS `background-image` from `lib/images.ts` over a gradient scrim
+  (no `next/image` remote config); verify any new Unsplash URL returns 200.
 
 ---
 
