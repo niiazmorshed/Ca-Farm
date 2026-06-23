@@ -33,7 +33,7 @@ app/
   lib/content.ts   # site config, services, pricing, copy data
   lib/images.ts    # curated Unsplash URLs (used as CSS background-image)
   lib/db.ts        # Postgres pool (pg) — contact write, admin reads
-  lib/supabase/    # @supabase/ssr clients, guards, session middleware
+  lib/supabase/    # @supabase/ssr browser/server/admin clients, guards, session helper
   globals.css      # brand tokens, easing/animation tokens, base styles
 proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /admin
 ```
@@ -76,25 +76,50 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
 
 ### Auth & data
 
-- **Auth = Supabase Auth via `@supabase/ssr`**, publishable key only — never the
-  service-role secret in app code. Browser client `lib/supabase/client.ts`,
-  server client `lib/supabase/server.ts`, guards `lib/supabase/guards.ts`
-  (`requireUser`, `requireAdmin`).
+- **Auth = Supabase Auth via `@supabase/ssr`.** Browser client `lib/supabase/client.ts`,
+  server client `lib/supabase/server.ts`, session refresh + route gating in `proxy.ts`
+  (matcher = `/portal` + `/admin` only), guards in `lib/supabase/guards.ts`
+  (`requireUser`, `requireAdmin`, `getSessionEmail`).
 - **Roles** live in `public.profiles.role` (`client` | `admin`); a signup trigger
   creates the row as `client`. Promote admins by SQL/MCP only — there is
   intentionally **no profile UPDATE policy**, so a client can't self-promote.
+- **Signup uses the Admin API** (`lib/supabase/admin.ts`, service-role key,
+  `admin.createUser({ email_confirm: true })`) so accounts are pre-confirmed — no
+  confirmation email, no email rate-limit, independent of the dashboard "Confirm
+  email" toggle. It then signs the user in and redirects by role.
 - **Google OAuth** via `signInWithOAuth` → `/auth/callback` exchanges the PKCE
-  code. OAuth users get a `client` profile from the same signup trigger. The
-  provider is enabled in the Supabase dashboard (not via code/MCP).
-- **Header auth state is client-side** (`onAuthStateChange`) to keep marketing
-  pages static — do **not** fetch the user in the root layout.
-- **Two data paths by design:** `lib/db.ts` (`pg`) for the contact write and the
-  admin enquiries read (behind `requireAdmin`); `supabase-js` for auth/session +
-  RLS reads. `enquiries` keeps RLS on with no policy (anon denied, `pg` owner
-  bypasses) — leave it.
-- **Secrets** live in `.env.local` only (`DATABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
-  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`). Never echo or commit them. Run Supabase
-  security advisors after any DDL.
+  code. OAuth users get a `client` profile from the same trigger. Provider is
+  enabled in the Supabase dashboard (not via code/MCP).
+- **Role lookups for redirect/gating use `pg`** (login action, `/auth/callback`,
+  `requireAdmin`) — reading `profiles.role` via the Supabase client right after
+  sign-in is unreliable (RLS + session timing), so query the `pg` pool by user id.
+- **Header auth is read SERVER-SIDE**: the root layout calls `getSessionEmail()`
+  (local `getClaims`, no network) and passes `userEmail` to `<SiteHeader>`; logout
+  is the **server action** in `app/auth/actions.ts` (clears the cookie server-side).
+  Do **not** read the session in the browser for the header — the SSR cookie isn't
+  reliably readable client-side.
+- **Two data paths by design:** `lib/db.ts` (`pg`) for the contact write, admin
+  enquiries read, and all role lookups; `supabase-js` for auth/session. `enquiries`
+  keeps RLS on with no policy (anon denied, `pg` owner bypasses) — leave it.
+- **Secrets** live in `.env.local` only — `DATABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, **`SUPABASE_SERVICE_ROLE_KEY`** (server-only,
+  never `NEXT_PUBLIC`), and the `EmailJs_*` keys. Never echo or commit them. Run
+  Supabase security advisors after any DDL.
+
+### Contact email (EmailJS)
+
+- `app/contact/actions.ts` saves the enquiry to Postgres, then sends an email via
+  the **EmailJS REST API** server-side, wrapped in Next's `after()` so it never
+  blocks the form response (best-effort — failures logged, not surfaced). Keys:
+  `EmailJs_Gmail_serviceid_KEY`, `EmailJs_Template_KEY`, `EmailJs_PUBLIC_KEY`,
+  `EmailJs_Private_KEY`.
+
+### Testing
+
+- E2E via **Playwright** lives in `/e2e` (gitignored, installed `--no-save` — not a
+  project dependency). Run: `npx playwright test --config e2e/playwright.config.ts`
+  (spins up a prod server on `:3100`). Covers marketing pages, auth gating,
+  login/signup/logout, role routing, and the contact form.
 
 ---
 
