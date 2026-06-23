@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { serviceCategories, site } from "../lib/content";
+import { signOutAction } from "../auth/actions";
 
 const secondaryLinks = [
   { href: "/pricing", label: "Pricing" },
@@ -62,7 +63,7 @@ function Logo({ onClick }: { onClick?: () => void }) {
   );
 }
 
-export function SiteHeader() {
+export function SiteHeader({ userEmail }: { userEmail: string | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -70,6 +71,10 @@ export function SiteHeader() {
   const lastY = useRef(0);
   const pathname = usePathname();
   const servicesActive = isActive(pathname, "/services");
+
+  // Auth comes from the server (root layout) — reliable across SSR cookies,
+  // unlike reading the session in the browser.
+  const user = userEmail ? { email: userEmail } : null;
 
   // Auto-hide: slide the header away on scroll-down, reveal it on scroll-up.
   useEffect(() => {
@@ -119,12 +124,31 @@ export function SiteHeader() {
             >
               {site.email}
             </a>
-            <Link
-              href="/contact"
-              className="font-medium text-primary-300 transition-colors duration-200 hover:text-primary-400"
-            >
-              Client login
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  href="/portal"
+                  className="font-medium text-primary-300 transition-colors duration-200 hover:text-primary-400"
+                >
+                  My account
+                </Link>
+                <form action={signOutAction}>
+                  <button
+                    type="submit"
+                    className="cursor-pointer transition-colors duration-200 hover:text-white"
+                  >
+                    Sign out
+                  </button>
+                </form>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="font-medium text-primary-300 transition-colors duration-200 hover:text-primary-400"
+              >
+                Client login
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -333,6 +357,34 @@ export function SiteHeader() {
               >
                 Book a consultation
               </Link>
+              {user ? (
+                <>
+                  <Link
+                    href="/portal"
+                    onClick={closeMobile}
+                    className="mt-1 rounded-sm px-3 py-2.5 text-[15px] font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
+                  >
+                    My account
+                  </Link>
+                  <form action={signOutAction}>
+                    <button
+                      type="submit"
+                      onClick={closeMobile}
+                      className="w-full rounded-sm px-3 py-2.5 text-left text-[15px] font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
+                    >
+                      Sign out
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={closeMobile}
+                  className="mt-1 rounded-sm px-3 py-2.5 text-[15px] font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
+                >
+                  Client login
+                </Link>
+              )}
             </div>
           </div>
         )}

@@ -16,6 +16,7 @@ Marketing site for **CA Farm** — a partner-led chartered accountancy practice 
 - **React 19**, **TypeScript**
 - **Tailwind CSS v4** (`app/globals.css` with `@theme` tokens)
 - **Framer Motion** (`motion` package, import from `motion/react`) — scroll reveals, count-up, accordion
+- **Supabase** — Postgres (via `pg`) + **Supabase Auth** (`@supabase/ssr`, cookie sessions, RLS)
 - **Fonts:** Fraunces (display), Geist (body) — loaded in `app/layout.tsx`
 
 Commands: `npm run dev` · `npm run build` · `npm run lint`
@@ -26,11 +27,15 @@ Commands: `npm run dev` · `npm run build` · `npm run lint`
 
 ```
 app/
-  page.tsx, about/, contact/, pricing/, services/   # routes
+  page.tsx, about/, contact/, pricing/, services/   # marketing routes
+  login/, signup/, portal/, admin/, auth/{confirm,callback}/  # auth routes
   components/      # UI, layout, sections + motion primitives
   lib/content.ts   # site config, services, pricing, copy data
   lib/images.ts    # curated Unsplash URLs (used as CSS background-image)
+  lib/db.ts        # Postgres pool (pg) — contact write, admin reads
+  lib/supabase/    # @supabase/ssr clients, guards, session middleware
   globals.css      # brand tokens, easing/animation tokens, base styles
+proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /admin
 ```
 
 - **Motion primitives** (client components, all reduced-motion safe):
@@ -68,6 +73,28 @@ app/
   div — an inner sticky child fills its short parent and can't stick).
 - Photos are CSS `background-image` from `lib/images.ts` over a gradient scrim
   (no `next/image` remote config); verify any new Unsplash URL returns 200.
+
+### Auth & data
+
+- **Auth = Supabase Auth via `@supabase/ssr`**, publishable key only — never the
+  service-role secret in app code. Browser client `lib/supabase/client.ts`,
+  server client `lib/supabase/server.ts`, guards `lib/supabase/guards.ts`
+  (`requireUser`, `requireAdmin`).
+- **Roles** live in `public.profiles.role` (`client` | `admin`); a signup trigger
+  creates the row as `client`. Promote admins by SQL/MCP only — there is
+  intentionally **no profile UPDATE policy**, so a client can't self-promote.
+- **Google OAuth** via `signInWithOAuth` → `/auth/callback` exchanges the PKCE
+  code. OAuth users get a `client` profile from the same signup trigger. The
+  provider is enabled in the Supabase dashboard (not via code/MCP).
+- **Header auth state is client-side** (`onAuthStateChange`) to keep marketing
+  pages static — do **not** fetch the user in the root layout.
+- **Two data paths by design:** `lib/db.ts` (`pg`) for the contact write and the
+  admin enquiries read (behind `requireAdmin`); `supabase-js` for auth/session +
+  RLS reads. `enquiries` keeps RLS on with no policy (anon denied, `pg` owner
+  bypasses) — leave it.
+- **Secrets** live in `.env.local` only (`DATABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`). Never echo or commit them. Run Supabase
+  security advisors after any DDL.
 
 ---
 

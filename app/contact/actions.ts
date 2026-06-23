@@ -1,5 +1,6 @@
 "use server";
 
+import { after } from "next/server";
 import { query } from "../lib/db";
 
 export interface EnquiryState {
@@ -9,6 +10,66 @@ export interface EnquiryState {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Send the enquiry as an email via the EmailJS REST API (server-side, so the
+ * private key never reaches the browser). Best-effort: the DB row is the source
+ * of truth, so a failed email is logged but doesn't fail the submission.
+ */
+async function sendEnquiryEmail(values: {
+  name: string;
+  email: string;
+  company: string;
+  service: string;
+  message: string;
+}) {
+  const serviceId = process.env.EmailJs_Gmail_serviceid_KEY;
+  const templateId = process.env.EmailJs_Template_KEY;
+  const publicKey = process.env.EmailJs_PUBLIC_KEY;
+  const privateKey = process.env.EmailJs_Private_KEY;
+
+  if (!serviceId || !templateId || !publicKey || !privateKey) {
+    console.warn(
+      "[enquiry] EmailJS not fully configured (need EmailJs_Template_KEY) — skipping email",
+    );
+    return;
+  }
+
+  try {
+    const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service_id: serviceId,
+        template_id: templateId,
+        user_id: publicKey,
+        accessToken: privateKey,
+        // Superset of params so any template variant renders. The form
+        // collects name/email/company/service/message; service is also exposed
+        // as {{budget}} and {{title}} for templates that use those names.
+        template_params: {
+          name: values.name,
+          email: values.email,
+          reply_to: values.email,
+          company: values.company || "—",
+          service: values.service || "—",
+          budget: values.service || "—",
+          title: values.service || "your enquiry",
+          message: values.message,
+        },
+      }),
+    });
+    if (!res.ok) {
+      console.error(
+        "[enquiry] EmailJS send failed:",
+        res.status,
+        await res.text(),
+      );
+    }
+  } catch (err) {
+    console.error("[enquiry] EmailJS request error:", err);
+  }
+}
 
 export async function submitEnquiry(
   _prev: EnquiryState,
@@ -51,6 +112,10 @@ export async function submitEnquiry(
     console.error("[enquiry] failed to save:", err);
     return { status: "error", values };
   }
+
+  // Send the notification email AFTER the response is returned, so the form
+  // submission isn't blocked by the EmailJS round-trip (best-effort).
+  after(() => sendEnquiryEmail(values));
 
   return { status: "success" };
 }
