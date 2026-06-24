@@ -2,11 +2,11 @@
 import { readFileSync } from "node:fs";
 import { Pool } from "pg";
 
-
-
-
 // Minimal .env.local loader (no dependency on dotenv).
-for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
+for (const line of readFileSync(
+  new URL("../.env.local", import.meta.url),
+  "utf8",
+).split("\n")) {
   const m = line.match(/^\s*([\w.-]+)\s*=\s*(.*)\s*$/);
   if (m) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
 }
