@@ -3,6 +3,7 @@ import { Fraunces, Geist } from "next/font/google";
 import { SiteHeader } from "./components/site-header";
 import { SiteFooter } from "./components/site-footer";
 import { BackToTop } from "./components/back-to-top";
+import { getSessionEmail } from "./lib/supabase/guards";
 import { site } from "./lib/content";
 import "./globals.css";
 
@@ -36,11 +37,12 @@ export const viewport: Viewport = {
   themeColor: "#1e2a33",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const userEmail = await getSessionEmail();
   return (
     <html
       lang="en"
@@ -54,7 +56,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <SiteHeader />
+        <SiteHeader userEmail={userEmail} />
         <main id="main" className="flex-1">
           {children}
         </main>
