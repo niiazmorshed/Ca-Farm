@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { serviceCategories, site } from "../lib/content";
-import { signOutAction } from "../auth/actions";
 import type { SessionUser } from "../lib/supabase/guards";
 
 const secondaryLinks = [
@@ -141,25 +140,16 @@ function Logo({ onClick }: { onClick?: () => void }) {
 export function SiteHeader({ user }: { user: SessionUser | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const lastY = useRef(0);
-  const accountRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const servicesActive = isActive(pathname, "/services");
 
-  // Close the account dropdown on outside click and on navigation.
-  useEffect(() => {
-    if (!accountOpen) return;
-    function onClick(e: MouseEvent) {
-      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
-        setAccountOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [accountOpen]);
+  const firstName =
+    user?.name?.trim().split(" ")[0] ??
+    user?.email?.split("@")[0] ??
+    "Account";
 
   // Auto-hide: slide the header away on scroll-down, reveal it on scroll-up.
   useEffect(() => {
@@ -330,61 +320,25 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
 
           <div className="flex items-center gap-2.5 sm:gap-3 lg:gap-4">
             {user ? (
-              <div className="relative" ref={accountRef}>
-                <button
-                  type="button"
-                  aria-haspopup="menu"
-                  aria-expanded={accountOpen}
-                  aria-label="Account menu"
-                  onClick={() => setAccountOpen((open) => !open)}
-                  className="flex cursor-pointer items-center gap-2 rounded-full p-0.5 transition-colors duration-200 hover:bg-secondary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-                >
-                  <Avatar user={user} />
-                  <Chevron
-                    className={`mr-1 hidden text-muted transition-transform duration-200 sm:block ${
-                      accountOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {accountOpen && (
-                  <div
-                    role="menu"
-                    className="absolute right-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-md border border-line bg-white shadow-xl shadow-navy-900/15"
-                  >
-                    <div className="flex items-center gap-3 border-b border-line px-4 py-3">
-                      <Avatar user={user} size={40} />
-                      <div className="min-w-0">
-                        {user.name && (
-                          <p className="truncate text-sm font-semibold text-ink">
-                            {user.name}
-                          </p>
-                        )}
-                        <p className="truncate text-xs text-muted">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-                    <Link
-                      href={user.role === "admin" ? "/admin" : "/portal"}
-                      role="menuitem"
-                      onClick={() => setAccountOpen(false)}
-                      className="block px-4 py-2.5 text-sm font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
-                    >
-                      {user.role === "admin" ? "Admin dashboard" : "My account"}
-                    </Link>
-                    <form action={signOutAction}>
-                      <button
-                        type="submit"
-                        role="menuitem"
-                        className="block w-full cursor-pointer px-4 py-2.5 text-left text-sm font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
-                      >
-                        Sign out
-                      </button>
-                    </form>
-                  </div>
-                )}
-              </div>
+              <Link
+                href={user.role === "admin" ? "/admin" : "/portal"}
+                aria-label={
+                  user.role === "admin" ? "Admin dashboard" : "My dashboard"
+                }
+                className="group flex items-center gap-2.5 rounded-full border border-line bg-surface py-1 pl-1 pr-1.5 shadow-sm transition-all duration-200 hover:border-primary-300 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 sm:pr-4"
+              >
+                <span className="rounded-full ring-2 ring-primary-300/60 ring-offset-2 ring-offset-surface">
+                  <Avatar user={user} size={34} />
+                </span>
+                <span className="hidden flex-col pr-1 leading-tight sm:flex">
+                  <span className="text-sm font-semibold text-ink">
+                    {firstName}
+                  </span>
+                  <span className="text-xs font-medium text-primary-600 transition-colors duration-200 group-hover:text-primary-500">
+                    {user.role === "admin" ? "Admin dashboard" : "My dashboard"}
+                  </span>
+                </span>
+              </Link>
             ) : (
               <Link
                 href="/login"

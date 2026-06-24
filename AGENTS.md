@@ -79,7 +79,7 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
 - **Auth = Supabase Auth via `@supabase/ssr`.** Browser client `lib/supabase/client.ts`,
   server client `lib/supabase/server.ts`, session refresh + route gating in `proxy.ts`
   (matcher = `/portal` + `/admin` only), guards in `lib/supabase/guards.ts`
-  (`requireUser`, `requireAdmin`, `getSessionEmail`).
+  (`requireUser`, `requireAdmin`, `requireClient`, `getSessionUser`).
 - **Roles** live in `public.profiles.role` (`client` | `admin`). The `handle_new_user`
   signup trigger is the **single source of truth**: it sets `role='admin'` only when
   the email matches one hardcoded admin address (`idublinfourir@gmail.com`,
@@ -93,22 +93,39 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
   email" toggle. It then signs the user in and redirects by role.
 - **Google OAuth** via `signInWithOAuth` → `/auth/callback` exchanges the PKCE
   code. OAuth users get a `client` profile from the same trigger. Provider is
-  enabled in the Supabase dashboard (not via code/MCP).
+  enabled in the Supabase dashboard (not via code/MCP). `redirectTo` =
+  `window.location.origin/auth/callback` (adapts per host). Google's authorized
+  redirect URI is the **Supabase** callback (`https://<ref>.supabase.co/auth/v1/callback`),
+  not the app URL. Supabase **Auth → URL Configuration** must allow-list both the
+  prod URL (`https://ca-farm.vercel.app/auth/callback`) and local
+  (`http://localhost:3000/**` — note **http**). Consent screen is External: add
+  test users or Publish.
+- **Role in the JWT:** `custom_access_token_hook` (DB function) stamps a `user_role`
+  claim from `profiles`; enable the "Customize Access Token (JWT) Claims" hook in the
+  dashboard to activate. `getSessionUser` prefers that claim and falls back to a
+  `profiles` lookup when absent — so the header needs no per-request DB query once
+  the hook is on.
 - **Role lookups for redirect/gating use `pg`** (login action, `/auth/callback`,
   `requireAdmin`) — reading `profiles.role` via the Supabase client right after
   sign-in is unreliable (RLS + session timing), so query the `pg` pool by user id.
-- **Header auth is read SERVER-SIDE**: the root layout calls `getSessionEmail()`
-  (local `getClaims`, no network) and passes `userEmail` to `<SiteHeader>`; logout
-  is the **server action** in `app/auth/actions.ts` (clears the cookie server-side).
-  Do **not** read the session in the browser for the header — the SSR cookie isn't
-  reliably readable client-side.
+- **Header auth is read SERVER-SIDE**: the root layout calls `getSessionUser()`
+  (local `getClaims`, no network) and passes the `user` (email/name/avatar/role) to
+  `<SiteHeader>`; logout is the **server action** in `app/auth/actions.ts` (clears
+  the cookie server-side). Do **not** read the session in the browser for the header
+  — the SSR cookie isn't reliably readable client-side. `/admin` and `/portal` render
+  their own shells (sidebar + topbar); `ChromeGate` hides the public header/footer there.
 - **Two data paths by design:** `lib/db.ts` (`pg`) for the contact write, admin
   enquiries read, and all role lookups; `supabase-js` for auth/session. `enquiries`
   keeps RLS on with no policy (anon denied, `pg` owner bypasses) — leave it.
-- **Secrets** live in `.env.local` only — `DATABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
+- **Secrets** live in `.env.local` locally — `DATABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, **`SUPABASE_SERVICE_ROLE_KEY`** (server-only,
-  never `NEXT_PUBLIC`), and the `EmailJs_*` keys. Never echo or commit them. Run
-  Supabase security advisors after any DDL.
+  never `NEXT_PUBLIC`), and the `EmailJs_*` keys. The same keys are set in **Vercel**
+  project env for prod. Never echo or commit them. Run Supabase security advisors
+  after any DDL.
+- **Security headers** are set in `next.config.ts` (`headers()`, all routes): CSP, HSTS
+  (prod), X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy. CSP allows
+  `'unsafe-inline'` (no nonce yet) and dev-only `'unsafe-eval'` + localhost ws; it
+  allow-lists Supabase (`connect-src`) and the Google avatar / Unsplash image hosts.
 
 ### Contact email (EmailJS)
 
