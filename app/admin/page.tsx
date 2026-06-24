@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { Container, PageHero } from "../components/ui";
 import { query } from "../lib/db";
 import { requireAdmin } from "../lib/supabase/guards";
 
 export const metadata: Metadata = {
-  title: "Admin — Enquiries",
+  title: "Dashboard",
   robots: { index: false, follow: false },
 };
 
@@ -26,33 +25,63 @@ const fmt = new Intl.DateTimeFormat("en-GB", {
   minute: "2-digit",
 });
 
-export default async function AdminPage() {
-  await requireAdmin();
-
-  const { rows } = await query<EnquiryRow>(
-    `select id, name, email, company, service, message, created_at
-       from enquiries
-      order by created_at desc
-      limit 200`,
+function StatCard({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="rounded-sm border border-line bg-white p-5">
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+        {label}
+      </p>
+      <p className="mt-2 font-display text-2xl font-semibold text-ink">{value}</p>
+    </div>
   );
+}
+
+export default async function AdminPage() {
+  const user = await requireAdmin();
+
+  const [{ rows }, { rows: countRows }] = await Promise.all([
+    query<EnquiryRow>(
+      `select id, name, email, company, service, message, created_at
+         from enquiries
+        order by created_at desc
+        limit 200`,
+    ),
+    query<{ total: string }>(`select count(*)::text as total from enquiries`),
+  ]);
+
+  const total = Number(countRows[0]?.total ?? 0);
+  const latest = rows[0] ? fmt.format(new Date(rows[0].created_at)) : "—";
 
   return (
-    <>
-      <PageHero
-        eyebrow="Admin"
-        title="Enquiries"
-        lede="Contact-form submissions, newest first."
-        image="tower"
-      />
-      <Container className="py-12 sm:py-16">
-        <p className="mb-6 text-sm text-muted">
-          {rows.length === 0
-            ? "No enquiries yet."
-            : `${rows.length} enquir${rows.length === 1 ? "y" : "ies"}.`}
+    <div className="mx-auto max-w-6xl">
+      <header className="mb-8">
+        <h2 className="font-display text-2xl font-semibold text-ink">Dashboard</h2>
+        <p className="mt-1 text-sm text-muted">
+          Welcome back — signed in as{" "}
+          <span className="font-medium text-ink-body">{user.email}</span>.
         </p>
+      </header>
+
+      <div className="mb-10 grid gap-4 sm:grid-cols-3">
+        <StatCard label="Total enquiries" value={total} />
+        <StatCard label="Latest received" value={latest} />
+        <StatCard label="Role" value="Administrator" />
+      </div>
+
+      <section>
+        <div className="mb-4 flex items-baseline justify-between">
+          <h3 className="font-display text-lg font-semibold text-ink">
+            Recent enquiries
+          </h3>
+          <p className="text-sm text-muted">
+            {total === 0
+              ? "No enquiries yet."
+              : `Showing ${rows.length} of ${total}.`}
+          </p>
+        </div>
 
         {rows.length > 0 && (
-          <div className="overflow-x-auto rounded-sm border border-line bg-surface">
+          <div className="overflow-x-auto rounded-sm border border-line bg-white">
             <table className="w-full min-w-[44rem] border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-line bg-surface-muted text-xs font-semibold uppercase tracking-wide text-muted">
@@ -98,7 +127,7 @@ export default async function AdminPage() {
             </table>
           </div>
         )}
-      </Container>
-    </>
+      </section>
+    </div>
   );
 }

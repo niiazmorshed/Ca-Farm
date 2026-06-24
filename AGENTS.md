@@ -80,9 +80,13 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
   server client `lib/supabase/server.ts`, session refresh + route gating in `proxy.ts`
   (matcher = `/portal` + `/admin` only), guards in `lib/supabase/guards.ts`
   (`requireUser`, `requireAdmin`, `getSessionEmail`).
-- **Roles** live in `public.profiles.role` (`client` | `admin`); a signup trigger
-  creates the row as `client`. Promote admins by SQL/MCP only — there is
-  intentionally **no profile UPDATE policy**, so a client can't self-promote.
+- **Roles** live in `public.profiles.role` (`client` | `admin`). The `handle_new_user`
+  signup trigger is the **single source of truth**: it sets `role='admin'` only when
+  the email matches one hardcoded admin address (`idublinfourir@gmail.com`,
+  case-insensitive), otherwise `client`. This holds for every sign-in path (password
+  or Google OAuth) and there is intentionally **no profile UPDATE policy**, so a
+  client can't self-promote. Change the admin by editing that email in the trigger
+  (via migration/MCP).
 - **Signup uses the Admin API** (`lib/supabase/admin.ts`, service-role key,
   `admin.createUser({ email_confirm: true })`) so accounts are pre-confirmed — no
   confirmation email, no email rate-limit, independent of the dashboard "Confirm
