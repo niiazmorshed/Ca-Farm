@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { serviceCategories, site } from "../lib/content";
 import { signOutAction } from "../auth/actions";
+import type { SessionUser } from "../lib/supabase/guards";
 
 const secondaryLinks = [
   { href: "/pricing", label: "Pricing" },
@@ -45,6 +46,79 @@ function Chevron({ className = "" }: { className?: string }) {
   );
 }
 
+function UtilIcon({ children }: { children: React.ReactNode }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="shrink-0 text-primary-300"
+    >
+      {children}
+    </svg>
+  );
+}
+
+const PhoneIcon = (
+  <UtilIcon>
+    <path d="M5.5 2.5 3 3c-.3 2 .6 4.4 2.3 6.1S9 12.3 11 12l.5-2.5-2.3-1.1-1 1.1A8 8 0 0 1 5.6 6.8l1.1-1L5.5 2.5Z" />
+  </UtilIcon>
+);
+
+const ClockIcon = (
+  <UtilIcon>
+    <circle cx="8" cy="8" r="5.5" />
+    <path d="M8 5v3l2 1.3" />
+  </UtilIcon>
+);
+
+const MailIcon = (
+  <UtilIcon>
+    <rect x="2" y="3.5" width="12" height="9" rx="1.5" />
+    <path d="m2.5 4.5 5.5 4 5.5-4" />
+  </UtilIcon>
+);
+
+const PinIcon = (
+  <UtilIcon>
+    <path d="M8 14s4.5-4 4.5-7.5a4.5 4.5 0 1 0-9 0C3.5 10 8 14 8 14Z" />
+    <circle cx="8" cy="6.5" r="1.5" />
+  </UtilIcon>
+);
+
+function Avatar({ user, size = 36 }: { user: SessionUser; size?: number }) {
+  const initial = (user.name ?? user.email).trim().charAt(0).toUpperCase();
+  const dim = { width: size, height: size };
+  if (user.avatarUrl) {
+    // Plain <img> (avatar host isn't in next/image remote config); Google's
+    // CDN needs no-referrer to serve the picture.
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={user.avatarUrl}
+        alt=""
+        referrerPolicy="no-referrer"
+        style={dim}
+        className="rounded-full object-cover ring-1 ring-line"
+      />
+    );
+  }
+  return (
+    <span
+      style={dim}
+      className="grid place-items-center rounded-full bg-primary-500 text-sm font-semibold text-white"
+    >
+      {initial || "U"}
+    </span>
+  );
+}
+
 function Logo({ onClick }: { onClick?: () => void }) {
   return (
     <Link href="/" className="flex items-center gap-2.5" onClick={onClick}>
@@ -55,7 +129,7 @@ function Logo({ onClick }: { onClick?: () => void }) {
         <span className="font-display text-lg font-semibold tracking-tight text-ink">
           CA Farm
         </span>
-        <span className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.16em] text-muted">
+        <span className="mt-0.5 whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.16em] text-muted">
           Chartered Accountants
         </span>
       </span>
@@ -63,18 +137,28 @@ function Logo({ onClick }: { onClick?: () => void }) {
   );
 }
 
-export function SiteHeader({ userEmail }: { userEmail: string | null }) {
+export function SiteHeader({ user }: { user: SessionUser | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const lastY = useRef(0);
+  const accountRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const servicesActive = isActive(pathname, "/services");
 
-  // Auth comes from the server (root layout) — reliable across SSR cookies,
-  // unlike reading the session in the browser.
-  const user = userEmail ? { email: userEmail } : null;
+  // Close the account dropdown on outside click and on navigation.
+  useEffect(() => {
+    if (!accountOpen) return;
+    function onClick(e: MouseEvent) {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+        setAccountOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [accountOpen]);
 
   // Auto-hide: slide the header away on scroll-down, reveal it on scroll-up.
   useEffect(() => {
@@ -105,58 +189,46 @@ export function SiteHeader({ userEmail }: { userEmail: string | null }) {
         hidden ? "-translate-y-full" : "translate-y-0"
       }`}
     >
-      {/* utility bar */}
-      <div className="hidden bg-navy-900 text-white/70 md:block">
-        <div className="mx-auto flex h-10 w-full max-w-6xl items-center justify-between px-5 text-xs sm:px-8">
-          <div className="flex items-center gap-6">
+      {/* tier 1 — contact bar (navy, desktop only) */}
+      <div className="hidden bg-navy-900 text-[13px] text-white/70 md:block">
+        <div className="mx-auto flex h-10 w-full max-w-6xl items-center justify-between px-5 sm:px-8">
+          <div className="flex items-center gap-4">
             <a
               href={site.phoneHref}
-              className="font-medium transition-colors duration-200 hover:text-white"
+              className="flex items-center gap-2 font-medium text-white/90 transition-colors duration-200 hover:text-white"
             >
+              {PhoneIcon}
               {site.phone}
             </a>
-            <span className="text-white/40">{site.hours}</span>
+            <span className="h-3.5 w-px bg-white/15" aria-hidden="true" />
+            <span className="flex items-center gap-2 text-white/55">
+              {ClockIcon}
+              {site.hours}
+            </span>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            <span className="hidden items-center gap-2 text-white/55 lg:flex">
+              {PinIcon}
+              {site.address[1]}
+            </span>
+            <span className="hidden h-3.5 w-px bg-white/15 lg:block" aria-hidden="true" />
             <a
               href={`mailto:${site.email}`}
-              className="transition-colors duration-200 hover:text-white"
+              className="flex items-center gap-2 text-white/90 transition-colors duration-200 hover:text-white"
             >
+              {MailIcon}
               {site.email}
             </a>
-            {user ? (
-              <>
-                <Link
-                  href="/portal"
-                  className="font-medium text-primary-300 transition-colors duration-200 hover:text-primary-400"
-                >
-                  My account
-                </Link>
-                <form action={signOutAction}>
-                  <button
-                    type="submit"
-                    className="cursor-pointer transition-colors duration-200 hover:text-white"
-                  >
-                    Sign out
-                  </button>
-                </form>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                className="font-medium text-primary-300 transition-colors duration-200 hover:text-primary-400"
-              >
-                Client login
-              </Link>
-            )}
           </div>
         </div>
       </div>
 
-      {/* main nav */}
+      {/* tier 2 — main nav (warm paper) */}
       <div
-        className={`border-b border-line bg-white/95 backdrop-blur-md transition-shadow duration-300 ease-snappy ${
-          scrolled ? "shadow-lg shadow-navy-900/10" : ""
+        className={`border-b backdrop-blur-md transition-all duration-300 ease-snappy ${
+          scrolled
+            ? "border-line bg-canvas/95 shadow-[0_8px_24px_-12px] shadow-navy-900/25"
+            : "border-line/70 bg-canvas/85"
         }`}
       >
         <nav
@@ -165,20 +237,27 @@ export function SiteHeader({ userEmail }: { userEmail: string | null }) {
         >
           <Logo onClick={closeMobile} />
 
-          <div className="hidden items-center gap-8 lg:flex">
+          <div className="hidden items-center gap-7 lg:flex">
             {/* Services mega-menu (CSS hover + focus-within) */}
             <div className="group relative">
               <Link
                 href="/services"
                 aria-current={servicesActive ? "page" : undefined}
-                className={`flex items-center gap-1 text-sm font-medium transition-colors duration-200 ${
+                className={`relative flex items-center gap-1 text-sm font-medium transition-colors duration-200 ${
                   servicesActive
-                    ? "font-semibold text-primary-500"
-                    : "text-ink-body hover:text-primary-500"
+                    ? "text-primary-600"
+                    : "text-ink-body hover:text-ink"
                 }`}
               >
                 Services
                 <Chevron className="text-muted transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" />
+                <span
+                  className={`pointer-events-none absolute -bottom-1.5 left-0 h-0.5 w-full origin-left bg-primary-500 transition-transform duration-200 ease-snappy ${
+                    servicesActive
+                      ? "scale-x-100"
+                      : "scale-x-0 group-hover:scale-x-100"
+                  }`}
+                />
               </Link>
 
               <div className="invisible absolute left-1/2 top-full z-50 w-[min(64rem,calc(100vw-2rem))] -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
@@ -233,19 +312,86 @@ export function SiteHeader({ userEmail }: { userEmail: string | null }) {
                   key={link.href}
                   href={link.href}
                   aria-current={active ? "page" : undefined}
-                  className={`text-sm font-medium transition-colors duration-200 ${
-                    active
-                      ? "font-semibold text-primary-500"
-                      : "text-ink-body hover:text-primary-500"
+                  className={`group relative text-sm font-medium transition-colors duration-200 ${
+                    active ? "text-primary-600" : "text-ink-body hover:text-ink"
                   }`}
                 >
                   {link.label}
+                  <span
+                    className={`pointer-events-none absolute -bottom-1.5 left-0 h-0.5 w-full origin-left bg-primary-500 transition-transform duration-200 ease-snappy ${
+                      active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                    }`}
+                  />
                 </Link>
               );
             })}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3 lg:gap-4">
+            {user ? (
+              <div className="relative" ref={accountRef}>
+                <button
+                  type="button"
+                  aria-haspopup="menu"
+                  aria-expanded={accountOpen}
+                  aria-label="Account menu"
+                  onClick={() => setAccountOpen((open) => !open)}
+                  className="flex cursor-pointer items-center gap-2 rounded-full p-0.5 transition-colors duration-200 hover:bg-secondary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+                >
+                  <Avatar user={user} />
+                  <Chevron
+                    className={`mr-1 hidden text-muted transition-transform duration-200 sm:block ${
+                      accountOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {accountOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-md border border-line bg-white shadow-xl shadow-navy-900/15"
+                  >
+                    <div className="flex items-center gap-3 border-b border-line px-4 py-3">
+                      <Avatar user={user} size={40} />
+                      <div className="min-w-0">
+                        {user.name && (
+                          <p className="truncate text-sm font-semibold text-ink">
+                            {user.name}
+                          </p>
+                        )}
+                        <p className="truncate text-xs text-muted">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    <Link
+                      href={user.role === "admin" ? "/admin" : "/portal"}
+                      role="menuitem"
+                      onClick={() => setAccountOpen(false)}
+                      className="block px-4 py-2.5 text-sm font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
+                    >
+                      {user.role === "admin" ? "Admin dashboard" : "My account"}
+                    </Link>
+                    <form action={signOutAction}>
+                      <button
+                        type="submit"
+                        role="menuitem"
+                        className="block w-full cursor-pointer px-4 py-2.5 text-left text-sm font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
+                      >
+                        Sign out
+                      </button>
+                    </form>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="inline-flex h-10 cursor-pointer items-center whitespace-nowrap rounded-md border border-line px-4 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-secondary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+              >
+                Sign in
+              </Link>
+            )}
             <Link
               href="/contact"
               className="hidden h-10 cursor-pointer items-center rounded-md bg-primary-500 px-5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 sm:inline-flex"
@@ -284,7 +430,7 @@ export function SiteHeader({ userEmail }: { userEmail: string | null }) {
         {menuOpen && (
           <div
             id="mobile-menu"
-            className="max-h-[calc(100vh-4.5rem)] overflow-y-auto border-t border-line bg-white px-5 py-4 lg:hidden"
+            className="max-h-[calc(100vh-4.75rem)] overflow-y-auto border-t border-line bg-canvas px-5 py-4 lg:hidden"
           >
             <div className="flex flex-col gap-1">
               {/* Services accordion */}
@@ -357,34 +503,6 @@ export function SiteHeader({ userEmail }: { userEmail: string | null }) {
               >
                 Book a consultation
               </Link>
-              {user ? (
-                <>
-                  <Link
-                    href="/portal"
-                    onClick={closeMobile}
-                    className="mt-1 rounded-sm px-3 py-2.5 text-[15px] font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
-                  >
-                    My account
-                  </Link>
-                  <form action={signOutAction}>
-                    <button
-                      type="submit"
-                      onClick={closeMobile}
-                      className="w-full rounded-sm px-3 py-2.5 text-left text-[15px] font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
-                    >
-                      Sign out
-                    </button>
-                  </form>
-                </>
-              ) : (
-                <Link
-                  href="/login"
-                  onClick={closeMobile}
-                  className="mt-1 rounded-sm px-3 py-2.5 text-[15px] font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
-                >
-                  Client login
-                </Link>
-              )}
             </div>
           </div>
         )}

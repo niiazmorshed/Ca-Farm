@@ -3,7 +3,8 @@ import { Fraunces, Geist } from "next/font/google";
 import { SiteHeader } from "./components/site-header";
 import { SiteFooter } from "./components/site-footer";
 import { BackToTop } from "./components/back-to-top";
-import { getSessionEmail } from "./lib/supabase/guards";
+import { ChromeGate } from "./components/chrome-gate";
+import { getSessionUser } from "./lib/supabase/guards";
 import { site } from "./lib/content";
 import "./globals.css";
 
@@ -42,7 +43,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const userEmail = await getSessionEmail();
+  const user = await getSessionUser();
   return (
     <html
       lang="en"
@@ -56,12 +57,16 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
-        <SiteHeader userEmail={userEmail} />
+        <ChromeGate>
+          <SiteHeader user={user} />
+        </ChromeGate>
         <main id="main" className="flex-1">
           {children}
         </main>
-        <SiteFooter />
-        <BackToTop />
+        <ChromeGate>
+          <SiteFooter />
+          <BackToTop />
+        </ChromeGate>
       </body>
     </html>
   );
