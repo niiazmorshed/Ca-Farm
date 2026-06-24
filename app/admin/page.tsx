@@ -72,7 +72,9 @@ export default async function AdminPage() {
                     <td className="whitespace-nowrap px-4 py-3 text-muted">
                       {fmt.format(new Date(row.created_at))}
                     </td>
-                    <td className="px-4 py-3 font-medium text-ink">{row.name}</td>
+                    <td className="px-4 py-3 font-medium text-ink">
+                      {row.name}
+                    </td>
                     <td className="px-4 py-3">
                       <a
                         href={`mailto:${row.email}`}

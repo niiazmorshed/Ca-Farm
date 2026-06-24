@@ -2,14 +2,19 @@ import type { MetadataRoute } from "next";
 import { serviceCategories, site } from "./lib/content";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPages = ["", "/services", "/pricing", "/about", "/contact"].map(
-    (path) => ({
-      url: `${site.url}${path}`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: path === "" ? 1 : 0.8,
-    }),
-  );
+  const staticPages = [
+    "",
+    "/services",
+    "/pricing",
+    "/tools/ireland",
+    "/about",
+    "/contact",
+  ].map((path) => ({
+    url: `${site.url}${path}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: path === "" ? 1 : 0.8,
+  }));
 
   const servicePages = serviceCategories.flatMap((category) => [
     {

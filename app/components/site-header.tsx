@@ -8,6 +8,7 @@ import { signOutAction } from "../auth/actions";
 
 const secondaryLinks = [
   { href: "/pricing", label: "Pricing" },
+  { href: "/tools/ireland", label: "Tools" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
