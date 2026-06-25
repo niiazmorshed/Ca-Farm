@@ -268,6 +268,28 @@ export function Services() {
               </span>
             </Link>
           ))}
+
+          {/* fills the trailing grid cell with a CTA instead of empty space */}
+          <Link
+            href="/contact"
+            className="group flex flex-col justify-between bg-navy-900 p-8 text-white transition-colors duration-200 hover:bg-navy-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-400 sm:col-span-2 lg:col-span-1"
+          >
+            <div>
+              <span className="font-display text-sm font-semibold text-primary-300">
+                Get started
+              </span>
+              <h3 className="mt-4 font-display text-xl font-medium tracking-tight">
+                Not sure where to start?
+              </h3>
+              <p className="mt-2.5 text-[15px] leading-7 text-white/70">
+                Tell us about your business and we&apos;ll point you to the right
+                service.
+              </p>
+            </div>
+            <span className="mt-auto pt-6 text-sm font-semibold text-primary-300">
+              Book a consultation <span aria-hidden="true">→</span>
+            </span>
+          </Link>
         </div>
         </Reveal>
       </Container>
@@ -482,20 +504,24 @@ export function Testimonials() {
           {testimonials.map((testimonial) => (
             <figure
               key={testimonial.name}
-              className="flex flex-col border-t-2 border-primary-400 bg-surface p-8 shadow-sm shadow-navy-900/5"
+              className="group flex flex-col border-t-2 border-primary-400 bg-surface p-8 shadow-sm shadow-navy-900/5 transition-all duration-300 ease-snappy hover:-translate-y-1 hover:bg-navy-900 hover:shadow-xl hover:shadow-navy-900/20"
             >
               <span
                 aria-hidden="true"
-                className="font-display text-5xl leading-none text-primary-400/40"
+                className="font-display text-5xl leading-none text-primary-400/40 transition-colors duration-300 group-hover:text-primary-300"
               >
                 “
               </span>
-              <blockquote className="mt-3 flex-1 font-display text-lg leading-8 text-ink">
+              <blockquote className="mt-3 flex-1 font-display text-lg leading-8 text-ink transition-colors duration-300 group-hover:text-white">
                 {testimonial.quote}
               </blockquote>
-              <figcaption className="mt-6 border-t border-line pt-5 text-sm">
-                <span className="font-semibold text-ink">{testimonial.name}</span>
-                <span className="block text-muted">{testimonial.role}</span>
+              <figcaption className="mt-6 border-t border-line pt-5 text-sm transition-colors duration-300 group-hover:border-white/15">
+                <span className="font-semibold text-ink transition-colors duration-300 group-hover:text-white">
+                  {testimonial.name}
+                </span>
+                <span className="block text-muted transition-colors duration-300 group-hover:text-white/70">
+                  {testimonial.role}
+                </span>
               </figcaption>
             </figure>
           ))}

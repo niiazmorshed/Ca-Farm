@@ -4,6 +4,7 @@ import { SiteHeader } from "./components/site-header";
 import { SiteFooter } from "./components/site-footer";
 import { BackToTop } from "./components/back-to-top";
 import { ChromeGate } from "./components/chrome-gate";
+import { RouteProgress } from "./components/route-progress";
 import { getSessionUser } from "./lib/supabase/guards";
 import { site } from "./lib/content";
 import "./globals.css";
@@ -51,6 +52,7 @@ export default async function RootLayout({
       className={`${fraunces.variable} ${geistSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-canvas font-sans text-ink-body">
+        <RouteProgress />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-navy-900 focus:px-5 focus:py-3 focus:text-sm focus:text-white"

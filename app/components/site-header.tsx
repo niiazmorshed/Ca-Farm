@@ -140,11 +140,19 @@ function Logo({ onClick }: { onClick?: () => void }) {
 export function SiteHeader({ user }: { user: SessionUser | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [servicesClosed, setServicesClosed] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const lastY = useRef(0);
   const pathname = usePathname();
   const servicesActive = isActive(pathname, "/services");
+
+  // Force the Services mega-menu shut after a link is clicked (otherwise the
+  // clicked link keeps focus / hover and the panel stays open on the new page).
+  function closeServices(e: React.MouseEvent<HTMLElement>) {
+    setServicesClosed(true);
+    e.currentTarget.blur();
+  }
 
   const firstName =
     user?.name?.trim().split(" ")[0] ??
@@ -230,10 +238,15 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
 
           <div className="hidden items-center gap-7 lg:flex">
             {/* Services mega-menu (CSS hover + focus-within) */}
-            <div className="group relative">
+            <div
+              className="group relative"
+              onMouseEnter={() => setServicesClosed(false)}
+              onFocus={() => setServicesClosed(false)}
+            >
               <Link
                 href="/services"
                 aria-current={servicesActive ? "page" : undefined}
+                onClick={closeServices}
                 className={`relative flex items-center gap-1 text-sm font-medium transition-colors duration-200 ${
                   servicesActive
                     ? "text-primary-600"
@@ -251,13 +264,20 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                 />
               </Link>
 
-              <div className="invisible absolute left-1/2 top-full z-50 w-[min(64rem,calc(100vw-2rem))] -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              <div
+                className={`invisible absolute left-1/2 top-full z-50 w-[min(64rem,calc(100vw-2rem))] -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 ${
+                  servicesClosed
+                    ? "!invisible !opacity-0"
+                    : ""
+                }`}
+              >
                 <div className="rounded-sm border border-line bg-white p-6 shadow-2xl shadow-navy-900/15">
                   <div className="grid grid-cols-2 gap-x-8 gap-y-6 lg:grid-cols-4">
                     {serviceCategories.map((category) => (
                       <div key={category.slug}>
                         <Link
                           href={`/services/${category.slug}`}
+                          onClick={closeServices}
                           className="flex items-center gap-2 font-display text-sm font-semibold text-ink transition-colors duration-200 hover:text-primary-500"
                         >
                           {category.title}
@@ -269,6 +289,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                               <li key={item.slug}>
                                 <Link
                                   href={`/services/${category.slug}/${item.slug}`}
+                                  onClick={closeServices}
                                   className="text-[13px] leading-5 text-muted transition-colors duration-200 hover:text-primary-500"
                                 >
                                   {item.title}
@@ -287,6 +308,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                   <div className="mt-6 border-t border-line pt-4">
                     <Link
                       href="/services"
+                      onClick={closeServices}
                       className="text-sm font-semibold text-primary-500 transition-colors duration-200 hover:text-primary-600"
                     >
                       View all services <span aria-hidden="true">→</span>
