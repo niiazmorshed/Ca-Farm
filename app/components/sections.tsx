@@ -268,6 +268,28 @@ export function Services() {
               </span>
             </Link>
           ))}
+
+          {/* fills the trailing grid cell with a CTA instead of empty space */}
+          <Link
+            href="/contact"
+            className="group flex flex-col justify-between bg-navy-900 p-8 text-white transition-colors duration-200 hover:bg-navy-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-400 sm:col-span-2 lg:col-span-1"
+          >
+            <div>
+              <span className="font-display text-sm font-semibold text-primary-300">
+                Get started
+              </span>
+              <h3 className="mt-4 font-display text-xl font-medium tracking-tight">
+                Not sure where to start?
+              </h3>
+              <p className="mt-2.5 text-[15px] leading-7 text-white/70">
+                Tell us about your business and we&apos;ll point you to the right
+                service.
+              </p>
+            </div>
+            <span className="mt-auto pt-6 text-sm font-semibold text-primary-300">
+              Book a consultation <span aria-hidden="true">→</span>
+            </span>
+          </Link>
         </div>
         </Reveal>
       </Container>

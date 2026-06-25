@@ -45,7 +45,7 @@ export default function ServicesPage() {
                   </span>
                   <Link
                     href={`/services/${category.slug}`}
-                    className="text-sm font-semibold text-primary-500 transition-colors duration-200 hover:text-primary-600"
+                    className="relative z-10 text-sm font-semibold text-primary-500 transition-colors duration-200 hover:text-primary-600"
                   >
                     {comingSoon ? "Learn more" : "Explore"}{" "}
                     <span aria-hidden="true">→</span>
@@ -54,7 +54,7 @@ export default function ServicesPage() {
                 <h2 className="mt-3 flex flex-wrap items-center gap-2.5 font-display text-2xl font-medium tracking-tight text-ink">
                   <Link
                     href={`/services/${category.slug}`}
-                    className="transition-colors duration-200 hover:text-primary-500"
+                    className="transition-colors duration-200 before:absolute before:inset-0 before:content-[''] hover:text-primary-500"
                   >
                     {category.title}
                   </Link>

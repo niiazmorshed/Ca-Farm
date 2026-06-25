@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireClient } from "../lib/supabase/guards";
 import { signOutAction } from "../auth/actions";
+import { LogoutButton } from "../components/logout-button";
 import { PortalNav } from "./portal-nav";
 
 export const metadata: Metadata = {
@@ -61,12 +62,7 @@ export default async function PortalLayout({
               Client
             </span>
             <form action={signOutAction}>
-              <button
-                type="submit"
-                className="cursor-pointer rounded-md border border-line px-4 py-2 text-sm font-medium text-ink transition-colors duration-200 hover:bg-surface-muted"
-              >
-                Log out
-              </button>
+              <LogoutButton />
             </form>
           </div>
         </header>
