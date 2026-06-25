@@ -504,20 +504,24 @@ export function Testimonials() {
           {testimonials.map((testimonial) => (
             <figure
               key={testimonial.name}
-              className="flex flex-col border-t-2 border-primary-400 bg-surface p-8 shadow-sm shadow-navy-900/5"
+              className="group flex flex-col border-t-2 border-primary-400 bg-surface p-8 shadow-sm shadow-navy-900/5 transition-all duration-300 ease-snappy hover:-translate-y-1 hover:bg-navy-900 hover:shadow-xl hover:shadow-navy-900/20"
             >
               <span
                 aria-hidden="true"
-                className="font-display text-5xl leading-none text-primary-400/40"
+                className="font-display text-5xl leading-none text-primary-400/40 transition-colors duration-300 group-hover:text-primary-300"
               >
                 “
               </span>
-              <blockquote className="mt-3 flex-1 font-display text-lg leading-8 text-ink">
+              <blockquote className="mt-3 flex-1 font-display text-lg leading-8 text-ink transition-colors duration-300 group-hover:text-white">
                 {testimonial.quote}
               </blockquote>
-              <figcaption className="mt-6 border-t border-line pt-5 text-sm">
-                <span className="font-semibold text-ink">{testimonial.name}</span>
-                <span className="block text-muted">{testimonial.role}</span>
+              <figcaption className="mt-6 border-t border-line pt-5 text-sm transition-colors duration-300 group-hover:border-white/15">
+                <span className="font-semibold text-ink transition-colors duration-300 group-hover:text-white">
+                  {testimonial.name}
+                </span>
+                <span className="block text-muted transition-colors duration-300 group-hover:text-white/70">
+                  {testimonial.role}
+                </span>
               </figcaption>
             </figure>
           ))}
