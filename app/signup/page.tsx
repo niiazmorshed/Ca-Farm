@@ -17,7 +17,7 @@ export default function SignupPage() {
         image="tower"
       />
       <Container className="py-16 sm:py-20">
-        <div className="mx-auto max-w-md rounded-sm border border-line bg-surface p-6 shadow-sm shadow-navy-900/5 sm:p-8">
+        <div className="mx-auto max-w-md rounded-none border border-line bg-surface p-6 shadow-sm shadow-navy-900/5 sm:p-8">
           <SignupForm />
         </div>
       </Container>

@@ -8,7 +8,7 @@ import { serviceCategories } from "../lib/content";
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Accounting, tax, business consulting, digital transformation, AI and fractional CFO services for businesses across the UK and Ireland.",
+    "Accounting, tax, business consulting, digital transformation, AI and fractional CFO services for businesses across Ireland.",
 };
 
 export default function ServicesPage() {
@@ -17,7 +17,7 @@ export default function ServicesPage() {
       <PageHero
         eyebrow="Services"
         title="Everything your finance function needs."
-        lede="From day-to-day bookkeeping to AI and international expansion — built for businesses across the UK and Ireland. Take one service or the whole stack, scoped upfront."
+        lede="From day-to-day bookkeeping to AI and international expansion — built for businesses across Ireland. Take one service or the whole stack, scoped upfront."
         image="tower"
       />
 
@@ -59,7 +59,7 @@ export default function ServicesPage() {
                     {category.title}
                   </Link>
                   {comingSoon && (
-                    <span className="rounded-sm bg-secondary-50 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-500">
+                    <span className="rounded-none bg-secondary-50 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-500">
                       Soon
                     </span>
                   )}
@@ -89,7 +89,7 @@ export default function ServicesPage() {
         </Reveal>
 
         <Reveal>
-        <div className="mt-14 flex flex-col items-center gap-3 rounded-sm border-t-2 border-primary-400 bg-surface px-8 py-12 text-center shadow-sm shadow-navy-900/5">
+        <div className="mt-14 flex flex-col items-center gap-3 rounded-none border-t-2 border-primary-400 bg-surface px-8 py-12 text-center shadow-sm shadow-navy-900/5">
           <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
             Not sure what you need?
           </h2>

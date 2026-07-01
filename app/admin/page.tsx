@@ -27,7 +27,7 @@ const fmt = new Intl.DateTimeFormat("en-GB", {
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-sm border border-line bg-white p-5">
+    <div className="rounded-none border border-line bg-white p-5">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">
         {label}
       </p>
@@ -81,7 +81,7 @@ export default async function AdminPage() {
         </div>
 
         {rows.length > 0 && (
-          <div className="overflow-x-auto rounded-sm border border-line bg-white">
+          <div className="overflow-x-auto rounded-none border border-line bg-white">
             <table className="w-full min-w-[44rem] border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-line bg-surface-muted text-xs font-semibold uppercase tracking-wide text-muted">

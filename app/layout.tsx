@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Geist } from "next/font/google";
+import { Archivo, Geist } from "next/font/google";
 import { SiteHeader } from "./components/site-header";
 import { SiteFooter } from "./components/site-footer";
 import { BackToTop } from "./components/back-to-top";
@@ -9,10 +9,10 @@ import { getSessionUser } from "./lib/supabase/guards";
 import { site } from "./lib/content";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
-  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 const geistSans = Geist({
@@ -49,13 +49,16 @@ export default async function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${fraunces.variable} ${geistSans.variable} h-full antialiased`}
+      className={`${archivo.variable} ${geistSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-canvas font-sans text-ink-body">
+      <body
+        className="min-h-full flex flex-col bg-canvas font-sans text-ink-body"
+        suppressHydrationWarning
+      >
         <RouteProgress />
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-navy-900 focus:px-5 focus:py-3 focus:text-sm focus:text-white"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-none focus:bg-navy-900 focus:px-5 focus:py-3 focus:text-sm focus:text-white"
         >
           Skip to content
         </a>

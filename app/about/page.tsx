@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 const credentials = [
-  "ICAEW registered firm",
+  "Chartered Accountants Ireland member firm",
   "Xero Platinum Partner",
   "QuickBooks ProAdvisor",
   "ACCA approved employer",
@@ -60,7 +60,7 @@ export default function AboutPage() {
         <Reveal delay={120} className="flex flex-col gap-5">
           <ClipReveal
             url={images.teamLaptops}
-            className="h-48 w-full rounded-sm"
+            className="h-48 w-full rounded-none"
           />
           {values.map((value) => (
             <div
@@ -90,11 +90,11 @@ export default function AboutPage() {
             {team.map((member) => (
               <li
                 key={member.name}
-                className="rounded-sm border border-line bg-surface p-6"
+                className="rounded-none border border-line bg-surface p-6"
               >
                 <span
                   aria-hidden="true"
-                  className="grid h-14 w-14 place-items-center rounded-sm bg-navy-900 font-display text-lg font-semibold text-primary-300"
+                  className="grid h-14 w-14 place-items-center rounded-none bg-navy-900 font-display text-lg font-semibold text-primary-300"
                 >
                   {member.name
                     .split(" ")
@@ -125,7 +125,7 @@ export default function AboutPage() {
               {credentials.map((credential) => (
                 <li
                   key={credential}
-                  className="rounded-sm border border-line bg-surface px-5 py-2.5 text-sm font-medium text-ink-body"
+                  className="rounded-none border border-line bg-surface px-5 py-2.5 text-sm font-medium text-ink-body"
                 >
                   {credential}
                 </li>

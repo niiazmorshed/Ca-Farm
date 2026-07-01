@@ -45,7 +45,7 @@ function CurrencyField({
           step={1000}
           value={Number.isFinite(value) ? value : 0}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="h-11 w-full rounded-md border border-line bg-surface pl-7 pr-3 text-sm text-ink tabular-nums transition-colors duration-200 focus:border-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/40"
+          className="h-11 w-full rounded-none border border-line bg-surface pl-7 pr-3 text-sm text-ink tabular-nums transition-colors duration-200 focus:border-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/40"
         />
       </div>
       {hint && <p className="mt-1 text-xs text-muted">{hint}</p>}
@@ -85,7 +85,7 @@ function NumberField({
           step={step}
           value={Number.isFinite(value) ? value : 0}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="h-11 w-full rounded-md border border-line bg-surface px-3 text-sm text-ink tabular-nums transition-colors duration-200 focus:border-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/40"
+          className="h-11 w-full rounded-none border border-line bg-surface px-3 text-sm text-ink tabular-nums transition-colors duration-200 focus:border-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/40"
         />
         {suffix && (
           <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">
@@ -115,7 +115,7 @@ function SegmentedField<T extends string>({
       <div
         role="radiogroup"
         aria-label={label}
-        className="mt-1.5 flex flex-wrap gap-1.5 rounded-md border border-line bg-surface-muted p-1"
+        className="mt-1.5 flex flex-wrap gap-1.5 rounded-none border border-line bg-surface-muted p-1"
       >
         {options.map((opt) => {
           const active = opt.value === value;
@@ -126,7 +126,7 @@ function SegmentedField<T extends string>({
               role="radio"
               aria-checked={active}
               onClick={() => onChange(opt.value)}
-              className={`flex-1 cursor-pointer rounded-sm px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
+              className={`flex-1 cursor-pointer rounded-none px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
                 active
                   ? "bg-surface text-ink shadow-sm"
                   : "text-muted hover:text-ink"
@@ -238,12 +238,12 @@ function IncomeTaxCalculator() {
       </div>
 
       {/* results */}
-      <div className="rounded-sm border-t-2 border-primary-400 bg-surface p-6 shadow-sm shadow-navy-900/5">
+      <div className="rounded-none border-t-2 border-primary-400 bg-surface p-6 shadow-sm shadow-navy-900/5">
         <div className="flex items-baseline justify-between gap-4">
           <h3 className="font-display text-base font-medium text-ink">
             Estimated take-home
           </h3>
-          <span className="rounded-sm bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-600">
+          <span className="rounded-none bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-600">
             {TAX_YEAR}
           </span>
         </div>
@@ -395,7 +395,7 @@ function MortgageCalculator() {
       </div>
 
       {/* results */}
-      <div className="rounded-sm border-t-2 border-primary-400 bg-surface p-6 shadow-sm shadow-navy-900/5">
+      <div className="rounded-none border-t-2 border-primary-400 bg-surface p-6 shadow-sm shadow-navy-900/5">
         <h3 className="font-display text-base font-medium text-ink">
           Monthly repayment
         </h3>
@@ -427,7 +427,7 @@ function MortgageCalculator() {
         </div>
 
         <div
-          className={`mt-4 rounded-sm border px-4 py-3 text-sm leading-6 ${
+          className={`mt-4 rounded-none border px-4 py-3 text-sm leading-6 ${
             result.withinLimits
               ? "border-secondary-400/40 bg-secondary-50 text-secondary-600"
               : "border-primary-400/40 bg-primary-50 text-primary-600"
@@ -473,7 +473,7 @@ export function IrelandCalculator() {
       <div
         role="tablist"
         aria-label="Calculator"
-        className="inline-flex gap-1 rounded-md border border-line bg-surface-muted p-1"
+        className="inline-flex gap-1 rounded-none border border-line bg-surface-muted p-1"
       >
         {(
           [
@@ -489,7 +489,7 @@ export function IrelandCalculator() {
               role="tab"
               aria-selected={active}
               onClick={() => setTab(t.id)}
-              className={`cursor-pointer rounded-sm px-5 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
+              className={`cursor-pointer rounded-none px-5 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
                 active
                   ? "bg-surface text-ink shadow-sm"
                   : "text-muted hover:text-ink"

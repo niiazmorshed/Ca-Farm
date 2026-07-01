@@ -49,12 +49,12 @@ export function SectionHeading({
   align?: "left" | "center";
 }) {
   return (
-    <div className={align === "center" ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
+    <div className={align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
       <Eyebrow align={align}>{eyebrow}</Eyebrow>
-      <h2 className="mt-5 font-display text-3xl font-medium leading-[1.1] tracking-tight text-balance text-ink sm:text-4xl">
+      <h2 className="mt-5 font-display text-4xl font-bold leading-[1.03] tracking-[-0.02em] text-balance text-ink sm:text-5xl">
         {title}
       </h2>
-      {lede && <p className="mt-4 text-lg leading-8 text-muted">{lede}</p>}
+      {lede && <p className="mt-5 max-w-2xl text-lg leading-8 text-ink-body sm:text-xl">{lede}</p>}
     </div>
   );
 }
@@ -62,7 +62,7 @@ export function SectionHeading({
 type ButtonVariant = "primary" | "outline" | "outlineLight";
 
 const buttonBase =
-  "inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-md px-7 text-sm font-semibold tracking-wide transition-[color,background-color,border-color,transform] duration-200 ease-snappy active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2";
+  "inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-none px-7 text-sm font-semibold tracking-wide transition-[color,background-color,border-color,transform] duration-200 ease-snappy active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2";
 
 const buttonVariants: Record<ButtonVariant, string> = {
   primary:
@@ -129,16 +129,16 @@ export function PageHero({
         aria-hidden="true"
         className="absolute inset-0 -z-10 bg-gradient-to-r from-navy-900 via-navy-900/90 to-navy-900/55"
       />
-      <Container className="py-20 sm:py-24">
-        <div className="max-w-2xl border-l-2 border-primary-400 pl-6 sm:pl-8">
+      <Container className="py-24 sm:py-32">
+        <div className="max-w-3xl">
           <span className="animate-fade-up block">
             {breadcrumb ?? (eyebrow && <Eyebrow tone="dark">{eyebrow}</Eyebrow>)}
           </span>
-          <h1 className="animate-fade-up mt-5 flex flex-wrap items-center gap-3 font-display text-4xl font-medium leading-[1.08] tracking-tight text-balance [animation-delay:80ms] sm:text-5xl">
+          <h1 className="animate-fade-up mt-6 flex flex-wrap items-center gap-3 font-display text-5xl font-bold leading-[0.98] tracking-[-0.025em] text-balance [animation-delay:80ms] sm:text-6xl lg:text-7xl">
             {title}
           </h1>
           {lede && (
-            <p className="animate-fade-up mt-5 max-w-xl text-lg leading-8 text-white/75 [animation-delay:150ms]">
+            <p className="animate-fade-up mt-6 max-w-xl text-lg leading-8 text-white/75 [animation-delay:150ms] sm:text-xl">
               {lede}
             </p>
           )}

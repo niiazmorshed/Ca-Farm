@@ -22,7 +22,7 @@ export default async function AdminLayout({
           href="/"
           className="flex h-16 items-center gap-2.5 border-b border-white/10 px-5 transition-colors duration-200 hover:bg-white/5"
         >
-          <span className="grid h-8 w-8 place-items-center rounded-sm bg-primary-500 font-display text-sm font-semibold text-white">
+          <span className="grid h-8 w-8 place-items-center rounded-none bg-primary-500 font-display text-sm font-semibold text-white">
             CA
           </span>
           <span className="font-display text-base font-semibold tracking-tight">
@@ -33,7 +33,7 @@ export default async function AdminLayout({
         <div className="mt-auto border-t border-white/10 p-3">
           <Link
             href="/"
-            className="block rounded-sm px-3 py-2 text-sm text-white/60 transition-colors duration-200 hover:bg-white/5 hover:text-white"
+            className="block rounded-none px-3 py-2 text-sm text-white/60 transition-colors duration-200 hover:bg-white/5 hover:text-white"
           >
             ← Back to site
           </Link>
@@ -45,7 +45,7 @@ export default async function AdminLayout({
         {/* Topbar */}
         <header className="flex h-16 items-center justify-between gap-4 border-b border-line bg-white px-5 sm:px-8">
           <div className="flex items-center gap-3">
-            <span className="grid h-8 w-8 place-items-center rounded-sm bg-navy-900 font-display text-sm font-semibold text-primary-400 md:hidden">
+            <span className="grid h-8 w-8 place-items-center rounded-none bg-navy-900 font-display text-sm font-semibold text-primary-400 md:hidden">
               CA
             </span>
             <h1 className="font-display text-lg font-semibold text-ink">Admin</h1>

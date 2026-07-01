@@ -7,7 +7,7 @@ import { PasswordInput } from "../components/password-input";
 import { GoogleButton } from "../components/google-button";
 
 const inputClasses =
-  "w-full rounded-md border border-line bg-canvas px-4 py-3 text-[15px] text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500";
+  "w-full rounded-none border border-line bg-canvas px-4 py-3 text-[15px] text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500";
 
 const initialState: SignupState = {};
 
@@ -17,7 +17,7 @@ export function SignupForm() {
   if (state.checkEmail) {
     return (
       <div className="flex flex-col items-start gap-4">
-        <span className="grid h-12 w-12 place-items-center rounded-sm bg-navy-900 text-primary-300">
+        <span className="grid h-12 w-12 place-items-center rounded-none bg-navy-900 text-primary-300">
           <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5" aria-hidden="true">
             <path
               d="M3 5l7 5 7-5M3 5v10h14V5"
@@ -53,7 +53,7 @@ export function SignupForm() {
       {state.error && (
         <p
           role="alert"
-          className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="rounded-none border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
         >
           {state.error}
         </p>
@@ -122,7 +122,7 @@ export function SignupForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-md bg-primary-500 px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-default disabled:opacity-60"
+          className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-none bg-primary-500 px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-default disabled:opacity-60"
         >
           {isPending ? "Creating account…" : "Create account"}
         </button>

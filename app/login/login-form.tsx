@@ -7,7 +7,7 @@ import { PasswordInput } from "../components/password-input";
 import { GoogleButton } from "../components/google-button";
 
 const inputClasses =
-  "w-full rounded-md border border-line bg-canvas px-4 py-3 text-[15px] text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500";
+  "w-full rounded-none border border-line bg-canvas px-4 py-3 text-[15px] text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500";
 
 const initialState: AuthState = {};
 
@@ -24,14 +24,14 @@ export function LoginForm({
   return (
     <div className="flex flex-col gap-5">
       {notice && (
-        <p className="rounded-md border border-primary-300 bg-primary-50 px-4 py-3 text-sm text-primary-600">
+        <p className="rounded-none border border-primary-300 bg-primary-50 px-4 py-3 text-sm text-primary-600">
           {notice}
         </p>
       )}
       {state.error && (
         <p
           role="alert"
-          className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="rounded-none border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
         >
           {state.error}
         </p>
@@ -81,7 +81,7 @@ export function LoginForm({
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-md bg-primary-500 px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-default disabled:opacity-60"
+          className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-none bg-primary-500 px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-default disabled:opacity-60"
         >
           {isPending ? "Signing in…" : "Sign in"}
         </button>

@@ -25,7 +25,7 @@ export function GoogleButton({ next }: { next?: string }) {
       type="button"
       onClick={handleGoogle}
       disabled={loading}
-      className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-3 rounded-md border border-line bg-surface px-5 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-secondary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-default disabled:opacity-60"
+      className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-3 rounded-none border border-line bg-surface px-5 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-secondary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-default disabled:opacity-60"
     >
       <GoogleIcon />
       {loading ? "Redirecting…" : "Continue with Google"}

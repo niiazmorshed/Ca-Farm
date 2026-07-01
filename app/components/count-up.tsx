@@ -5,13 +5,13 @@ import { useEffect, useRef } from "react";
 
 /**
  * Counts a stat value up to its target once, when scrolled into view.
- * - Preserves prefix/suffix: "£40m+" → counts "40", keeps "£" and "m+".
+ * - Preserves prefix/suffix: "€40m+" → counts "40", keeps "€" and "m+".
  * - Leaves non-stat values static (e.g. "< 1 day", or values under 5).
  * - SSR + reduced-motion render the final value; off-screen it resets to 0,
  *   so there's no flicker when it scrolls in.
  */
 function parse(value: string) {
-  const match = value.match(/^(£?)(\d+)(.*)$/);
+  const match = value.match(/^(€?)(\d+)(.*)$/);
   if (!match) return null;
   const target = Number(match[2]);
   if (target < 5) return null;
