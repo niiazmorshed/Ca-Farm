@@ -4,7 +4,7 @@
    Form → "Calculate Tax" → results screen (2026 vs 2025), in the site theme.
    All maths lives in ../lib/ireland-income-tax. Tax only — no mortgage here. */
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   compareYears,
   type IncomeTaxInput,
@@ -124,8 +124,9 @@ function CurrencyField({
           inputMode="numeric"
           min={0}
           step={1000}
-          value={Number.isFinite(value) ? value : 0}
-          onChange={(e) => onChange(Number(e.target.value))}
+          placeholder="0"
+          value={value ? String(value) : ""}
+          onChange={(e) => onChange(e.target.value === "" ? 0 : Number(e.target.value))}
           className="h-11 w-full rounded-none border border-line bg-surface pl-7 pr-3 text-sm text-ink tabular-nums transition-colors duration-200 focus:border-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/40"
         />
       </div>
@@ -156,8 +157,9 @@ function NumberField({
         min={0}
         max={120}
         step={1}
-        value={Number.isFinite(value) ? value : 0}
-        onChange={(e) => onChange(Number(e.target.value))}
+        placeholder="0"
+        value={value ? String(value) : ""}
+        onChange={(e) => onChange(e.target.value === "" ? 0 : Number(e.target.value))}
         className="mt-1.5 h-11 w-full rounded-none border border-line bg-surface px-3 text-sm text-ink tabular-nums transition-colors duration-200 focus:border-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/40"
       />
     </div>
@@ -287,13 +289,18 @@ const DEFAULTS: IncomeTaxInput = {
 export function IrelandIncomeTaxCalculator() {
   const [form, setForm] = useState<IncomeTaxInput>(DEFAULTS);
   const [result, setResult] = useState<YearComparison | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  // After results render, bring the results section into view (not the page top).
+  useEffect(() => {
+    if (result) resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [result]);
 
   const set = <K extends keyof IncomeTaxInput>(key: K, value: IncomeTaxInput[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
   const calculate = () => {
     setResult(compareYears(form, CURRENT_YEAR, PRIOR_YEAR));
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const newCalculation = () => {
@@ -303,7 +310,7 @@ export function IrelandIncomeTaxCalculator() {
 
   if (result) {
     return (
-      <div>
+      <div ref={resultsRef} className="scroll-mt-24">
         <ResultsTable comparison={result} />
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <button type="button" className={btnOutline} onClick={() => setResult(null)}>
