@@ -64,7 +64,7 @@ export default async function CategoryPage({
             )}
           </>
         }
-        lede={cat.overview}
+        lede={cat.blurb}
         action={
           <Button href="/contact">
             {comingSoon
@@ -76,14 +76,21 @@ export default async function CategoryPage({
 
       {/* services / personas: grid of sub-service cards */}
       {!comingSoon && !isSingle && (
-        <Container className="py-16 sm:py-20">
+        <Container className="py-14 sm:py-16">
+          <Reveal className="max-w-3xl">
+          <p className="text-lg leading-8 text-ink-body sm:text-xl">
+            {cat.overview}
+          </p>
+          <div className="mt-10 border-t border-line pt-10">
+            <Eyebrow>{isPersona ? "Who we help" : "What this covers"}</Eyebrow>
+            <h2 className="mt-4 font-display text-2xl font-medium tracking-tight text-ink sm:text-3xl">
+              {isPersona
+                ? "Specialist support by profession"
+                : `${cat.items.length} ways we help`}
+            </h2>
+          </div>
+          </Reveal>
           <Reveal>
-          <Eyebrow>{isPersona ? "Who we help" : "What this covers"}</Eyebrow>
-          <h2 className="mt-4 font-display text-2xl font-medium tracking-tight text-ink sm:text-3xl">
-            {isPersona
-              ? "Specialist support by profession"
-              : `${cat.items.length} ways we help`}
-          </h2>
           <div className="mt-10 grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-2">
             {cat.items.map((item, index) => (
               <Link
@@ -139,25 +146,50 @@ export default async function CategoryPage({
 
       {/* single: included list + sticky CTA / best-for aside */}
       {!comingSoon && isSingle && (
-        <Container className="grid items-start gap-12 py-16 sm:py-20 lg:grid-cols-[1fr_22rem]">
+        <Container className="grid items-start gap-12 py-14 sm:py-16 lg:grid-cols-[1fr_22rem]">
           <Reveal>
-            <Eyebrow>What’s included</Eyebrow>
-            <h2 className="mt-4 font-display text-2xl font-medium tracking-tight text-ink sm:text-3xl">
-              Everything {cat.title.toLowerCase()} covers
-            </h2>
-            <ul className="mt-8 grid gap-3 sm:grid-cols-2">
-              {(cat.included ?? []).map((entry) => (
-                <li
-                  key={entry}
-                  className="flex items-start gap-3 rounded-none border border-line bg-surface p-4 text-sm leading-6 text-ink-body transition-colors duration-200 hover:border-primary-300"
-                >
-                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-none bg-navy-900 text-primary-300">
-                    <CheckIcon className="h-3 w-3" />
-                  </span>
-                  {entry}
-                </li>
-              ))}
+            <p className="max-w-2xl border-l-[3px] border-primary-500 pl-6 font-display text-xl font-light leading-9 text-ink sm:text-[1.7rem] sm:leading-[2.6rem]">
+              {cat.overview}
+            </p>
+            <div className="mt-12 flex items-baseline justify-between gap-4 border-t border-line pt-6">
+              <Eyebrow>What’s included</Eyebrow>
+              <span className="font-display text-sm font-semibold text-primary-500">
+                {String((cat.included ?? []).length).padStart(2, "0")} items
+              </span>
+            </div>
+            <ul className="mt-2 divide-y divide-line border-b border-line">
+              {(cat.included ?? []).map((entry) => {
+                const [label, ...rest] = entry.split(" — ");
+                const detail = rest.join(" — ");
+                return (
+                  <li
+                    key={entry}
+                    className="group flex items-baseline gap-4 py-5 transition-colors duration-200 hover:bg-secondary-50/40"
+                  >
+                    <span className="mt-1 shrink-0 text-primary-500">
+                      <CheckIcon className="h-3.5 w-3.5" />
+                    </span>
+                    <p className="text-[15px] leading-7 text-muted">
+                      <span className="font-display font-semibold text-ink">
+                        {label}
+                      </span>
+                      {detail && <> — {detail}</>}
+                    </p>
+                  </li>
+                );
+              })}
             </ul>
+
+            {cat.context && (
+              <div className="mt-12 border-t border-line pt-10">
+                <Eyebrow>What you should know</Eyebrow>
+                <div className="mt-5 max-w-2xl space-y-5 text-[15px] leading-7 text-ink-body">
+                  {cat.context.split("\n\n").map((para) => (
+                    <p key={para.slice(0, 32)}>{para}</p>
+                  ))}
+                </div>
+              </div>
+            )}
           </Reveal>
           <aside className="flex flex-col gap-6 lg:sticky lg:top-28">
             <div className="rounded-none bg-navy-900 p-7 text-white">
