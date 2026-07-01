@@ -4,14 +4,10 @@ import { useId, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   MORTGAGE_RULES,
-  TAX_YEAR,
   computeMortgage,
-  computeTax,
   eur,
   pct,
   type BuyerType,
-  type EmploymentType,
-  type FilingStatus,
 } from "../lib/ireland-tax";
 
 /* ---------- shared inputs ---------- */
@@ -180,135 +176,6 @@ function ResultRow({
   );
 }
 
-/* ---------- income tax calculator ---------- */
-
-function IncomeTaxCalculator() {
-  const [income, setIncome] = useState(55_000);
-  const [partnerIncome, setPartnerIncome] = useState(35_000);
-  const [status, setStatus] = useState<FilingStatus>("single");
-  const [employment, setEmployment] = useState<EmploymentType>("employee");
-
-  const result = useMemo(
-    () => computeTax({ income, status, employment, partnerIncome }),
-    [income, status, employment, partnerIncome],
-  );
-
-  const monthlyNet = result.netIncome / 12;
-
-  return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
-      {/* inputs */}
-      <div className="flex flex-col gap-5">
-        <SegmentedField
-          label="Filing status"
-          value={status}
-          onChange={setStatus}
-          options={[
-            { value: "single", label: "Single" },
-            { value: "married-one", label: "Married · 1 income" },
-            { value: "married-two", label: "Married · 2 incomes" },
-          ]}
-        />
-        <SegmentedField
-          label="Employment"
-          value={employment}
-          onChange={setEmployment}
-          options={[
-            { value: "employee", label: "Employee (PAYE)" },
-            { value: "self-employed", label: "Self-employed" },
-          ]}
-        />
-        <CurrencyField
-          label="Gross annual income"
-          value={income}
-          onChange={setIncome}
-        />
-        {status === "married-two" && (
-          <CurrencyField
-            label="Partner's gross annual income"
-            value={partnerIncome}
-            onChange={setPartnerIncome}
-          />
-        )}
-        <p className="text-xs leading-5 text-muted">
-          Estimate for {TAX_YEAR} based on standard credits. Excludes pension
-          relief, BIK, age/medical-card USC reductions and the PRSI tapered
-          credit.
-        </p>
-      </div>
-
-      {/* results */}
-      <div className="rounded-none border-t-2 border-primary-400 bg-surface p-6 shadow-sm shadow-navy-900/5">
-        <div className="flex items-baseline justify-between gap-4">
-          <h3 className="font-display text-base font-medium text-ink">
-            Estimated take-home
-          </h3>
-          <span className="rounded-none bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-600">
-            {TAX_YEAR}
-          </span>
-        </div>
-
-        <p className="mt-4 font-display text-3xl font-semibold tabular-nums text-ink">
-          {eur(result.netIncome)}
-          <span className="ml-1.5 text-sm font-normal text-muted">/year</span>
-        </p>
-        <p className="mt-0.5 text-sm text-muted">
-          {eur(monthlyNet)} per month · effective rate{" "}
-          {pct(result.effectiveRate)}
-        </p>
-
-        <div className="mt-5">
-          <ResultRow label="Gross income" value={eur(result.grossIncome)} />
-          <ResultRow
-            label="Income tax (PAYE)"
-            value={`− ${eur(result.incomeTax)}`}
-            tone="deduct"
-          />
-          <ResultRow label="USC" value={`− ${eur(result.usc)}`} tone="deduct" />
-          <ResultRow
-            label="PRSI"
-            value={`− ${eur(result.prsi)}`}
-            tone="deduct"
-          />
-          <ResultRow
-            label="Net income"
-            value={eur(result.netIncome)}
-            strong
-            tone="positive"
-          />
-        </div>
-
-        <details className="mt-4 border-t border-line pt-3 text-sm">
-          <summary className="cursor-pointer list-none font-medium text-muted transition-colors duration-200 hover:text-ink">
-            How the income tax is worked out
-          </summary>
-          <div className="mt-3">
-            <ResultRow
-              label={`Standard rate (20%) up to ${eur(result.standardRateCutOff)}`}
-              value={eur(result.taxAtStandard)}
-            />
-            <ResultRow
-              label="Higher rate (40%)"
-              value={eur(result.taxAtHigher)}
-            />
-            <ResultRow label="Gross tax" value={eur(result.grossTax)} />
-            <ResultRow
-              label="Less tax credits"
-              value={`− ${eur(result.taxCredits)}`}
-              tone="deduct"
-            />
-            <ResultRow
-              label="Income tax due"
-              value={eur(result.incomeTax)}
-              strong
-            />
-          </div>
-        </details>
-      </div>
-    </div>
-  );
-}
-
 /* ---------- mortgage calculator ---------- */
 
 function MortgageCalculator() {
@@ -461,53 +328,16 @@ function MortgageCalculator() {
   );
 }
 
-/* ---------- shell with tabs ---------- */
-
-type Tab = "tax" | "mortgage";
+/* ---------- mortgage calculator shell ---------- */
 
 export function IrelandCalculator() {
-  const [tab, setTab] = useState<Tab>("tax");
-
   return (
     <div>
-      <div
-        role="tablist"
-        aria-label="Calculator"
-        className="inline-flex gap-1 rounded-none border border-line bg-surface-muted p-1"
-      >
-        {(
-          [
-            { id: "tax", label: "Income tax" },
-            { id: "mortgage", label: "Mortgage" },
-          ] as const
-        ).map((t) => {
-          const active = t.id === tab;
-          return (
-            <button
-              key={t.id}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              onClick={() => setTab(t.id)}
-              className={`cursor-pointer rounded-none px-5 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
-                active
-                  ? "bg-surface text-ink shadow-sm"
-                  : "text-muted hover:text-ink"
-              }`}
-            >
-              {t.label}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="mt-8">
-        {tab === "tax" ? <IncomeTaxCalculator /> : <MortgageCalculator />}
-      </div>
+      <MortgageCalculator />
 
       <p className="mt-8 text-sm leading-6 text-muted">
-        These calculators give indicative estimates for the Republic of Ireland
-        only and are not tax or financial advice. For a precise assessment,{" "}
+        This calculator gives an indicative estimate for the Republic of Ireland
+        only and is not tax or financial advice. For a precise assessment,{" "}
         <Link
           href="/contact"
           className="font-medium text-primary-500 transition-colors duration-200 hover:text-primary-600"

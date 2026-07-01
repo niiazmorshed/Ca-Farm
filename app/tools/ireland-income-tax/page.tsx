@@ -2,31 +2,30 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs, Container, PageHero } from "../../components/ui";
 import { ContactCta } from "../../components/sections";
-import { IrelandCalculator } from "../../components/ireland-calculator";
-import { TAX_YEAR } from "../../lib/ireland-tax";
+import { IrelandIncomeTaxCalculator } from "../../components/ireland-income-tax-calculator";
 
 export const metadata: Metadata = {
-  title: "Ireland Mortgage Calculator",
+  title: "Ireland Income Tax Calculator (Income Tax + USC + PRSI) — 2026",
   description:
-    "Estimate what you can borrow in Ireland against the Central Bank loan-to-income and loan-to-value limits, and work out your monthly repayment. 2025 rules.",
+    "Estimate your Irish personal tax for 2026: income tax, USC and PRSI, with pension relief, tax credits and a 2025 comparison. Republic of Ireland.",
 };
 
 const notes = [
   {
-    title: "Central Bank mortgage rules",
-    body: "Checks your borrowing against the loan-to-income and loan-to-value limits, flags the binding constraint, and works out the monthly repayment.",
+    title: "Income tax, USC & PRSI",
+    body: "Full annual position across all three deductions, with the 20%/40% band split and every tax credit itemised so each number is traceable to a rule.",
   },
   {
-    title: "Every buyer type",
-    body: "First-time buyers, movers and buy-to-let each get the correct LTI multiple and maximum LTV, with the minimum deposit worked out for you.",
+    title: "Pension relief, done right",
+    body: "Applies the age-banded relief cap on €115,000 of earnings — pension reduces income tax only, not USC or PRSI, and any excess above the cap gets no relief.",
   },
   {
-    title: "Built for Irish clients",
-    body: "Figures follow Central Bank of Ireland macroprudential policy for the Republic of Ireland. Lenders may apply their own exemptions and affordability tests.",
+    title: "2026 vs 2025",
+    body: "Shows both tax years side by side and the year-on-year change, so clients can see the impact of the Budget changes in USC bands and the PRSI rate.",
   },
 ];
 
-export default function IrelandMortgagePage() {
+export default function IrelandIncomeTaxPage() {
   return (
     <>
       <PageHero
@@ -36,27 +35,27 @@ export default function IrelandMortgagePage() {
             items={[
               { label: "Home", href: "/" },
               { label: "Tools" },
-              { label: "Ireland mortgage" },
+              { label: "Ireland income tax" },
             ]}
           />
         }
-        title="Ireland mortgage calculator"
-        lede={`Estimate what you can borrow and what it will cost — Central Bank lending rules for ${TAX_YEAR}.`}
+        title="Ireland income tax calculator"
+        lede="Estimate your Irish income tax, USC and PRSI for 2026 — including pension relief and tax credits — with a 2025 comparison alongside."
       />
 
       <Container className="py-16 sm:py-20">
         <div className="mb-8 rounded-none border border-line bg-surface p-4 text-sm text-muted">
-          Looking for tax instead?{" "}
+          Buying a home?{" "}
           <Link
-            href="/tools/ireland-income-tax"
+            href="/tools/ireland"
             className="font-medium text-primary-500 transition-colors duration-200 hover:text-primary-600"
           >
-            Open the Ireland income tax calculator →
+            Open the Ireland mortgage calculator →
           </Link>
         </div>
 
         <div className="rounded-none border border-line bg-canvas p-6 sm:p-8 lg:p-10">
-          <IrelandCalculator />
+          <IrelandIncomeTaxCalculator />
         </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-3">

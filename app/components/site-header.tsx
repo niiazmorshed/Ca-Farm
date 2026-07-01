@@ -8,7 +8,7 @@ import type { SessionUser } from "../lib/supabase/guards";
 
 const secondaryLinks = [
   { href: "/pricing", label: "Pricing" },
-  { href: "/tools/ireland", label: "Tools" },
+  { href: "/tools/ireland-income-tax", label: "Tools" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
