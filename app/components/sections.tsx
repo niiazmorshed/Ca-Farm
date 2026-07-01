@@ -21,7 +21,9 @@ export function Hero() {
       <HeroVideo
         clips={[
           { src: "/hero-1.mp4", poster: "/hero-1.jpg" },
+          // Dublin Docklands / IFSC — River Liffey and the Samuel Beckett Bridge
           { src: "/hero-2.mp4", poster: "/hero-2.jpg" },
+          // River Liffey toward the Samuel Beckett Bridge and Convention Centre
           { src: "/hero-3.mp4", poster: "/hero-3.jpg" },
         ]}
         className="absolute inset-0 -z-20"
@@ -541,7 +543,7 @@ export function Process() {
   return (
     <section
       id="process"
-      className="scroll-mt-24 border-y border-line bg-surface-muted"
+      className="scroll-mt-24 border-y border-line bg-[#fafbfa]"
     >
       <Container className="py-20 sm:py-28">
         <Reveal>
