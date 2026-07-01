@@ -53,7 +53,7 @@ export default async function PortalPage() {
       <div className="grid gap-8 lg:grid-cols-[1fr_1.6fr]">
         {/* Account summary */}
         <aside className="flex flex-col gap-6">
-          <div className="rounded-sm border-t-2 border-primary-400 bg-white p-6 shadow-sm shadow-navy-900/5">
+          <div className="rounded-none border-t-2 border-primary-400 bg-white p-6 shadow-sm shadow-navy-900/5">
             <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               Your account
             </h3>
@@ -79,7 +79,7 @@ export default async function PortalPage() {
             </dl>
           </div>
 
-          <div className="rounded-sm border border-line bg-white p-6">
+          <div className="rounded-none border border-line bg-white p-6">
             <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               Documents
             </h3>
@@ -87,7 +87,7 @@ export default async function PortalPage() {
               Statements, returns and signed accounts will appear here once your
               accountant shares them.
             </p>
-            <span className="mt-3 inline-block rounded-sm bg-secondary-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-500">
+            <span className="mt-3 inline-block rounded-none bg-secondary-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-500">
               Coming soon
             </span>
           </div>
@@ -108,14 +108,14 @@ export default async function PortalPage() {
           </div>
 
           {enquiries.length === 0 ? (
-            <div className="mt-5 rounded-sm border border-dashed border-line bg-white p-8 text-center">
+            <div className="mt-5 rounded-none border border-dashed border-line bg-white p-8 text-center">
               <p className="text-[15px] text-muted">No enquiries yet.</p>
               <p className="mt-1 text-sm text-muted">
                 When you send us a message it&apos;ll show here with its status.
               </p>
               <Link
                 href="/contact"
-                className="mt-4 inline-flex h-11 items-center justify-center rounded-md bg-primary-500 px-6 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600"
+                className="mt-4 inline-flex h-11 items-center justify-center rounded-none bg-primary-500 px-6 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600"
               >
                 Start an enquiry
               </Link>
@@ -125,7 +125,7 @@ export default async function PortalPage() {
               {enquiries.map((enquiry) => (
                 <li
                   key={enquiry.id}
-                  className="rounded-sm border border-line bg-white p-5 shadow-sm shadow-navy-900/5"
+                  className="rounded-none border border-line bg-white p-5 shadow-sm shadow-navy-900/5"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-display text-sm font-semibold text-ink">
@@ -138,7 +138,7 @@ export default async function PortalPage() {
                   <p className="mt-2 line-clamp-3 text-sm leading-6 text-ink-body">
                     {enquiry.message}
                   </p>
-                  <span className="mt-3 inline-flex items-center gap-1.5 rounded-sm bg-secondary-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-500">
+                  <span className="mt-3 inline-flex items-center gap-1.5 rounded-none bg-secondary-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-500">
                     <span className="h-1.5 w-1.5 rounded-full bg-secondary-400" />
                     Received
                   </span>

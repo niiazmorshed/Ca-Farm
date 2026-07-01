@@ -58,7 +58,7 @@ export default async function CategoryPage({
           <>
             {cat.title}
             {comingSoon && (
-              <span className="rounded-sm bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary-300">
+              <span className="rounded-none bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary-300">
                 Coming soon
               </span>
             )}
@@ -149,9 +149,9 @@ export default async function CategoryPage({
               {(cat.included ?? []).map((entry) => (
                 <li
                   key={entry}
-                  className="flex items-start gap-3 rounded-sm border border-line bg-surface p-4 text-sm leading-6 text-ink-body transition-colors duration-200 hover:border-primary-300"
+                  className="flex items-start gap-3 rounded-none border border-line bg-surface p-4 text-sm leading-6 text-ink-body transition-colors duration-200 hover:border-primary-300"
                 >
-                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-sm bg-navy-900 text-primary-300">
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-none bg-navy-900 text-primary-300">
                     <CheckIcon className="h-3 w-3" />
                   </span>
                   {entry}
@@ -160,7 +160,7 @@ export default async function CategoryPage({
             </ul>
           </Reveal>
           <aside className="flex flex-col gap-6 lg:sticky lg:top-28">
-            <div className="rounded-sm bg-navy-900 p-7 text-white">
+            <div className="rounded-none bg-navy-900 p-7 text-white">
               <h2 className="font-display text-lg font-medium tracking-tight">
                 Talk to us about {cat.title.toLowerCase()}
               </h2>
@@ -179,7 +179,7 @@ export default async function CategoryPage({
               </a>
             </div>
             {(cat.bestFor ?? []).length > 0 && (
-              <div className="rounded-sm border-t-2 border-primary-400 bg-surface p-6 shadow-sm shadow-navy-900/5">
+              <div className="rounded-none border-t-2 border-primary-400 bg-surface p-6 shadow-sm shadow-navy-900/5">
                 <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
                   Best for
                 </h2>
@@ -202,7 +202,7 @@ export default async function CategoryPage({
       {/* coming soon: simple reassurance block */}
       {comingSoon && (
         <Container className="py-16 sm:py-20">
-          <Reveal className="mx-auto flex max-w-xl flex-col items-center gap-3 rounded-sm border-t-2 border-primary-400 bg-surface px-8 py-12 text-center shadow-sm shadow-navy-900/5">
+          <Reveal className="mx-auto flex max-w-xl flex-col items-center gap-3 rounded-none border-t-2 border-primary-400 bg-surface px-8 py-12 text-center shadow-sm shadow-navy-900/5">
             <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
               We’re building this service
             </h2>

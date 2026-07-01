@@ -20,7 +20,7 @@ const notes = [
     body: "Checks your borrowing against the loan-to-income and loan-to-value limits, flags the binding constraint, and works out the monthly repayment.",
   },
   {
-    title: "Built for UK & Ireland clients",
+    title: "Built for Irish clients",
     body: "Figures track Budget 2025 policy for the Republic of Ireland. For a precise position — pension relief, reliefs, exemptions — speak to our team.",
   },
 ];
@@ -44,7 +44,7 @@ export default function IrelandToolsPage() {
       />
 
       <Container className="py-16 sm:py-20">
-        <div className="rounded-sm border border-line bg-canvas p-6 sm:p-8 lg:p-10">
+        <div className="rounded-none border border-line bg-canvas p-6 sm:p-8 lg:p-10">
           <IrelandCalculator />
         </div>
 
@@ -52,7 +52,7 @@ export default function IrelandToolsPage() {
           {notes.map((note) => (
             <div
               key={note.title}
-              className="rounded-sm border border-line bg-surface p-6"
+              className="rounded-none border border-line bg-surface p-6"
             >
               <h2 className="font-display text-base font-medium tracking-tight text-ink">
                 {note.title}

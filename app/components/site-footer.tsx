@@ -14,11 +14,11 @@ const firmLinks = [
 export function SiteFooter() {
   return (
     <footer className="relative isolate overflow-hidden bg-navy-900 text-white">
-      {/* photographic backdrop — Westminster at dusk (UK) */}
+      {/* photographic backdrop — Irish countryside at dusk */}
       <div
         aria-hidden="true"
         className="absolute inset-0 -z-20 bg-cover bg-center bg-no-repeat opacity-55"
-        style={{ backgroundImage: `url(${images.londonDusk})` }}
+        style={{ backgroundImage: `url(${images.footerLand})` }}
       />
       {/* navy scrim keeps text legible while letting the photo read through */}
       <div
@@ -34,7 +34,7 @@ export function SiteFooter() {
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-sm bg-white/10 font-display text-sm font-semibold text-primary-300">
+              <span className="grid h-9 w-9 place-items-center rounded-none bg-white/10 font-display text-sm font-semibold text-primary-300">
                 CA
               </span>
               <span className="font-display text-lg font-semibold tracking-tight text-white">
@@ -43,8 +43,7 @@ export function SiteFooter() {
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-6 text-white/60">
               A partner-led chartered accountancy practice helping founders and
-              family businesses across the UK and Ireland grow on solid
-              financial ground.
+              family businesses across Ireland grow on solid financial ground.
             </p>
           </div>
 
@@ -113,7 +112,7 @@ export function SiteFooter() {
 
         <div className="mt-14 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} CA Farm. All rights reserved.</p>
-          <p>ICAEW registered practice · York, UK</p>
+          <p>Chartered Accountants Ireland member firm · Dublin</p>
         </div>
       </div>
     </footer>

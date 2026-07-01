@@ -45,7 +45,7 @@ export default function PricingPage() {
 
         <div className="mt-16 grid items-start gap-12 lg:grid-cols-[1fr_22rem]">
           <div>
-            <div className="rounded-sm border border-line bg-surface p-8">
+            <div className="rounded-none border border-line bg-surface p-8">
               <h2 className="font-display text-xl font-medium tracking-tight text-ink">
                 Add-ons and one-off work
               </h2>
@@ -92,7 +92,7 @@ export default function PricingPage() {
           </div>
 
           <aside className="lg:sticky lg:top-28">
-            <div className="rounded-sm bg-navy-900 p-7 text-white">
+            <div className="rounded-none bg-navy-900 p-7 text-white">
               <h2 className="font-display text-lg font-medium tracking-tight">
                 Not sure which plan fits?
               </h2>

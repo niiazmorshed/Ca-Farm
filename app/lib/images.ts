@@ -19,6 +19,8 @@ export const images = {
   deskFinance: u("1554224155-6726b3ff858f", 1400),
   /** Startup team at laptops — advisory / digital. */
   teamLaptops: u("1454165804606-c3d57bc86b40", 1400),
+  /** Hand-drawn growth forecast on paper, pen + ruler — advisory / planning. */
+  forecast: u("1543286386-2e659306cd6c", 1400),
   /** Modern open-plan office — about / firm. */
   office: u("1497215728101-856f4ea42174", 1400),
   /** Glass office tower — corporate page heroes. */
@@ -31,8 +33,8 @@ export const images = {
   fields: u("1444858291040-58f756a3bdd6", 1920),
   /** Misty forest path — quiet brand atmosphere. */
   forest: u("1507537297725-24a1c029d3ca", 1600),
-  /** Westminster / Big Ben at moody sunset — UK footer backdrop (wide crop). */
-  londonDusk: u("1529655683826-aba9b3e77383", 1920, 70, 720),
+  /** Rolling green Irish countryside at dusk — footer backdrop (wide crop). */
+  footerLand: u("1444858291040-58f756a3bdd6", 1920, 70, 720),
 } as const;
 
 export type ImageKey = keyof typeof images;

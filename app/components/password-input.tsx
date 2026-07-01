@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 const base =
-  "w-full rounded-md border border-line bg-canvas px-4 py-3 pr-11 text-[15px] text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500";
+  "w-full rounded-none border border-line bg-canvas px-4 py-3 pr-11 text-[15px] text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500";
 
 /** Password field with a show/hide eye toggle. */
 export function PasswordInput({
@@ -38,7 +38,7 @@ export function PasswordInput({
         onClick={() => setShow((s) => !s)}
         aria-label={show ? "Hide password" : "Show password"}
         aria-pressed={show}
-        className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 cursor-pointer place-items-center rounded-sm text-muted transition-colors duration-200 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500"
+        className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 cursor-pointer place-items-center rounded-none text-muted transition-colors duration-200 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500"
       >
         {show ? <EyeOff /> : <Eye />}
       </button>

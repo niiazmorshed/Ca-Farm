@@ -7,7 +7,7 @@ import { serviceCategories } from "../lib/content";
 const initialState: EnquiryState = { status: "idle" };
 
 const inputClasses =
-  "w-full rounded-md border border-line bg-canvas px-4 py-3 text-[15px] text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500";
+  "w-full rounded-none border border-line bg-canvas px-4 py-3 text-[15px] text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500";
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
@@ -26,8 +26,8 @@ export function ContactForm() {
 
   if (state.status === "success") {
     return (
-      <div className="flex flex-col items-start gap-4 rounded-sm border-t-2 border-primary-400 bg-surface p-8 shadow-sm shadow-navy-900/5">
-        <span className="grid h-12 w-12 place-items-center rounded-sm bg-navy-900 text-primary-300">
+      <div className="flex flex-col items-start gap-4 rounded-none border-t-2 border-primary-400 bg-surface p-8 shadow-sm shadow-navy-900/5">
+        <span className="grid h-12 w-12 place-items-center rounded-none bg-navy-900 text-primary-300">
           <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5" aria-hidden="true">
             <path
               d="M4 10.5l4 4L16 6"
@@ -148,7 +148,7 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-md bg-primary-500 px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-default disabled:opacity-60"
+          className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-none bg-primary-500 px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-default disabled:opacity-60"
         >
           {isPending && (
             <svg

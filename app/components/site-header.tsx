@@ -19,7 +19,7 @@ function isActive(pathname: string, href: string) {
 
 function SoonTag() {
   return (
-    <span className="rounded-sm bg-secondary-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-secondary-500">
+    <span className="rounded-none bg-secondary-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-secondary-500">
       Soon
     </span>
   );
@@ -122,7 +122,7 @@ function Avatar({ user, size = 36 }: { user: SessionUser; size?: number }) {
 function Logo({ onClick }: { onClick?: () => void }) {
   return (
     <Link href="/" className="flex items-center gap-2.5" onClick={onClick}>
-      <span className="grid h-9 w-9 place-items-center rounded-sm bg-navy-900 font-display text-sm font-semibold text-primary-400">
+      <span className="grid h-9 w-9 place-items-center rounded-none bg-navy-900 font-display text-sm font-semibold text-primary-400">
         CA
       </span>
       <span className="flex flex-col leading-none">
@@ -271,7 +271,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                     : ""
                 }`}
               >
-                <div className="rounded-sm border border-line bg-white p-6 shadow-2xl shadow-navy-900/15">
+                <div className="rounded-none border border-line bg-white p-6 shadow-2xl shadow-navy-900/15">
                   <div className="grid grid-cols-2 gap-x-8 gap-y-6 lg:grid-cols-4">
                     {serviceCategories.map((category) => (
                       <div key={category.slug}>
@@ -364,20 +364,20 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
             ) : (
               <Link
                 href="/login"
-                className="inline-flex h-10 cursor-pointer items-center whitespace-nowrap rounded-md border border-line px-4 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-secondary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+                className="inline-flex h-10 cursor-pointer items-center whitespace-nowrap rounded-none border border-line px-4 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-secondary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
               >
                 Sign in
               </Link>
             )}
             <Link
               href="/contact"
-              className="hidden h-10 cursor-pointer items-center rounded-md bg-primary-500 px-5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 sm:inline-flex"
+              className="hidden h-10 cursor-pointer items-center rounded-none bg-primary-500 px-5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 sm:inline-flex"
             >
               Book a consultation
             </Link>
             <button
               type="button"
-              className="grid h-10 w-10 cursor-pointer place-items-center rounded-sm border border-line text-ink transition-colors duration-200 hover:bg-secondary-50 lg:hidden"
+              className="grid h-10 w-10 cursor-pointer place-items-center rounded-none border border-line text-ink transition-colors duration-200 hover:bg-secondary-50 lg:hidden"
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -415,7 +415,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                 type="button"
                 aria-expanded={mobileServicesOpen}
                 onClick={() => setMobileServicesOpen((open) => !open)}
-                className={`flex items-center justify-between rounded-sm px-3 py-2.5 text-[15px] font-medium transition-colors duration-200 ${
+                className={`flex items-center justify-between rounded-none px-3 py-2.5 text-[15px] font-medium transition-colors duration-200 ${
                   servicesActive
                     ? "bg-secondary-50 font-semibold text-primary-500"
                     : "text-ink-body hover:bg-secondary-50"
@@ -433,7 +433,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                   <Link
                     href="/services"
                     onClick={closeMobile}
-                    className="rounded-sm px-3 py-2 text-sm font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
+                    className="rounded-none px-3 py-2 text-sm font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
                   >
                     All services
                   </Link>
@@ -442,7 +442,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                       key={category.slug}
                       href={`/services/${category.slug}`}
                       onClick={closeMobile}
-                      className="flex items-center gap-2 rounded-sm px-3 py-2 text-sm text-muted transition-colors duration-200 hover:bg-secondary-50 hover:text-primary-500"
+                      className="flex items-center gap-2 rounded-none px-3 py-2 text-sm text-muted transition-colors duration-200 hover:bg-secondary-50 hover:text-primary-500"
                     >
                       {category.title}
                       {category.status === "coming-soon" && <SoonTag />}
@@ -456,7 +456,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                   key={link.href}
                   href={link.href}
                   aria-current={isActive(pathname, link.href) ? "page" : undefined}
-                  className={`rounded-sm px-3 py-2.5 text-[15px] font-medium transition-colors duration-200 ${
+                  className={`rounded-none px-3 py-2.5 text-[15px] font-medium transition-colors duration-200 ${
                     isActive(pathname, link.href)
                       ? "bg-secondary-50 font-semibold text-primary-500"
                       : "text-ink-body hover:bg-secondary-50"
@@ -468,14 +468,14 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
               ))}
               <a
                 href={site.phoneHref}
-                className="rounded-sm px-3 py-2.5 text-[15px] font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
+                className="rounded-none px-3 py-2.5 text-[15px] font-medium text-ink-body transition-colors duration-200 hover:bg-secondary-50"
                 onClick={closeMobile}
               >
                 {site.phone}
               </a>
               <Link
                 href="/contact"
-                className="mt-2 inline-flex h-11 items-center justify-center rounded-md bg-primary-500 px-5 text-sm font-semibold text-white"
+                className="mt-2 inline-flex h-11 items-center justify-center rounded-none bg-primary-500 px-5 text-sm font-semibold text-white"
                 onClick={closeMobile}
               >
                 Book a consultation

@@ -78,9 +78,9 @@ export default async function SubServicePage({
             {item.included.map((entry) => (
               <li
                 key={entry}
-                className="flex items-start gap-3 rounded-sm border border-line bg-surface p-4 text-sm leading-6 text-ink-body transition-colors duration-200 hover:border-primary-300"
+                className="flex items-start gap-3 rounded-none border border-line bg-surface p-4 text-sm leading-6 text-ink-body transition-colors duration-200 hover:border-primary-300"
               >
-                <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-sm bg-navy-900 text-primary-300">
+                <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-none bg-navy-900 text-primary-300">
                   <CheckIcon className="h-3 w-3" />
                 </span>
                 {entry}
@@ -90,7 +90,7 @@ export default async function SubServicePage({
         </Reveal>
 
         <aside className="flex flex-col gap-6 lg:sticky lg:top-28">
-          <div className="rounded-sm bg-navy-900 p-7 text-white">
+          <div className="rounded-none bg-navy-900 p-7 text-white">
             <h2 className="font-display text-lg font-medium tracking-tight">
               Talk to us about {item.title.toLowerCase()}
             </h2>
@@ -109,7 +109,7 @@ export default async function SubServicePage({
             </a>
           </div>
 
-          <div className="rounded-sm border-t-2 border-primary-400 bg-surface p-6 shadow-sm shadow-navy-900/5">
+          <div className="rounded-none border-t-2 border-primary-400 bg-surface p-6 shadow-sm shadow-navy-900/5">
             <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               {isPersona ? "Ideal if" : "Best for"}
             </h2>

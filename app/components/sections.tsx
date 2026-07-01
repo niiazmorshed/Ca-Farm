@@ -5,6 +5,7 @@ import { Reveal } from "./reveal";
 import { CountUp } from "./count-up";
 import { ClipReveal } from "./clip-reveal";
 import { Accordion } from "./accordion";
+import { HeroVideo } from "./hero-video";
 import { images } from "../lib/images";
 import { industries, serviceCategories, site } from "../lib/content";
 
@@ -16,42 +17,63 @@ function bg(url: string): CSSProperties {
 
 export function Hero() {
   return (
-    <section className="relative isolate overflow-hidden bg-navy-900 text-white">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-20 bg-cover bg-center"
-        style={bg(images.heroHandshake)}
+    <section className="relative isolate flex min-h-[88vh] items-center overflow-hidden bg-navy-900 text-white">
+      <HeroVideo
+        clips={[
+          { src: "/hero-1.mp4", poster: "/hero-1.jpg" },
+          { src: "/hero-2.mp4", poster: "/hero-2.jpg" },
+          { src: "/hero-3.mp4", poster: "/hero-3.jpg" },
+        ]}
+        className="absolute inset-0 -z-20"
       />
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-gradient-to-r from-navy-900 via-navy-900/90 to-navy-900/40"
+        className="absolute inset-0 -z-10 bg-navy-900/15"
       />
-      <Container className="py-24 sm:py-28 lg:py-36">
-        <div className="max-w-2xl border-l-2 border-primary-400 pl-6 sm:pl-8">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-gradient-to-r from-navy-900/85 via-navy-900/45 to-transparent"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-gradient-to-t from-navy-900/70 via-transparent to-navy-900/20"
+      />
+      <Container className="py-28 sm:py-36 lg:py-44">
+        <div className="max-w-4xl">
           <span className="animate-fade-up block">
             <Eyebrow tone="dark">
-              Chartered Accountants &amp; Advisors · UK &amp; Ireland
+              Chartered Accountants &amp; Advisors · Ireland
             </Eyebrow>
           </span>
-          <h1 className="animate-fade-up mt-6 font-display text-4xl font-medium leading-[1.05] tracking-tight text-balance [animation-delay:80ms] sm:text-5xl lg:text-6xl">
-            Solid ground for{" "}
-            <em className="text-primary-300 not-italic">growing</em> businesses.
+          <h1 className="animate-fade-up mt-7 font-display text-5xl font-bold leading-[0.95] tracking-[-0.03em] text-balance [animation-delay:80ms] sm:text-6xl lg:text-7xl">
+            Accountancy,{" "}
+            <em className="text-primary-300 not-italic">rebuilt around AI.</em>
           </h1>
-          <p className="animate-fade-up mt-6 max-w-xl text-lg leading-8 text-white/80 [animation-delay:150ms]">
-            Partner-led accounting, tax and advisory — backed by modern cloud
-            tools and AI. We keep you compliant, ahead of every deadline, and
-            never paying more tax than you owe.
+          <p className="animate-fade-up mt-7 max-w-xl text-lg leading-8 text-white/80 [animation-delay:150ms] sm:text-xl">
+            Partner-led tax, audit and advisory across Ireland — with AI doing
+            the heavy lifting.
           </p>
-          <div className="animate-fade-up mt-9 flex flex-col gap-3 [animation-delay:220ms] sm:flex-row">
+          <div className="animate-fade-up mt-10 flex flex-col gap-3 [animation-delay:220ms] sm:flex-row">
             <Button href="/contact">Book a free consultation</Button>
-            <Button href="/services" variant="outlineLight">
-              Explore our services
+            <Button href="/services/ai" variant="outlineLight">
+              See how we use AI
             </Button>
           </div>
-          <ul className="animate-fade-up mt-10 flex flex-wrap gap-x-8 gap-y-2 border-t border-white/15 pt-6 text-sm text-white/65 [animation-delay:290ms]">
-            <li>ICAEW-registered practice</li>
-            <li>20+ years in practice</li>
-            <li>500+ clients served</li>
+          <ul className="animate-fade-up mt-12 grid max-w-2xl grid-cols-3 gap-px overflow-hidden border border-white/15 bg-white/15 [animation-delay:290ms]">
+            {[
+              ["20+", "years in practice"],
+              ["500+", "clients served"],
+              ["€40m+", "saved in tax"],
+            ].map(([value, label]) => (
+              <li key={label} className="bg-navy-900 px-5 py-5">
+                <span className="block font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  {value}
+                </span>
+                <span className="mt-1 block text-xs leading-5 text-white/60 sm:text-sm">
+                  {label}
+                </span>
+              </li>
+            ))}
           </ul>
         </div>
       </Container>
@@ -229,7 +251,7 @@ export function Services() {
           <SectionHeading
             eyebrow="What we do"
             title="One firm for the whole journey."
-            lede="From year-end accounts done properly to a finance function without the headcount — across the UK and Ireland."
+            lede="Year-end accounts, payroll, tax, a part-time CFO — take one or the lot. Across Ireland."
           />
           <Link
             href="/services"
@@ -239,32 +261,29 @@ export function Services() {
           </Link>
         </div>
         <div className="mt-14 grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
-          {serviceCategories.map((category, index) => (
+          {serviceCategories.map((category) => (
             <Link
               key={category.slug}
               href={`/services/${category.slug}`}
-              className="group relative flex flex-col bg-surface p-8 transition-colors duration-200 hover:bg-secondary-50/60 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500"
+              className="group relative flex items-center justify-between gap-3 bg-surface p-8 transition-colors duration-200 hover:bg-secondary-50/60 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500"
             >
               <span
                 aria-hidden="true"
-                className="absolute left-0 top-0 h-0.5 w-0 bg-primary-400 transition-all duration-300 group-hover:w-full"
+                className="absolute left-0 top-0 h-1 w-0 bg-primary-500 transition-all duration-300 group-hover:w-full"
               />
-              <span className="font-display text-sm font-semibold text-primary-500">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <h3 className="mt-4 flex flex-wrap items-center gap-2 font-display text-xl font-medium tracking-tight text-ink">
+              <h3 className="flex flex-wrap items-center gap-2 font-display text-xl font-bold tracking-[-0.01em] text-ink">
                 {category.title}
                 {category.status === "coming-soon" && (
-                  <span className="rounded-sm bg-secondary-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-secondary-500">
+                  <span className="rounded-none bg-secondary-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-secondary-500">
                     Soon
                   </span>
                 )}
               </h3>
-              <p className="mt-2.5 text-[15px] leading-7 text-muted">
-                {category.blurb}
-              </p>
-              <span className="mt-auto pt-6 text-sm font-semibold text-primary-500">
-                Learn more <span aria-hidden="true">→</span>
+              <span
+                aria-hidden="true"
+                className="text-primary-500 transition-transform duration-200 group-hover:translate-x-1"
+              >
+                →
               </span>
             </Link>
           ))}
@@ -272,22 +291,16 @@ export function Services() {
           {/* fills the trailing grid cell with a CTA instead of empty space */}
           <Link
             href="/contact"
-            className="group flex flex-col justify-between bg-navy-900 p-8 text-white transition-colors duration-200 hover:bg-navy-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-400 sm:col-span-2 lg:col-span-1"
+            className="group flex items-center justify-between gap-3 bg-navy-900 p-8 text-white transition-colors duration-200 hover:bg-navy-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-400 sm:col-span-2 lg:col-span-1"
           >
-            <div>
-              <span className="font-display text-sm font-semibold text-primary-300">
-                Get started
-              </span>
-              <h3 className="mt-4 font-display text-xl font-medium tracking-tight">
-                Not sure where to start?
-              </h3>
-              <p className="mt-2.5 text-[15px] leading-7 text-white/70">
-                Tell us about your business and we&apos;ll point you to the right
-                service.
-              </p>
-            </div>
-            <span className="mt-auto pt-6 text-sm font-semibold text-primary-300">
-              Book a consultation <span aria-hidden="true">→</span>
+            <h3 className="font-display text-xl font-bold tracking-[-0.01em] text-primary-300">
+              Not sure where to start?
+            </h3>
+            <span
+              aria-hidden="true"
+              className="text-primary-300 transition-transform duration-200 group-hover:translate-x-1"
+            >
+              →
             </span>
           </Link>
         </div>
@@ -297,44 +310,162 @@ export function Services() {
   );
 }
 
-/* ---------- harvest band (signature) ---------- */
+/* ---------- promo banner (kpmg-style full-width split) ---------- */
 
-export function HarvestBand() {
+export function PromoBanner({
+  eyebrow,
+  title,
+  body,
+  ctaHref,
+  ctaLabel,
+  image,
+  reverse = false,
+}: {
+  eyebrow: string;
+  title: ReactNode;
+  body: string;
+  ctaHref: string;
+  ctaLabel: string;
+  image: keyof typeof images;
+  reverse?: boolean;
+}) {
+  return (
+    <section className="border-y border-line bg-surface">
+      <div className="grid lg:grid-cols-2">
+        <div
+          className={`flex flex-col justify-center px-5 py-16 sm:px-8 sm:py-20 lg:py-28 ${
+            reverse
+              ? "lg:order-2 lg:ml-0 lg:mr-auto lg:max-w-xl lg:pl-16"
+              : "lg:ml-auto lg:mr-0 lg:max-w-xl lg:pr-16"
+          }`}
+        >
+          <Reveal>
+            <Eyebrow>{eyebrow}</Eyebrow>
+            <h2 className="mt-5 font-display text-4xl font-bold leading-[1.03] tracking-[-0.02em] text-balance text-ink sm:text-5xl">
+              {title}
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-ink-body">{body}</p>
+            <div className="mt-9">
+              <Button href={ctaHref}>{ctaLabel}</Button>
+            </div>
+          </Reveal>
+        </div>
+        <div
+          aria-hidden="true"
+          className={`min-h-[320px] bg-cover bg-center lg:min-h-[520px] ${
+            reverse ? "lg:order-1" : ""
+          }`}
+          style={bg(images[image])}
+        />
+      </div>
+    </section>
+  );
+}
+
+/* ---------- AI band (signature pillar) ---------- */
+
+type AiIcon = "forecast" | "automate" | "tax";
+
+function AiGlyph({ name }: { name: AiIcon }) {
+  const common = {
+    width: 24,
+    height: 24,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.6,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true,
+  };
+  switch (name) {
+    case "forecast":
+      return (
+        <svg {...common}>
+          <path d="M4 19V5M4 19h16" />
+          <path d="M7 15l4-4 3 2 5-6" />
+          <path d="M19 7v3.5M19 7h-3.5" />
+        </svg>
+      );
+    case "automate":
+      return (
+        <svg {...common}>
+          <path d="M13 3L5 13h5l-1 8 8-10h-5l1-8z" />
+        </svg>
+      );
+    case "tax":
+      return (
+        <svg {...common}>
+          <path d="M7 3h7l4 4v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+          <path d="M13 3v5h5" />
+          <path d="M9 13l2 2 3-4" />
+        </svg>
+      );
+  }
+}
+
+const aiCapabilities: { icon: AiIcon; title: string; note: string }[] = [
+  {
+    icon: "forecast",
+    title: "Forecasting & insight",
+    note: "See what’s coming — cash-flow forecasts, anomaly detection, live reporting.",
+  },
+  {
+    icon: "automate",
+    title: "Automation",
+    note: "Invoice capture, reconciliations and approvals that run themselves.",
+  },
+  {
+    icon: "tax",
+    title: "Tax intelligence",
+    note: "Spot reliefs you’re missing — checked by a chartered accountant.",
+  },
+];
+
+export function AiBand() {
   return (
     <section className="relative isolate overflow-hidden bg-navy-900 text-white">
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-20 bg-cover bg-center"
-        style={bg(images.fields)}
+        className="absolute inset-0 -z-10 opacity-[0.06] [background-image:linear-gradient(var(--color-primary-300)_1px,transparent_1px),linear-gradient(90deg,var(--color-primary-300)_1px,transparent_1px)] [background-size:44px_44px]"
       />
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-gradient-to-t from-navy-900 via-navy-900/80 to-navy-900/55"
+        className="absolute -right-32 -top-32 -z-10 h-96 w-96 rounded-full bg-primary-500/20 blur-3xl"
       />
       <Container className="py-24 sm:py-32">
-        <Reveal className="max-w-3xl">
-        <div>
-          <Eyebrow tone="dark">Why CA Farm</Eyebrow>
-          <p className="mt-6 font-display text-3xl font-medium leading-[1.18] tracking-tight text-balance sm:text-4xl">
-            We don’t just file your accounts. We help you understand the numbers
-            behind them — and grow what they measure.
-          </p>
-          <div className="mt-10 grid max-w-2xl grid-cols-1 gap-px overflow-hidden rounded-sm border border-white/15 bg-white/15 sm:grid-cols-3">
-            {[
-              ["£40m+", "saved for clients in tax"],
-              ["100%", "filings in on time"],
-              ["< 1 day", "median reply time"],
-            ].map(([value, label]) => (
-              <div key={label} className="bg-navy-900/40 px-6 py-7 backdrop-blur-sm">
-                <CountUp
-                  value={value}
-                  className="block font-display text-3xl font-medium tracking-tight text-primary-300"
-                />
-                <div className="mt-1 text-sm leading-6 text-white/70">{label}</div>
+        <Reveal>
+          <div className="max-w-2xl border-l-2 border-primary-400 pl-6 sm:pl-8">
+            <Eyebrow tone="dark">AI, applied</Eyebrow>
+            <h2 className="mt-6 font-display text-4xl font-bold leading-[1.03] tracking-[-0.02em] text-balance sm:text-5xl">
+              AI in the work —{" "}
+              <em className="text-primary-300 not-italic">not bolted on after.</em>
+            </h2>
+            <p className="mt-6 text-lg leading-8 text-white/80">
+              Where AI earns its place, we use it. Where it doesn’t, we say so.
+            </p>
+          </div>
+          <div className="mt-14 grid grid-cols-1 gap-px overflow-hidden border border-white/12 bg-white/12 sm:grid-cols-3">
+            {aiCapabilities.map((cap) => (
+              <div
+                key={cap.title}
+                className="flex flex-col bg-navy-900 px-7 py-9"
+              >
+                <span className="text-primary-300">
+                  <AiGlyph name={cap.icon} />
+                </span>
+                <h3 className="mt-5 font-display text-lg font-medium tracking-tight text-white">
+                  {cap.title}
+                </h3>
+                <p className="mt-2.5 text-[15px] leading-7 text-white/65">
+                  {cap.note}
+                </p>
               </div>
             ))}
           </div>
-        </div>
+          <div className="mt-12">
+            <Button href="/services/ai">Explore our AI services</Button>
+          </div>
         </Reveal>
       </Container>
     </section>
@@ -355,19 +486,29 @@ export function Industries() {
           />
           <ClipReveal
             url={images.meeting}
-            className="mt-10 hidden h-64 w-full rounded-sm lg:block"
+            className="mt-10 hidden h-64 w-full rounded-none lg:block"
           />
         </Reveal>
         <Reveal delay={120}>
         <ul className="grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-2">
-          {industries.map((industry) => (
-            <li key={industry.name} className="bg-surface p-6">
-              <h3 className="font-display text-lg font-medium tracking-tight text-ink">
-                {industry.name}
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-muted">{industry.note}</p>
-            </li>
-          ))}
+          {industries.map((industry, i) => {
+            // last card spans both columns when the count is odd — no orphan cell
+            const spanFull =
+              industries.length % 2 === 1 && i === industries.length - 1;
+            return (
+              <li
+                key={industry.name}
+                className={`bg-surface p-6 ${spanFull ? "sm:col-span-2" : ""}`}
+              >
+                <h3 className="font-display text-lg font-medium tracking-tight text-ink">
+                  {industry.name}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  {industry.note}
+                </p>
+              </li>
+            );
+          })}
         </ul>
         </Reveal>
       </Container>
@@ -380,23 +521,19 @@ export function Industries() {
 const steps = [
   {
     title: "Discovery call",
-    description:
-      "A free 30-minute conversation about where your books stand and what you need — no pitch, no jargon.",
+    description: "A free 30 minutes on where you stand. No pitch.",
   },
   {
     title: "Fixed-fee proposal",
-    description:
-      "A clear scope and a fixed monthly fee. You know exactly what it costs before you commit.",
+    description: "Clear scope, fixed monthly fee. No surprises.",
   },
   {
     title: "Painless onboarding",
-    description:
-      "We collect records, talk to your previous accountant and set up your cloud stack. You sign one letter.",
+    description: "We handle the handover. You sign one letter.",
   },
   {
     title: "Year-round care",
-    description:
-      "Monthly accounts, deadline tracking and proactive tax planning — not just a January scramble.",
+    description: "Monthly numbers and proactive planning — not a January scramble.",
   },
 ];
 
@@ -443,7 +580,7 @@ export function Process() {
 const stats = [
   { value: "20+", label: "years in practice" },
   { value: "500+", label: "businesses served" },
-  { value: "£40m+", label: "saved for clients in tax" },
+  { value: "€40m+", label: "saved for clients in tax" },
   { value: "98%", label: "client retention" },
 ];
 
@@ -482,7 +619,7 @@ const testimonials = [
   },
   {
     quote:
-      "They found £40k in R&D relief our previous accountant never mentioned. They’ve paid for themselves many times over.",
+      "They found €40k in R&D credits our previous accountant never mentioned. They’ve paid for themselves many times over.",
     name: "Marcus Hale",
     role: "Director, Cedar Logistics",
   },
@@ -553,12 +690,12 @@ const faqs = [
   {
     question: "Do you work with businesses like mine?",
     answer:
-      "Our clients range from sole traders to £20m-turnover companies — agriculture, hospitality, e-commerce, construction and professional services are our deepest benches.",
+      "Our clients range from sole traders to €20m-turnover companies — startups and SaaS, hospitality, retail, healthcare and professional services are our deepest benches.",
   },
   {
     question: "I’ve already missed deadlines. Can you help?",
     answer:
-      "Yes. Penalty triage is routine work for us: we bring filings up to date, deal with HMRC correspondence on your behalf and appeal penalties where there are grounds.",
+      "Yes. Penalty triage is routine work for us: we bring filings up to date, deal with Revenue correspondence on your behalf and appeal surcharges where there are grounds.",
   },
 ];
 
@@ -639,7 +776,7 @@ export function ContactCta({ children }: { children?: ReactNode }) {
   return (
     <section id="contact" className="scroll-mt-24 bg-canvas">
       <Container className="py-20 sm:py-24">
-        <div className="relative isolate overflow-hidden rounded-sm bg-navy-900 text-white">
+        <div className="relative isolate overflow-hidden rounded-none bg-navy-900 text-white">
           <div
             aria-hidden="true"
             className="absolute inset-0 -z-20 bg-cover bg-center opacity-40"

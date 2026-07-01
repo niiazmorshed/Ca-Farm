@@ -2,36 +2,36 @@
 
 @theme inline {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 }
 
 @theme {
-  /* CA Farm — The Practice: navy ink, harvest amber, field olive, warm paper */
-  --color-canvas: #f7f5f0;
+  /* CA Farm — vibrant white base + signal green (#26890d) accent, near-black ink */
+  --color-canvas: #ffffff;
   --color-surface: #ffffff;
-  --color-surface-muted: #efece4;
-  --color-ink: #14212e;
-  --color-ink-body: #3c4651;
-  --color-muted: #6c7480;
-  --color-line: #e4e0d6;
+  --color-surface-muted: #f2f6ef;
+  --color-ink: #0b0b0c;
+  --color-ink-body: #2b2f33;
+  --color-muted: #62686e;
+  --color-line: #e2e4e5;
 
-  /* harvest amber — the one bold accent */
-  --color-primary-50: #f6e9d6;
-  --color-primary-300: #d79f57;
-  --color-primary-400: #c07a2a;
-  --color-primary-500: #a5641d;
-  --color-primary-600: #854f16;
+  /* signal green — the one bold accent */
+  --color-primary-50: #e8f3df;
+  --color-primary-300: #6fae3d;
+  --color-primary-400: #4f9e1f;
+  --color-primary-500: #26890d;
+  --color-primary-600: #1d6b09;
 
-  /* field olive — secondary, grounds the brand */
-  --color-secondary-50: #eef0e8;
-  --color-secondary-400: #7d8a6a;
-  --color-secondary-500: #566049;
-  --color-secondary-600: #3f4734;
+  /* secondary — aligned to the #26890d green, grounds the brand */
+  --color-secondary-50: #eaf3e3;
+  --color-secondary-400: #6fae3d;
+  --color-secondary-500: #26890d;
+  --color-secondary-600: #1d6b09;
 
-  /* navy ink — dark sections */
-  --color-navy-700: #2c3a48;
-  --color-navy-800: #1c2935;
-  --color-navy-900: #122029;
+  /* charcoal — dark sections */
+  --color-navy-700: #2a2d31;
+  --color-navy-800: #161719;
+  --color-navy-900: #0b0b0c;
 
   /* Strong custom easing (Emil Kowalski) — built-in curves are too weak */
   --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
@@ -71,7 +71,7 @@ body {
 
 ::selection {
   background-color: var(--color-primary-50);
-  color: var(--color-navy-900);
+  color: var(--color-ink);
 }
 
 summary::-webkit-details-marker {
