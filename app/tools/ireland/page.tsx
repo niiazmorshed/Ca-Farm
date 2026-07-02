@@ -2,31 +2,33 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs, Container, PageHero } from "../../components/ui";
 import { ContactCta } from "../../components/sections";
-import { IrelandCalculator } from "../../components/ireland-calculator";
-import { TAX_YEAR } from "../../lib/ireland-tax";
+import { IrelandMortgageCalculator } from "../../components/ireland-mortgage-calculator";
+import { getMortgageData } from "../../lib/mortgage-data";
 
 export const metadata: Metadata = {
-  title: "Ireland Mortgage Calculator",
+  title: "Ireland Mortgage Calculator — Compare Repayments by Lender",
   description:
-    "Estimate what you can borrow in Ireland against the Central Bank loan-to-income and loan-to-value limits, and work out your monthly repayment. 2025 rules.",
+    "Compare monthly mortgage repayments across Irish lenders — first-time buyer, trading up, switcher and investment rates with APRC, green mortgage and cashback offers.",
 };
 
 const notes = [
   {
-    title: "Central Bank mortgage rules",
-    body: "Checks your borrowing against the loan-to-income and loan-to-value limits, flags the binding constraint, and works out the monthly repayment.",
+    title: "Compare Irish lenders",
+    body: "Monthly repayments across AIB, Haven, Bank of Ireland, Avant Money, PTSB and ICS — with each product's interest rate, APRC and incentives side by side.",
   },
   {
-    title: "Every buyer type",
-    body: "First-time buyers, movers and buy-to-let each get the correct LTI multiple and maximum LTV, with the minimum deposit worked out for you.",
+    title: "Every rate type",
+    body: "Filter variable, 2–10 year fixed and full-term fixed rates, including green mortgage rates for energy-efficient homes and cashback offers.",
   },
   {
-    title: "Built for Irish clients",
-    body: "Figures follow Central Bank of Ireland macroprudential policy for the Republic of Ireland. Lenders may apply their own exemptions and affordability tests.",
+    title: "Central Bank guardrails",
+    body: "Flags where your loan sits against the loan-to-income and loan-to-value limits, and where your term runs past typical lender age caps.",
   },
 ];
 
-export default function IrelandMortgagePage() {
+export default async function IrelandMortgagePage() {
+  const { products, policy, ratesAsOf } = await getMortgageData();
+
   return (
     <>
       <PageHero
@@ -41,7 +43,7 @@ export default function IrelandMortgagePage() {
           />
         }
         title="Ireland mortgage calculator"
-        lede={`Estimate what you can borrow and what it will cost — Central Bank lending rules for ${TAX_YEAR}.`}
+        lede={`Compare monthly repayments across Irish lenders — variable, fixed and green rates as of ${ratesAsOf}.`}
       />
 
       <Container className="py-16 sm:py-20">
@@ -56,7 +58,11 @@ export default function IrelandMortgagePage() {
         </div>
 
         <div className="rounded-none border border-line bg-canvas p-6 sm:p-8 lg:p-10">
-          <IrelandCalculator />
+          <IrelandMortgageCalculator
+            products={products}
+            policy={policy}
+            ratesAsOf={ratesAsOf}
+          />
         </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-3">
