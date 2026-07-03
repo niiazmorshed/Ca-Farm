@@ -74,3 +74,97 @@ select * from (values
   ('Bank of Ireland',   'Buy-to-Let 2 Year Fixed', 'fixed-2',    4.65, 4.90, 0.7, false, null,           '{investment}')
 ) as seed(lender, name, rate_type, rate_percent, aprc_percent, max_ltv, green, cashback, audience)
 where not exists (select 1 from mortgage_products);
+
+-- ── Auth: profiles, roles and the admin allow-list ──────────────────────────
+-- Tracks what is live in Supabase (originally created in the dashboard SQL
+-- editor). Re-runnable. One profile row per auth.users row; `role` drives the
+-- /admin vs /portal split (see app/lib/supabase/guards.ts).
+
+create table if not exists public.profiles (
+  id         uuid primary key references auth.users (id) on delete cascade,
+  email      text,
+  full_name  text,
+  role       text not null default 'client' check (role in ('client', 'admin')),
+  created_at timestamptz not null default now()
+);
+
+alter table public.profiles enable row level security;
+
+-- Security-definer helper lives outside `public` so PostgREST never exposes it.
+create schema if not exists private;
+
+create or replace function private.is_admin()
+returns boolean
+language sql
+security definer
+set search_path to 'public'
+as $$
+  select exists (select 1 from public.profiles where id = auth.uid() and role = 'admin');
+$$;
+
+-- Users read their own profile; admins read all.
+drop policy if exists profiles_select_own_or_admin on public.profiles;
+create policy profiles_select_own_or_admin on public.profiles
+  for select using (auth.uid() = id or private.is_admin());
+
+-- The auth server needs to read roles when stamping JWT claims (token hook).
+drop policy if exists auth_admin_read_roles on public.profiles;
+create policy auth_admin_read_roles on public.profiles
+  for select to supabase_auth_admin using (true);
+
+-- Creates the profile row on signup. THE ADMIN EMAIL ALLOW-LIST LIVES HERE —
+-- add an email to the `in (...)` list to make that account an admin from its
+-- first login. Existing accounts instead need:
+--   update public.profiles set role = 'admin' where lower(email) = '<email>';
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path to 'public'
+as $$
+begin
+  insert into public.profiles (id, email, full_name, role)
+  values (
+    new.id,
+    new.email,
+    new.raw_user_meta_data->>'full_name',
+    case when lower(new.email) in ('idublinfourir@gmail.com', 'fineanswer2025@gmail.com')
+         then 'admin' else 'client' end
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
+
+-- Stamps the `user_role` claim into every JWT so the app can authorise from
+-- the locally-verified token. Must also be enabled in the Supabase dashboard:
+-- Authentication → Hooks → Custom Access Token → this function.
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+stable
+set search_path to ''
+as $$
+declare
+  claims jsonb := coalesce(event -> 'claims', '{}'::jsonb);
+  v_role text;
+begin
+  begin
+    select role into v_role
+      from public.profiles
+     where id = (event ->> 'user_id')::uuid;
+  exception when others then
+    v_role := null;
+  end;
+
+  claims := jsonb_set(claims, '{user_role}', to_jsonb(coalesce(v_role, 'client')));
+  return jsonb_set(event, '{claims}', claims);
+end;
+$$;
+
+grant execute on function public.custom_access_token_hook to supabase_auth_admin;
