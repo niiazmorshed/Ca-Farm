@@ -36,6 +36,8 @@ export interface AdminSettings {
   maxLtvOwnerPercent: number;
   maxLtvInvestmentPercent: number;
   maxAgeAtEnd: number;
+  maxTermOwner: number;
+  maxTermInvestment: number;
 }
 
 const AUDIENCE_OPTIONS = [
@@ -119,6 +121,12 @@ function SettingsForm({ settings }: { settings: AdminSettings }) {
         </Field>
         <Field label="Investment max LTV (%)">
           <input name="max_ltv_investment_percent" type="number" step="1" min="1" max="100" defaultValue={settings.maxLtvInvestmentPercent} className={inputClass} required />
+        </Field>
+        <Field label="Residential max term (years)">
+          <input name="max_term_owner" type="number" step="1" min="5" max="45" defaultValue={settings.maxTermOwner} className={inputClass} required />
+        </Field>
+        <Field label="Investment max term (years)">
+          <input name="max_term_investment" type="number" step="1" min="5" max="45" defaultValue={settings.maxTermInvestment} className={inputClass} required />
         </Field>
       </div>
 

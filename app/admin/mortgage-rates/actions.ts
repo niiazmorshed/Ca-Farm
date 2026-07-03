@@ -180,6 +180,8 @@ export async function updateSettings(
   const maxLtvOwner = num(formData.get("max_ltv_owner_percent")) / 100;
   const maxLtvInvestment = num(formData.get("max_ltv_investment_percent")) / 100;
   const maxAgeAtEnd = num(formData.get("max_age_at_end"));
+  const maxTermOwner = num(formData.get("max_term_owner"));
+  const maxTermInvestment = num(formData.get("max_term_investment"));
 
   if (!ratesAsOf) return { status: "error", message: "Rates-as-of label is required." };
   if (!Number.isFinite(ltiFirstTime) || ltiFirstTime <= 0 || ltiFirstTime > 20)
@@ -192,13 +194,18 @@ export async function updateSettings(
     return { status: "error", message: "Investment max LTV must be between 1 and 100." };
   if (!Number.isInteger(maxAgeAtEnd) || maxAgeAtEnd < 50 || maxAgeAtEnd > 100)
     return { status: "error", message: "Max age at end of term must be 50–100." };
+  if (!Number.isInteger(maxTermOwner) || maxTermOwner < 5 || maxTermOwner > 45)
+    return { status: "error", message: "Residential max term must be 5–45 years." };
+  if (!Number.isInteger(maxTermInvestment) || maxTermInvestment < 5 || maxTermInvestment > 45)
+    return { status: "error", message: "Investment max term must be 5–45 years." };
 
   try {
     await query(
       `insert into mortgage_settings
          (id, rates_as_of, lti_first_time, lti_trading_up,
-          max_ltv_owner, max_ltv_investment, max_age_at_end)
-       values (1, $1, $2, $3, $4, $5, $6)
+          max_ltv_owner, max_ltv_investment, max_age_at_end,
+          max_term_owner, max_term_investment)
+       values (1, $1, $2, $3, $4, $5, $6, $7, $8)
        on conflict (id) do update
          set rates_as_of = excluded.rates_as_of,
              lti_first_time = excluded.lti_first_time,
@@ -206,8 +213,19 @@ export async function updateSettings(
              max_ltv_owner = excluded.max_ltv_owner,
              max_ltv_investment = excluded.max_ltv_investment,
              max_age_at_end = excluded.max_age_at_end,
+             max_term_owner = excluded.max_term_owner,
+             max_term_investment = excluded.max_term_investment,
              updated_at = now()`,
-      [ratesAsOf, ltiFirstTime, ltiTradingUp, maxLtvOwner, maxLtvInvestment, maxAgeAtEnd],
+      [
+        ratesAsOf,
+        ltiFirstTime,
+        ltiTradingUp,
+        maxLtvOwner,
+        maxLtvInvestment,
+        maxAgeAtEnd,
+        maxTermOwner,
+        maxTermInvestment,
+      ],
     );
   } catch (err) {
     console.error("[mortgage-rates] settings save failed:", err);

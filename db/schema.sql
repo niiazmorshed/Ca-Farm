@@ -36,15 +36,22 @@ create table if not exists mortgage_products (
 
 -- Central Bank policy numbers + the "rates as of" label. Single row (id = 1).
 create table if not exists mortgage_settings (
-  id                 smallint primary key default 1 check (id = 1),
-  rates_as_of        text not null,
-  lti_first_time     numeric(4,2) not null default 4.0,
-  lti_trading_up     numeric(4,2) not null default 3.5,
-  max_ltv_owner      numeric(4,3) not null default 0.9,
-  max_ltv_investment numeric(4,3) not null default 0.7,
-  max_age_at_end     int not null default 70,
-  updated_at         timestamptz not null default now()
+  id                  smallint primary key default 1 check (id = 1),
+  rates_as_of         text not null,
+  lti_first_time      numeric(4,2) not null default 4.0,
+  lti_trading_up      numeric(4,2) not null default 3.5,
+  max_ltv_owner       numeric(4,3) not null default 0.9,
+  max_ltv_investment  numeric(4,3) not null default 0.7,
+  max_age_at_end      int not null default 70,
+  -- Longest term lenders offer: residential vs buy-to-let/investment.
+  max_term_owner      int not null default 35,
+  max_term_investment int not null default 25,
+  updated_at          timestamptz not null default now()
 );
+
+-- Upgrade path for databases created before the per-type term caps existed.
+alter table mortgage_settings add column if not exists max_term_owner      int not null default 35;
+alter table mortgage_settings add column if not exists max_term_investment int not null default 25;
 
 insert into mortgage_settings (id, rates_as_of)
 values (1, 'July 2026')

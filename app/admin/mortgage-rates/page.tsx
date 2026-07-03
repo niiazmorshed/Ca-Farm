@@ -34,6 +34,8 @@ interface SettingsRow {
   max_ltv_owner: string;
   max_ltv_investment: string;
   max_age_at_end: number;
+  max_term_owner: number;
+  max_term_investment: number;
 }
 
 export default async function MortgageRatesPage() {
@@ -48,7 +50,8 @@ export default async function MortgageRatesPage() {
     ),
     query<SettingsRow>(
       `select rates_as_of, lti_first_time, lti_trading_up,
-              max_ltv_owner, max_ltv_investment, max_age_at_end
+              max_ltv_owner, max_ltv_investment, max_age_at_end,
+              max_term_owner, max_term_investment
          from mortgage_settings
         where id = 1`,
     ),
@@ -77,6 +80,8 @@ export default async function MortgageRatesPage() {
         maxLtvOwnerPercent: Math.round(Number(s.max_ltv_owner) * 100),
         maxLtvInvestmentPercent: Math.round(Number(s.max_ltv_investment) * 100),
         maxAgeAtEnd: s.max_age_at_end,
+        maxTermOwner: s.max_term_owner,
+        maxTermInvestment: s.max_term_investment,
       }
     : {
         ratesAsOf: RATES_AS_OF,
@@ -85,6 +90,8 @@ export default async function MortgageRatesPage() {
         maxLtvOwnerPercent: Math.round(DEFAULT_POLICY.maxLtvOwner * 100),
         maxLtvInvestmentPercent: Math.round(DEFAULT_POLICY.maxLtvInvestment * 100),
         maxAgeAtEnd: DEFAULT_POLICY.maxAgeAtEnd,
+        maxTermOwner: DEFAULT_POLICY.maxTermOwner,
+        maxTermInvestment: DEFAULT_POLICY.maxTermInvestment,
       };
 
   return (

@@ -309,6 +309,10 @@ export interface MortgagePolicy {
   maxLtvInvestment: number;
   /** Most lenders require the mortgage to end by this age. */
   maxAgeAtEnd: number;
+  /** Longest term lenders offer on a residential (owner-occupier) mortgage. */
+  maxTermOwner: number;
+  /** Longest term lenders offer on a buy-to-let / investment mortgage. */
+  maxTermInvestment: number;
 }
 
 export const DEFAULT_POLICY: MortgagePolicy = {
@@ -317,6 +321,8 @@ export const DEFAULT_POLICY: MortgagePolicy = {
   maxLtvOwner: 0.9,
   maxLtvInvestment: 0.7,
   maxAgeAtEnd: 70,
+  maxTermOwner: 35,
+  maxTermInvestment: 25,
 };
 
 function ltiMultipleFor(policy: MortgagePolicy, type: ProductType): number | null {
@@ -328,6 +334,11 @@ function ltiMultipleFor(policy: MortgagePolicy, type: ProductType): number | nul
 
 function maxLtvFor(policy: MortgagePolicy, type: ProductType): number {
   return type === "investment" ? policy.maxLtvInvestment : policy.maxLtvOwner;
+}
+
+/** Longest available term for the buyer type (owner 35y / investment 25y by default). */
+export function maxTermFor(policy: MortgagePolicy, type: ProductType): number {
+  return type === "investment" ? policy.maxTermInvestment : policy.maxTermOwner;
 }
 
 export interface ComparisonInput {
@@ -394,6 +405,15 @@ export function compareProducts(
       `A ${fmtEur(loan)} loan is above the ${ltiMultiple}× loan-to-income limit for your income (max ${fmtEur(
         ltiMultiple * input.income,
       )}). Lenders may still approve under an exemption.`,
+    );
+  }
+
+  const maxTerm = maxTermFor(policy, input.productType);
+  if (input.termYears > maxTerm) {
+    warnings.push(
+      `A ${input.termYears}-year term is longer than the ${maxTerm}-year maximum lenders offer on ${
+        input.productType === "investment" ? "an investment" : "a residential"
+      } mortgage.`,
     );
   }
 

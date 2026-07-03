@@ -40,6 +40,8 @@ interface SettingsRow {
   max_ltv_owner: string;
   max_ltv_investment: string;
   max_age_at_end: number;
+  max_term_owner: number;
+  max_term_investment: number;
 }
 
 export async function getMortgageData(): Promise<MortgageData> {
@@ -54,7 +56,8 @@ export async function getMortgageData(): Promise<MortgageData> {
       ),
       query<SettingsRow>(
         `select rates_as_of, lti_first_time, lti_trading_up,
-                max_ltv_owner, max_ltv_investment, max_age_at_end
+                max_ltv_owner, max_ltv_investment, max_age_at_end,
+                max_term_owner, max_term_investment
            from mortgage_settings
           where id = 1`,
       ),
@@ -85,6 +88,8 @@ export async function getMortgageData(): Promise<MortgageData> {
           maxLtvOwner: Number(s.max_ltv_owner),
           maxLtvInvestment: Number(s.max_ltv_investment),
           maxAgeAtEnd: s.max_age_at_end,
+          maxTermOwner: s.max_term_owner,
+          maxTermInvestment: s.max_term_investment,
         }
       : DEFAULT_POLICY;
 

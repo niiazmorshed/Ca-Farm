@@ -10,6 +10,7 @@ import {
   PRODUCT_TYPES,
   RATE_TYPE_LABELS,
   compareProducts,
+  maxTermFor,
   type ComparisonResult,
   type LenderProduct,
   type MortgagePolicy,
@@ -403,13 +404,21 @@ export function IrelandMortgageCalculator({
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
+  const maxTerm = maxTermFor(policy, form.productType);
+
   const goToStep2 = () => {
     if (form.propertyValue <= 0) return setError("Enter the value of the home.");
     if (form.loanAmount <= 0) return setError("Enter the amount to borrow.");
     if (form.loanAmount > form.propertyValue)
       return setError("The loan can't be more than the property value.");
-    if (form.termYears < 5 || form.termYears > 40)
-      return setError("Mortgage term must be between 5 and 40 years.");
+    if (form.termYears < 5 || form.termYears > maxTerm)
+      return setError(
+        `Mortgage term must be between 5 and ${maxTerm} years for ${
+          form.productType === "investment"
+            ? "an investment property"
+            : "a residential mortgage"
+        }.`,
+      );
     setError(null);
     setStep(2);
   };
@@ -568,7 +577,7 @@ export function IrelandMortgageCalculator({
               value={form.termYears}
               onChange={(v) => set("termYears", v)}
               suffix="years"
-              max={40}
+              max={maxTerm}
             />
           </>
         ) : (
