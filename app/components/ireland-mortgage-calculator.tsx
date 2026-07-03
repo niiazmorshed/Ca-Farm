@@ -83,6 +83,29 @@ function SegmentedField<T extends string>({
   );
 }
 
+/* Numeric field with a local text buffer. Echoing String(parsedNumber) straight
+   back into a controlled <input type="number"> destroys decimal entry: "5." is
+   sanitised to "" mid-keystroke, "5.50" snaps back to "5.5" and moves the
+   cursor, and a leading 0 renders as empty — so a user typing 5.5 could end up
+   with 55. The buffer holds exactly what was typed; the parent only receives
+   the parsed number, and the buffer re-syncs only when the parent value is
+   changed externally (e.g. New Calculation). */
+function useNumericText(value: number, onChange: (n: number) => void) {
+  const [text, setText] = useState(value ? String(value) : "");
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
+    const parsed = text === "" ? 0 : Number(text);
+    if (parsed !== value) setText(value ? String(value) : "");
+  }
+  const handleChange = (raw: string) => {
+    setText(raw);
+    const n = raw === "" ? 0 : Number(raw);
+    onChange(Number.isFinite(n) ? n : 0);
+  };
+  return { text, handleChange };
+}
+
 function CurrencyField({
   label,
   value,
@@ -95,6 +118,7 @@ function CurrencyField({
   hint?: string;
 }) {
   const id = useId();
+  const { text, handleChange } = useNumericText(value, onChange);
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-ink">
@@ -107,12 +131,12 @@ function CurrencyField({
         <input
           id={id}
           type="number"
-          inputMode="numeric"
+          inputMode="decimal"
           min={0}
-          step={1000}
+          step="any"
           placeholder="0"
-          value={value ? String(value) : ""}
-          onChange={(e) => onChange(e.target.value === "" ? 0 : Number(e.target.value))}
+          value={text}
+          onChange={(e) => handleChange(e.target.value)}
           className="h-11 w-full rounded-none border border-line bg-surface pl-7 pr-3 text-sm text-ink tabular-nums transition-colors duration-200 focus:border-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/40"
         />
       </div>
@@ -135,6 +159,7 @@ function NumberField({
   max?: number;
 }) {
   const id = useId();
+  const { text, handleChange } = useNumericText(value, onChange);
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-ink">
@@ -144,13 +169,13 @@ function NumberField({
         <input
           id={id}
           type="number"
-          inputMode="numeric"
+          inputMode="decimal"
           min={0}
           max={max}
-          step={1}
+          step="any"
           placeholder="0"
-          value={value ? String(value) : ""}
-          onChange={(e) => onChange(e.target.value === "" ? 0 : Number(e.target.value))}
+          value={text}
+          onChange={(e) => handleChange(e.target.value)}
           className="h-11 w-full rounded-none border border-line bg-surface px-3 pr-14 text-sm text-ink tabular-nums transition-colors duration-200 focus:border-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/40"
         />
         {suffix && (
