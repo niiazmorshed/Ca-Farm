@@ -7,9 +7,11 @@
 import { useEffect, useId, useRef, useState } from "react";
 import {
   compareYears,
+  RATES_BY_YEAR,
   type IncomeTaxInput,
   type IncomeTaxResult,
   type YearComparison,
+  type YearRates,
 } from "../lib/ireland-income-tax";
 
 const CURRENT_YEAR = 2026;
@@ -203,12 +205,22 @@ interface RowDef {
   variant?: RowVariant;
 }
 
-const ROWS: RowDef[] = [
+const rateLabel = (rate: number) => `${+(rate * 100).toFixed(2)}%`;
+
+const buildRows = (rates: YearRates): RowDef[] => [
   { label: "Total Income", value: (r) => r.grossIncome },
   { label: "Your Income", value: (r) => r.grossIncome },
   { label: "Qualifying Pension Deduction", value: (r) => r.pension.qualifying, deduct: true },
-  { label: "Tax @ Lower Rate", rate: "20%", value: (r) => r.incomeTax.taxAtStandard },
-  { label: "Tax @ Higher Rate", rate: "40%", value: (r) => r.incomeTax.taxAtHigher },
+  {
+    label: "Tax @ Lower Rate",
+    rate: rateLabel(rates.incomeTax.standardRate),
+    value: (r) => r.incomeTax.taxAtStandard,
+  },
+  {
+    label: "Tax @ Higher Rate",
+    rate: rateLabel(rates.incomeTax.higherRate),
+    value: (r) => r.incomeTax.taxAtHigher,
+  },
   { label: "Tax Credits", value: (r) => r.incomeTax.totalCredits, deduct: true },
   { label: "Net Tax", value: (r) => r.incomeTax.netTax, deduct: true, variant: "emphasis" },
   { label: "Universal Social Charge", value: (r) => r.usc.total, deduct: true },
@@ -233,7 +245,14 @@ function AmountCell({ row, r }: { row: RowDef; r: IncomeTaxResult }) {
   );
 }
 
-function ResultsTable({ comparison }: { comparison: YearComparison }) {
+function ResultsTable({
+  comparison,
+  rates,
+}: {
+  comparison: YearComparison;
+  rates: YearRates;
+}) {
+  const ROWS = buildRows(rates);
   const { current, prior, delta } = comparison;
   const rowBg = (variant: RowVariant | undefined, i: number) => {
     if (variant === "net") return "bg-primary-50 font-semibold";
@@ -311,7 +330,12 @@ const DEFAULTS: IncomeTaxInput = {
   pensionContribution: 0,
 };
 
-export function IrelandIncomeTaxCalculator() {
+export function IrelandIncomeTaxCalculator({
+  ratesByYear = RATES_BY_YEAR,
+}: {
+  /** Admin-managed per-year rates from the DB (tax-data.ts); static fallback. */
+  ratesByYear?: Record<number, YearRates>;
+}) {
   const [form, setForm] = useState<IncomeTaxInput>(DEFAULTS);
   const [result, setResult] = useState<YearComparison | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -325,7 +349,7 @@ export function IrelandIncomeTaxCalculator() {
     setForm((f) => ({ ...f, [key]: value }));
 
   const calculate = () => {
-    setResult(compareYears(form, CURRENT_YEAR, PRIOR_YEAR));
+    setResult(compareYears(form, CURRENT_YEAR, PRIOR_YEAR, ratesByYear));
   };
 
   const newCalculation = () => {
@@ -336,7 +360,7 @@ export function IrelandIncomeTaxCalculator() {
   if (result) {
     return (
       <div ref={resultsRef} className="scroll-mt-24">
-        <ResultsTable comparison={result} />
+        <ResultsTable comparison={result} rates={ratesByYear[CURRENT_YEAR]} />
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <button type="button" className={btnOutline} onClick={() => setResult(null)}>
             ← Go Back
@@ -347,7 +371,8 @@ export function IrelandIncomeTaxCalculator() {
         </div>
         <p className="mt-8 text-center text-xs leading-5 text-muted">
           Estimate for the Republic of Ireland. PRSI uses the flat rate at the start of each
-          year (4.2% for 2026, 4.1% for 2025). Excludes married two-income bands, widowed
+          year ({rateLabel(ratesByYear[CURRENT_YEAR].prsi.rate)} for {CURRENT_YEAR},{" "}
+          {rateLabel(ratesByYear[PRIOR_YEAR].prsi.rate)} for {PRIOR_YEAR}). Excludes married two-income bands, widowed
           bereavement-year uplift, medical-card USC relief and the 66+ state-pension PRSI
           exemption.
         </p>

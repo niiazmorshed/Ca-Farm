@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const items = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/mortgage-rates", label: "Mortgage rates" },
+  { href: "/admin/tax-rates", label: "Tax rates" },
 ];
 
 export function AdminNav() {

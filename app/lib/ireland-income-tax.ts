@@ -64,13 +64,13 @@ export interface IncomeTaxInput {
 /* Versioned rate config                                                       */
 /* ========================================================================== */
 
-interface UscBand {
+export interface UscBand {
   /** Cumulative upper bound of this band (income up to here). */
   upTo: number;
   rate: number;
 }
 
-interface PensionAgeBand {
+export interface PensionAgeBand {
   /** Inclusive upper age for this relief band. */
   maxAge: number;
   rate: number;
@@ -619,8 +619,14 @@ export function computePRSI(input: IncomeTaxInput, rates: YearRates): IncomeTaxR
 /* Top-level: full calculation for one year                                    */
 /* ========================================================================== */
 
-export function computeIrishTax(input: IncomeTaxInput, year: number): IncomeTaxResult {
-  const rates = RATES_BY_YEAR[year];
+export function computeIrishTax(
+  input: IncomeTaxInput,
+  year: number,
+  ratesOverride?: YearRates,
+): IncomeTaxResult {
+  // Rates normally come from the admin-managed tax_rates table (see
+  // tax-data.ts); the versioned configs above are the seed + fallback.
+  const rates = ratesOverride ?? RATES_BY_YEAR[year];
   if (!rates) throw new Error(`No rate config for tax year ${year}`);
 
   const employment = sanitize(input.employmentIncome);
@@ -678,9 +684,10 @@ export function compareYears(
   input: IncomeTaxInput,
   currentYear = 2026,
   priorYear = 2025,
+  ratesByYear?: Record<number, YearRates>,
 ): YearComparison {
-  const current = computeIrishTax(input, currentYear);
-  const prior = computeIrishTax(input, priorYear);
+  const current = computeIrishTax(input, currentYear, ratesByYear?.[currentYear]);
+  const prior = computeIrishTax(input, priorYear, ratesByYear?.[priorYear]);
   return {
     current,
     prior,

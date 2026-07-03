@@ -82,6 +82,20 @@ select * from (values
 ) as seed(lender, name, rate_type, rate_percent, aprc_percent, max_ltv, green, cashback, audience)
 where not exists (select 1 from mortgage_products);
 
+-- ── Ireland income tax calculator rates ─────────────────────────────────────
+-- One JSONB row per tax year holding the full YearRates config (income tax
+-- bands/credits, USC, PRSI, pension relief), editable in /admin/tax-rates so
+-- a Budget change never needs a deploy. The hardcoded RATES_<year> configs in
+-- app/lib/ireland-income-tax.ts are the fallback when a row is missing or
+-- fails validation. JSON has no Infinity: open-ended upper bounds (last USC
+-- band, last pension age band) are stored as null.
+
+create table if not exists tax_rates (
+  year       smallint primary key,
+  rates      jsonb not null,
+  updated_at timestamptz not null default now()
+);
+
 -- ── Auth: profiles, roles and the admin allow-list ──────────────────────────
 -- Tracks what is live in Supabase (originally created in the dashboard SQL
 -- editor). Re-runnable. One profile row per auth.users row; `role` drives the

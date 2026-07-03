@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Breadcrumbs, Container, PageHero } from "../../components/ui";
 import { ContactCta } from "../../components/sections";
 import { IrelandIncomeTaxCalculator } from "../../components/ireland-income-tax-calculator";
+import { getTaxRates } from "../../lib/tax-data";
 
 export const metadata: Metadata = {
   title: "Ireland Income Tax Calculator (Income Tax + USC + PRSI) — 2026",
@@ -25,7 +26,8 @@ const notes = [
   },
 ];
 
-export default function IrelandIncomeTaxPage() {
+export default async function IrelandIncomeTaxPage() {
+  const ratesByYear = await getTaxRates();
   return (
     <>
       <PageHero
@@ -55,7 +57,7 @@ export default function IrelandIncomeTaxPage() {
         </div>
 
         <div className="rounded-none border border-line bg-canvas p-6 sm:p-8 lg:p-10">
-          <IrelandIncomeTaxCalculator />
+          <IrelandIncomeTaxCalculator ratesByYear={ratesByYear} />
         </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-3">
