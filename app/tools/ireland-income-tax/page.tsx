@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Breadcrumbs, Container, PageHero } from "../../components/ui";
 import { ContactCta } from "../../components/sections";
+import { CalculatorTabs } from "../../components/calculator-tabs";
 import { IrelandIncomeTaxCalculator } from "../../components/ireland-income-tax-calculator";
 import { getTaxRates } from "../../lib/tax-data";
 
@@ -46,15 +46,7 @@ export default async function IrelandIncomeTaxPage() {
       />
 
       <Container className="py-16 sm:py-20">
-        <div className="mb-8 rounded-none border border-line bg-surface p-4 text-sm text-muted">
-          Buying a home?{" "}
-          <Link
-            href="/tools/ireland"
-            className="font-medium text-primary-500 transition-colors duration-200 hover:text-primary-600"
-          >
-            Open the Ireland mortgage calculator →
-          </Link>
-        </div>
+        <CalculatorTabs current="/tools/ireland-income-tax" />
 
         <div className="rounded-none border border-line bg-canvas p-6 sm:p-8 lg:p-10">
           <IrelandIncomeTaxCalculator ratesByYear={ratesByYear} />
