@@ -7,6 +7,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/services",
     "/pricing",
     "/tools/ireland",
+    "/tools/ireland-income-tax",
+    "/tools/ireland-vat",
+    "/tools/ireland-corporation-tax",
     "/about",
     "/contact",
   ].map((path) => ({

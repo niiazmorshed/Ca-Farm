@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { serviceCategories, site } from "../lib/content";
+import { CALCULATOR_TOOLS } from "./calculator-tabs";
 import type { SessionUser } from "../lib/supabase/guards";
 
 const secondaryLinks = [
   { href: "/pricing", label: "Pricing" },
-  { href: "/tools/ireland-income-tax", label: "Tools" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
@@ -140,17 +140,24 @@ function Logo({ onClick }: { onClick?: () => void }) {
 export function SiteHeader({ user }: { user: SessionUser | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
   const [servicesClosed, setServicesClosed] = useState(false);
+  const [toolsClosed, setToolsClosed] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const lastY = useRef(0);
   const pathname = usePathname();
   const servicesActive = isActive(pathname, "/services");
+  const toolsActive = isActive(pathname, "/tools");
 
-  // Force the Services mega-menu shut after a link is clicked (otherwise the
-  // clicked link keeps focus / hover and the panel stays open on the new page).
+  // Force an open dropdown shut after a link is clicked (otherwise the clicked
+  // link keeps focus / hover and the panel stays open on the new page).
   function closeServices(e: React.MouseEvent<HTMLElement>) {
     setServicesClosed(true);
+    e.currentTarget.blur();
+  }
+  function closeTools(e: React.MouseEvent<HTMLElement>) {
+    setToolsClosed(true);
     e.currentTarget.blur();
   }
 
@@ -180,6 +187,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
   function closeMobile() {
     setMenuOpen(false);
     setMobileServicesOpen(false);
+    setMobileToolsOpen(false);
   }
 
   return (
@@ -318,6 +326,61 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
               </div>
             </div>
 
+            {/* Tools dropdown (CSS hover + focus-within) */}
+            <div
+              className="group relative"
+              onMouseEnter={() => setToolsClosed(false)}
+              onFocus={() => setToolsClosed(false)}
+            >
+              <Link
+                href="/tools/ireland-income-tax"
+                aria-current={toolsActive ? "page" : undefined}
+                onClick={closeTools}
+                className={`relative flex items-center gap-1 text-sm font-medium transition-colors duration-200 ${
+                  toolsActive ? "text-primary-600" : "text-ink-body hover:text-ink"
+                }`}
+              >
+                Tools
+                <Chevron className="text-muted transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" />
+                <span
+                  className={`pointer-events-none absolute -bottom-1.5 left-0 h-0.5 w-full origin-left bg-primary-500 transition-transform duration-200 ease-snappy ${
+                    toolsActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                  }`}
+                />
+              </Link>
+
+              <div
+                className={`invisible absolute left-0 top-full z-50 w-[min(22rem,calc(100vw-2rem))] pt-4 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 ${
+                  toolsClosed ? "!invisible !opacity-0" : ""
+                }`}
+              >
+                <div className="rounded-none border border-line bg-white p-2 shadow-2xl shadow-navy-900/15">
+                  <p className="px-3 pb-2 pt-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">
+                    Ireland calculators
+                  </p>
+                  <ul className="flex flex-col">
+                    {CALCULATOR_TOOLS.map((tool) => (
+                      <li key={tool.href}>
+                        <Link
+                          href={tool.href}
+                          onClick={closeTools}
+                          aria-current={pathname === tool.href ? "page" : undefined}
+                          className="group/item block rounded-none px-3 py-2.5 transition-colors duration-200 hover:bg-secondary-50"
+                        >
+                          <span className="font-display text-sm font-semibold text-ink transition-colors duration-200 group-hover/item:text-primary-500">
+                            {tool.label}
+                          </span>
+                          <span className="mt-0.5 block text-[13px] leading-5 text-muted">
+                            {tool.desc}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {secondaryLinks.map((link) => {
               const active = isActive(pathname, link.href);
               return (
@@ -446,6 +509,40 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                     >
                       {category.title}
                       {category.status === "coming-soon" && <SoonTag />}
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* Tools accordion */}
+              <button
+                type="button"
+                aria-expanded={mobileToolsOpen}
+                onClick={() => setMobileToolsOpen((open) => !open)}
+                className={`flex items-center justify-between rounded-none px-3 py-2.5 text-[15px] font-medium transition-colors duration-200 ${
+                  toolsActive
+                    ? "bg-secondary-50 font-semibold text-primary-500"
+                    : "text-ink-body hover:bg-secondary-50"
+                }`}
+              >
+                Tools
+                <Chevron
+                  className={`text-muted transition-transform duration-200 ${
+                    mobileToolsOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+              {mobileToolsOpen && (
+                <div className="mb-1 ml-3 flex flex-col gap-0.5 border-l border-line pl-3">
+                  {CALCULATOR_TOOLS.map((tool) => (
+                    <Link
+                      key={tool.href}
+                      href={tool.href}
+                      onClick={closeMobile}
+                      aria-current={pathname === tool.href ? "page" : undefined}
+                      className="rounded-none px-3 py-2 text-sm text-muted transition-colors duration-200 hover:bg-secondary-50 hover:text-primary-500"
+                    >
+                      {tool.label}
                     </Link>
                   ))}
                 </div>

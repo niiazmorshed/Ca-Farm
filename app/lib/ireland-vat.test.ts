@@ -1,0 +1,78 @@
+/* Unit tests for the Ireland VAT engine.
+   Run: node --test app/lib/ireland-vat.test.ts   (Node 22.6+ strips types)
+
+   Covers add/remove at every rate, the net + vat === gross reconciliation
+   guarantee, and zero / negative edge inputs. */
+
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import {
+  addVat,
+  removeVat,
+  round2,
+  VAT_RATES,
+  getVatRate,
+  type VatBreakdown,
+} from "./ireland-vat.ts";
+
+/* The core promise: the three figures always reconcile to the cent. */
+function assertReconciles(b: VatBreakdown) {
+  assert.equal(round2(b.net + b.vat), b.gross, "net + vat must equal gross");
+}
+
+test("Add VAT — €100 net at each statutory rate", () => {
+  assert.deepEqual(addVat(100, 23), { net: 100, vat: 23, gross: 123, percent: 23 });
+  assert.deepEqual(addVat(100, 13.5), { net: 100, vat: 13.5, gross: 113.5, percent: 13.5 });
+  assert.deepEqual(addVat(100, 9), { net: 100, vat: 9, gross: 109, percent: 9 });
+  assert.deepEqual(addVat(100, 4.8), { net: 100, vat: 4.8, gross: 104.8, percent: 4.8 });
+  assert.deepEqual(addVat(100, 0), { net: 100, vat: 0, gross: 100, percent: 0 });
+});
+
+test("Remove VAT — inverse of Add VAT at each rate returns €100 net", () => {
+  assert.deepEqual(removeVat(123, 23), { net: 100, vat: 23, gross: 123, percent: 23 });
+  assert.deepEqual(removeVat(113.5, 13.5), { net: 100, vat: 13.5, gross: 113.5, percent: 13.5 });
+  assert.deepEqual(removeVat(109, 9), { net: 100, vat: 9, gross: 109, percent: 9 });
+  assert.deepEqual(removeVat(104.8, 4.8), { net: 100, vat: 4.8, gross: 104.8, percent: 4.8 });
+  assert.deepEqual(removeVat(100, 0), { net: 100, vat: 0, gross: 100, percent: 0 });
+});
+
+test("Rounding reconciles to the cent — awkward amounts", () => {
+  // 100 gross @ 23% → net 81.30, vat 18.70 (derived by subtraction).
+  const r = removeVat(100, 23);
+  assert.equal(r.net, 81.3);
+  assert.equal(r.vat, 18.7);
+  assertReconciles(r);
+
+  // 99.99 net @ 23% → vat 23.00, gross 122.99.
+  const a = addVat(99.99, 23);
+  assert.equal(a.vat, 23);
+  assert.equal(a.gross, 122.99);
+  assertReconciles(a);
+});
+
+test("Reconciliation holds for every rate, both directions", () => {
+  for (const rate of VAT_RATES) {
+    assertReconciles(addVat(1234.56, rate.percent));
+    assertReconciles(removeVat(1234.56, rate.percent));
+    assertReconciles(addVat(0.01, rate.percent));
+    assertReconciles(removeVat(0.01, rate.percent));
+  }
+});
+
+test("Edge inputs — zero and negative clamp to zero", () => {
+  assert.deepEqual(addVat(0, 23), { net: 0, vat: 0, gross: 0, percent: 23 });
+  assert.deepEqual(removeVat(0, 23), { net: 0, vat: 0, gross: 0, percent: 23 });
+  assert.deepEqual(addVat(-500, 23), { net: 0, vat: 0, gross: 0, percent: 23 });
+  assert.deepEqual(removeVat(-500, 23), { net: 0, vat: 0, gross: 0, percent: 23 });
+});
+
+test("round2 absorbs binary-float error", () => {
+  assert.equal(round2(1.005), 1.01);
+  assert.equal(round2(0.1 + 0.2), 0.3);
+});
+
+test("Rate table is the single source of truth", () => {
+  assert.equal(getVatRate("standard").percent, 23);
+  assert.equal(getVatRate("second-reduced").percent, 9);
+  assert.throws(() => getVatRate("nope" as never));
+});
