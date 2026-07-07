@@ -23,6 +23,10 @@ interface ProductRow {
   max_ltv: string;
   green: boolean;
   cashback: string | null;
+  revert_rate_percent: string | null;
+  cashback_percent: string | null;
+  cashback_flat: string | null;
+  details: string | null;
   audience: string[];
   active: boolean;
 }
@@ -44,7 +48,8 @@ export default async function MortgageRatesPage() {
   const [{ rows: productRows }, { rows: settingsRows }] = await Promise.all([
     query<ProductRow>(
       `select id, lender, name, rate_type, rate_percent, aprc_percent,
-              max_ltv, green, cashback, audience, active
+              max_ltv, green, cashback, revert_rate_percent, cashback_percent,
+              cashback_flat, details, audience, active
          from mortgage_products
         order by lender asc, rate_percent asc`,
     ),
@@ -67,6 +72,11 @@ export default async function MortgageRatesPage() {
     maxLtvPercent: Math.round(Number(r.max_ltv) * 100),
     green: r.green,
     cashback: r.cashback ?? "",
+    revertRatePercent:
+      r.revert_rate_percent == null ? null : Number(r.revert_rate_percent),
+    cashbackPercent: r.cashback_percent == null ? null : Number(r.cashback_percent),
+    cashbackFlat: r.cashback_flat == null ? null : Number(r.cashback_flat),
+    details: r.details ?? "",
     audience: r.audience,
     active: r.active,
   }));

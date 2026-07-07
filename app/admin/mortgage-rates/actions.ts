@@ -11,6 +11,7 @@ export interface ActionState {
 
 const RATE_TYPES = [
   "variable",
+  "fixed-1",
   "fixed-2",
   "fixed-3",
   "fixed-4",
@@ -29,6 +30,12 @@ function revalidate() {
 
 const num = (v: FormDataEntryValue | null) => Number(String(v ?? "").trim());
 
+/** Optional numeric field: empty input → null, otherwise the parsed number. */
+const optNum = (v: FormDataEntryValue | null): number | null => {
+  const s = String(v ?? "").trim();
+  return s === "" ? null : Number(s);
+};
+
 interface ParsedProduct {
   lender: string;
   name: string;
@@ -38,6 +45,10 @@ interface ParsedProduct {
   maxLtv: number;
   green: boolean;
   cashback: string | null;
+  revertRatePercent: number | null;
+  cashbackPercent: number | null;
+  cashbackFlat: number | null;
+  details: string | null;
   audience: string[];
   active: boolean;
 }
@@ -51,6 +62,10 @@ function parseProduct(formData: FormData): ParsedProduct | string {
   // Entered as a percentage (90), stored as a fraction (0.9).
   const maxLtv = num(formData.get("max_ltv_percent")) / 100;
   const cashback = String(formData.get("cashback") ?? "").trim();
+  const revertRatePercent = optNum(formData.get("revert_rate_percent"));
+  const cashbackPercent = optNum(formData.get("cashback_percent"));
+  const cashbackFlat = optNum(formData.get("cashback_flat"));
+  const details = String(formData.get("details") ?? "").trim();
   const audience = formData
     .getAll("audience")
     .map(String)
@@ -68,6 +83,18 @@ function parseProduct(formData: FormData): ParsedProduct | string {
     return "APRC must be between 0 and 100.";
   if (!Number.isFinite(maxLtv) || maxLtv <= 0 || maxLtv > 1)
     return "Max LTV must be between 1 and 100.";
+  if (
+    revertRatePercent !== null &&
+    (!Number.isFinite(revertRatePercent) || revertRatePercent <= 0 || revertRatePercent >= 100)
+  )
+    return "Revert rate must be between 0 and 100 (or left empty).";
+  if (
+    cashbackPercent !== null &&
+    (!Number.isFinite(cashbackPercent) || cashbackPercent <= 0 || cashbackPercent >= 100)
+  )
+    return "Cashback % must be between 0 and 100 (or left empty).";
+  if (cashbackFlat !== null && (!Number.isFinite(cashbackFlat) || cashbackFlat <= 0))
+    return "Flat cashback must be a positive amount (or left empty).";
   if (audience.length === 0) return "Pick at least one buyer type.";
 
   return {
@@ -79,6 +106,10 @@ function parseProduct(formData: FormData): ParsedProduct | string {
     maxLtv,
     green: formData.get("green") === "on",
     cashback: cashback || null,
+    revertRatePercent,
+    cashbackPercent,
+    cashbackFlat,
+    details: details || null,
     audience,
     active: formData.get("active") === "on",
   };
@@ -102,8 +133,10 @@ export async function saveProduct(
         `update mortgage_products
             set lender = $1, name = $2, rate_type = $3, rate_percent = $4,
                 aprc_percent = $5, max_ltv = $6, green = $7, cashback = $8,
-                audience = $9, active = $10, updated_at = now()
-          where id = $11`,
+                revert_rate_percent = $9, cashback_percent = $10,
+                cashback_flat = $11, details = $12,
+                audience = $13, active = $14, updated_at = now()
+          where id = $15`,
         [
           parsed.lender,
           parsed.name,
@@ -113,6 +146,10 @@ export async function saveProduct(
           parsed.maxLtv,
           parsed.green,
           parsed.cashback,
+          parsed.revertRatePercent,
+          parsed.cashbackPercent,
+          parsed.cashbackFlat,
+          parsed.details,
           parsed.audience,
           parsed.active,
           id,
@@ -122,8 +159,9 @@ export async function saveProduct(
       await query(
         `insert into mortgage_products
            (lender, name, rate_type, rate_percent, aprc_percent, max_ltv,
-            green, cashback, audience, active)
-         values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+            green, cashback, revert_rate_percent, cashback_percent,
+            cashback_flat, details, audience, active)
+         values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
         [
           parsed.lender,
           parsed.name,
@@ -133,6 +171,10 @@ export async function saveProduct(
           parsed.maxLtv,
           parsed.green,
           parsed.cashback,
+          parsed.revertRatePercent,
+          parsed.cashbackPercent,
+          parsed.cashbackFlat,
+          parsed.details,
           parsed.audience,
           parsed.active,
         ],

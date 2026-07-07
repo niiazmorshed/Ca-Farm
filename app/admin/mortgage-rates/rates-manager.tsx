@@ -25,6 +25,10 @@ export interface AdminProduct {
   maxLtvPercent: number;
   green: boolean;
   cashback: string;
+  revertRatePercent: number | null;
+  cashbackPercent: number | null;
+  cashbackFlat: number | null;
+  details: string;
   audience: string[];
   active: boolean;
 }
@@ -187,6 +191,15 @@ function ProductForm({ product }: { product?: AdminProduct }) {
           <Field label="Max LTV (%)">
             <input name="max_ltv_percent" type="number" step="1" min="1" max="100" defaultValue={product?.maxLtvPercent ?? 90} className={inputClass} required />
           </Field>
+          <Field label="Revert rate after fixed (%)">
+            <input name="revert_rate_percent" type="number" step="0.01" min="0.01" max="99" defaultValue={product?.revertRatePercent ?? ""} placeholder="none — rate runs whole term" className={inputClass} />
+          </Field>
+          <Field label="Cashback (% of loan)">
+            <input name="cashback_percent" type="number" step="0.01" min="0.01" max="99" defaultValue={product?.cashbackPercent ?? ""} placeholder="none" className={inputClass} />
+          </Field>
+          <Field label="Cashback (flat €)">
+            <input name="cashback_flat" type="number" step="1" min="1" defaultValue={product?.cashbackFlat ?? ""} placeholder="none" className={inputClass} />
+          </Field>
           <div className="flex items-end gap-4 pb-1">
             <label className="flex items-center gap-1.5 text-sm text-ink">
               <input type="checkbox" name="green" defaultChecked={product?.green ?? false} className="h-4 w-4 accent-primary-500" />
@@ -197,6 +210,9 @@ function ProductForm({ product }: { product?: AdminProduct }) {
               Active
             </label>
           </div>
+          <Field label="Offer details (shown under “See details”)" className="sm:col-span-2 lg:col-span-4">
+            <textarea name="details" rows={2} defaultValue={product?.details ?? ""} placeholder="e.g. 2% of the mortgage paid in cashback shortly after closing, and a further 1% at the end of year 5." className={`${inputClass} h-auto py-2`} />
+          </Field>
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5">

@@ -28,6 +28,7 @@ export const PRODUCT_TYPES: { value: ProductType; label: string }[] = [
 
 export type RateType =
   | "variable"
+  | "fixed-1"
   | "fixed-2"
   | "fixed-3"
   | "fixed-4"
@@ -38,6 +39,7 @@ export type RateType =
 
 export const RATE_TYPE_LABELS: Record<RateType, string> = {
   variable: "Variable",
+  "fixed-1": "1 Yr Fixed",
   "fixed-2": "2 Yr Fixed",
   "fixed-3": "3 Yr Fixed",
   "fixed-4": "4 Yr Fixed",
@@ -50,6 +52,7 @@ export const RATE_TYPE_LABELS: Record<RateType, string> = {
 /* Tab order on the results screen (mirrors mortgages.ie). */
 export const RATE_TYPE_TABS: RateType[] = [
   "variable",
+  "fixed-1",
   "fixed-2",
   "fixed-3",
   "fixed-4",
@@ -58,6 +61,13 @@ export const RATE_TYPE_TABS: RateType[] = [
   "fixed-10",
   "fixed-full",
 ];
+
+/** Years the initial rate is locked for: "fixed-3" → 3, full-term → whole term. */
+export function fixedYearsFor(rateType: RateType, termYears: number): number {
+  if (rateType === "variable") return 0;
+  if (rateType === "fixed-full") return termYears;
+  return Math.min(termYears, Number(rateType.slice("fixed-".length)));
+}
 
 /* ---------- lender rate snapshot ---------- */
 
@@ -76,6 +86,15 @@ export interface LenderProduct {
   green?: boolean;
   /** Lender incentive shown as a badge, e.g. "2% cashback". */
   cashback?: string;
+  /** Variable rate the loan rolls to when the fixed period ends (e.g. 4.15).
+      Absent → the product rate is assumed for the whole term. */
+  revertRatePercent?: number;
+  /** Structured cashback: % of the loan paid at drawdown (e.g. 2 for 2%). */
+  cashbackPercent?: number;
+  /** Flat euro cashback (e.g. 5000 for a €5,000 offer). */
+  cashbackFlat?: number;
+  /** Longer offer description shown in the per-product details view. */
+  details?: string;
   /** Which buyer types the product is open to. */
   audience: ProductType[];
 }
@@ -93,6 +112,7 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     aprcPercent: 3.9,
     maxLtv: 0.9,
     green: true,
+    revertRatePercent: 3.95,
     audience: OWNER_OCCUPIER,
   },
   {
@@ -104,6 +124,7 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     aprcPercent: 3.86,
     maxLtv: 0.9,
     green: true,
+    revertRatePercent: 3.75,
     audience: OWNER_OCCUPIER,
   },
   // ── Avant Money ──
@@ -116,6 +137,7 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     aprcPercent: 3.48,
     maxLtv: 0.9,
     cashback: "1% cashback",
+    cashbackPercent: 1,
     audience: OWNER_OCCUPIER,
   },
   {
@@ -127,6 +149,8 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     aprcPercent: 3.7,
     maxLtv: 0.9,
     cashback: "2% cashback",
+    revertRatePercent: 3.85,
+    cashbackPercent: 2,
     audience: OWNER_OCCUPIER,
   },
   {
@@ -137,6 +161,7 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     ratePercent: 3.6,
     aprcPercent: 3.8,
     maxLtv: 0.9,
+    revertRatePercent: 3.85,
     audience: OWNER_OCCUPIER,
   },
   {
@@ -147,6 +172,7 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     ratePercent: 3.45,
     aprcPercent: 3.6,
     maxLtv: 0.8,
+    revertRatePercent: 3.85,
     audience: OWNER_OCCUPIER,
   },
   {
@@ -157,6 +183,7 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     ratePercent: 3.5,
     aprcPercent: 3.6,
     maxLtv: 0.8,
+    revertRatePercent: 3.85,
     audience: OWNER_OCCUPIER,
   },
   // ── Bank of Ireland ──
@@ -169,6 +196,8 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     aprcPercent: 4.0,
     maxLtv: 0.9,
     cashback: "2% cashback",
+    revertRatePercent: 4.15,
+    cashbackPercent: 2,
     audience: OWNER_OCCUPIER,
   },
   {
@@ -180,6 +209,8 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     aprcPercent: 3.9,
     maxLtv: 0.9,
     cashback: "2% cashback",
+    revertRatePercent: 4.15,
+    cashbackPercent: 2,
     audience: OWNER_OCCUPIER,
   },
   {
@@ -202,6 +233,8 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     aprcPercent: 4.1,
     maxLtv: 0.9,
     cashback: "2% cashback",
+    revertRatePercent: 4.7,
+    cashbackPercent: 2,
     audience: OWNER_OCCUPIER,
   },
   {
@@ -213,6 +246,8 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     aprcPercent: 4.0,
     maxLtv: 0.9,
     cashback: "2% cashback",
+    revertRatePercent: 4.7,
+    cashbackPercent: 2,
     audience: OWNER_OCCUPIER,
   },
   // ── AIB / Haven variable ──
@@ -245,6 +280,7 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     ratePercent: 3.95,
     aprcPercent: 4.2,
     maxLtv: 0.9,
+    revertRatePercent: 4.3,
     audience: OWNER_OCCUPIER,
   },
   // ── Buy-to-let / investment ──
@@ -256,6 +292,7 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     ratePercent: 4.55,
     aprcPercent: 4.8,
     maxLtv: 0.7,
+    revertRatePercent: 5.0,
     audience: ["investment"],
   },
   {
@@ -276,6 +313,7 @@ export const LENDER_PRODUCTS: LenderProduct[] = [
     ratePercent: 4.65,
     aprcPercent: 4.9,
     maxLtv: 0.7,
+    revertRatePercent: 4.95,
     audience: ["investment"],
   },
 ];
@@ -295,6 +333,19 @@ export function monthlyPayment(
   if (r === 0) return loan / n;
   const factor = Math.pow(1 + r, n);
   return (loan * r * factor) / (factor - 1);
+}
+
+/** Balance still owed after `months` payments of `monthly` on `loan`. */
+function remainingBalance(
+  loan: number,
+  ratePercent: number,
+  monthly: number,
+  months: number,
+): number {
+  const r = ratePercent / 100 / 12;
+  if (r === 0) return Math.max(0, loan - monthly * months);
+  const factor = Math.pow(1 + r, months);
+  return Math.max(0, loan * factor - (monthly * (factor - 1)) / r);
 }
 
 /* ---------- Central Bank guardrails (warnings only) ---------- */
@@ -350,13 +401,83 @@ export interface ComparisonInput {
   age: number;
   /** Combined gross annual income of all applicants. */
   income: number;
+  /** Home has a BER of B3 or better — gates green-mortgage rates. */
+  berB3Plus?: boolean;
+}
+
+export interface RepaymentPhase {
+  years: number;
+  ratePercent: number;
+  monthly: number;
 }
 
 export interface ProductQuote {
   product: LenderProduct;
+  /** Repayment during the initial (fixed) period. */
   monthly: number;
   totalRepayable: number;
   totalInterest: number;
+  /** One phase for single-rate products; two when a fixed rate reverts to variable. */
+  phases: RepaymentPhase[];
+  /** Euro value of the structured cashback for this loan (0 when none). */
+  cashbackValue: number;
+}
+
+/* Two-phase quote, matching how lenders illustrate fixed products: the payment
+   is set as if the fixed rate ran the whole term; when the fixed period ends,
+   the remaining balance re-amortises at the lender's variable (revert) rate.
+   E.g. €360,000 over 35y, 2y fixed @ 3.8% reverting to 4.15% →
+   €1,551.09/month for 2 years, €1,623.28 for 33, total cost €680,045. */
+/* Lender illustrations total the payment rounded to the cent, so we do too —
+   this is what makes the totals match published examples exactly. */
+const toCent = (n: number) => Math.round(n * 100) / 100;
+
+export function quoteProduct(
+  product: LenderProduct,
+  loan: number,
+  termYears: number,
+): ProductQuote {
+  const months = Math.max(1, Math.round(termYears * 12));
+  const monthly = toCent(monthlyPayment(loan, product.ratePercent, termYears));
+  const fixedMonths = Math.round(fixedYearsFor(product.rateType, termYears) * 12);
+
+  let phases: RepaymentPhase[];
+  let totalRepayable: number;
+  if (
+    product.revertRatePercent != null &&
+    fixedMonths > 0 &&
+    fixedMonths < months
+  ) {
+    const fixedYears = fixedMonths / 12;
+    const balance = remainingBalance(loan, product.ratePercent, monthly, fixedMonths);
+    const revertMonthly = toCent(
+      monthlyPayment(balance, product.revertRatePercent, termYears - fixedYears),
+    );
+    phases = [
+      { years: fixedYears, ratePercent: product.ratePercent, monthly },
+      {
+        years: termYears - fixedYears,
+        ratePercent: product.revertRatePercent,
+        monthly: revertMonthly,
+      },
+    ];
+    totalRepayable = monthly * fixedMonths + revertMonthly * (months - fixedMonths);
+  } else {
+    phases = [{ years: termYears, ratePercent: product.ratePercent, monthly }];
+    totalRepayable = monthly * months;
+  }
+
+  const cashbackValue =
+    ((product.cashbackPercent ?? 0) / 100) * loan + (product.cashbackFlat ?? 0);
+
+  return {
+    product,
+    monthly,
+    totalRepayable,
+    totalInterest: Math.max(0, totalRepayable - loan),
+    phases,
+    cashbackValue,
+  };
 }
 
 export interface ComparisonResult {
@@ -426,24 +547,18 @@ export function compareProducts(
     );
   }
 
-  // Products the buyer qualifies for: right audience, and the rate's LTV band
-  // covers this loan. If the loan already breaches the Central Bank LTV cap we
-  // still quote 90%-band products so the buyer sees indicative repayments.
+  // Products the buyer qualifies for: right audience, the rate's LTV band
+  // covers this loan, and green rates only for BER B3+ homes. If the loan
+  // already breaches the Central Bank LTV cap we still quote 90%-band
+  // products so the buyer sees indicative repayments.
   const effectiveLtv = Math.min(ltv, maxLtv);
   const quotes: ProductQuote[] = products.filter(
     (p) =>
-      p.audience.includes(input.productType) && effectiveLtv <= p.maxLtv + 1e-9,
+      p.audience.includes(input.productType) &&
+      effectiveLtv <= p.maxLtv + 1e-9 &&
+      (!p.green || input.berB3Plus !== false),
   )
-    .map((product) => {
-      const monthly = monthlyPayment(loan, product.ratePercent, input.termYears);
-      const totalRepayable = monthly * Math.round(input.termYears * 12);
-      return {
-        product,
-        monthly,
-        totalRepayable,
-        totalInterest: Math.max(0, totalRepayable - loan),
-      };
-    })
+    .map((product) => quoteProduct(product, loan, input.termYears))
     .sort((a, b) => a.monthly - b.monthly);
 
   const availableRateTypes = RATE_TYPE_TABS.filter((t) =>

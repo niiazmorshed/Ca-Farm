@@ -22,17 +22,37 @@ create table if not exists mortgage_products (
   lender       text not null,
   name         text not null,
   rate_type    text not null check (rate_type in
-    ('variable','fixed-2','fixed-3','fixed-4','fixed-5','fixed-7','fixed-10','fixed-full')),
+    ('variable','fixed-1','fixed-2','fixed-3','fixed-4','fixed-5','fixed-7','fixed-10','fixed-full')),
   rate_percent numeric(5,2) not null check (rate_percent >= 0 and rate_percent < 100),
   aprc_percent numeric(5,2) not null check (aprc_percent >= 0 and aprc_percent < 100),
   max_ltv      numeric(4,3) not null default 0.9 check (max_ltv > 0 and max_ltv <= 1),
   green        boolean not null default false,
   cashback     text,
+  -- Variable rate the loan rolls to when the fixed period ends. Null → the
+  -- product rate is quoted for the whole term (variables, full-term fixed).
+  revert_rate_percent numeric(5,2) check (revert_rate_percent > 0 and revert_rate_percent < 100),
+  -- Structured cashback: % of the loan at drawdown and/or a flat € amount.
+  -- The free-text `cashback` column stays as the badge/narrative.
+  cashback_percent    numeric(5,2) check (cashback_percent > 0 and cashback_percent < 100),
+  cashback_flat       numeric(10,2) check (cashback_flat > 0),
+  -- Longer offer description shown in the calculator's per-product details.
+  details      text,
   -- Which buyer types may use the product: first-time / trading-up / switch / investment.
   audience     text[] not null default '{first-time,trading-up,switch}',
   active       boolean not null default true,
   updated_at   timestamptz not null default now()
 );
+
+-- Upgrade path for databases created before the revert-rate / cashback fields.
+alter table mortgage_products add column if not exists revert_rate_percent numeric(5,2) check (revert_rate_percent > 0 and revert_rate_percent < 100);
+alter table mortgage_products add column if not exists cashback_percent    numeric(5,2) check (cashback_percent > 0 and cashback_percent < 100);
+alter table mortgage_products add column if not exists cashback_flat       numeric(10,2) check (cashback_flat > 0);
+alter table mortgage_products add column if not exists details             text;
+
+-- Allow 1-year fixed products (constraint predates the fixed-1 rate type).
+alter table mortgage_products drop constraint if exists mortgage_products_rate_type_check;
+alter table mortgage_products add constraint mortgage_products_rate_type_check check (rate_type in
+  ('variable','fixed-1','fixed-2','fixed-3','fixed-4','fixed-5','fixed-7','fixed-10','fixed-full'));
 
 -- Central Bank policy numbers + the "rates as of" label. Single row (id = 1).
 create table if not exists mortgage_settings (
@@ -58,29 +78,54 @@ values (1, 'July 2026')
 on conflict (id) do nothing;
 
 -- Seed the July 2026 snapshot, only when the table is empty (re-runnable).
+-- revert = variable rate the fixed product rolls to; cb% = cashback % of loan.
 insert into mortgage_products
-  (lender, name, rate_type, rate_percent, aprc_percent, max_ltv, green, cashback, audience)
+  (lender, name, rate_type, rate_percent, aprc_percent, max_ltv, green, cashback, revert_rate_percent, cashback_percent, audience)
 select * from (values
-  ('Haven (AIB Group)', '4 Year Fixed',            'fixed-4',    3.20, 3.90, 0.9, true,  null::text,     '{first-time,trading-up,switch}'::text[]),
-  ('AIB',               '5 Year Fixed',            'fixed-5',    3.25, 3.86, 0.9, true,  null,           '{first-time,trading-up,switch}'),
-  ('Avant Money',       'Full-term Fixed',         'fixed-full', 3.40, 3.48, 0.9, false, '1% cashback',  '{first-time,trading-up,switch}'),
-  ('Avant Money',       '4 Year Fixed',            'fixed-4',    3.40, 3.70, 0.9, false, '2% cashback',  '{first-time,trading-up,switch}'),
-  ('Avant Money',       '3 Year Fixed',            'fixed-3',    3.60, 3.80, 0.9, false, null,           '{first-time,trading-up,switch}'),
-  ('Avant Money',       '7 Year Fixed',            'fixed-7',    3.45, 3.60, 0.8, false, null,           '{first-time,trading-up,switch}'),
-  ('Avant Money',       '10 Year Fixed',           'fixed-10',   3.50, 3.60, 0.8, false, null,           '{first-time,trading-up,switch}'),
-  ('Bank of Ireland',   '2 Year Fixed',            'fixed-2',    3.65, 4.00, 0.9, false, '2% cashback',  '{first-time,trading-up,switch}'),
-  ('Bank of Ireland',   '4 Year Fixed',            'fixed-4',    3.45, 3.90, 0.9, false, '2% cashback',  '{first-time,trading-up,switch}'),
-  ('Bank of Ireland',   'Standard Variable',       'variable',   4.15, 4.30, 0.9, false, null,           '{first-time,trading-up,switch}'),
-  ('PTSB',              '3 Year Fixed',            'fixed-3',    3.70, 4.10, 0.9, false, '2% cashback',  '{first-time,trading-up,switch}'),
-  ('PTSB',              '5 Year Fixed',            'fixed-5',    3.60, 4.00, 0.9, false, '2% cashback',  '{first-time,trading-up,switch}'),
-  ('AIB',               'Standard Variable',       'variable',   3.75, 3.90, 0.9, false, null,           '{first-time,trading-up,switch}'),
-  ('Haven (AIB Group)', 'Variable',                'variable',   3.95, 4.10, 0.9, false, null,           '{first-time,trading-up,switch}'),
-  ('ICS Mortgages',     '3 Year Fixed',            'fixed-3',    3.95, 4.20, 0.9, false, null,           '{first-time,trading-up,switch}'),
-  ('ICS Mortgages',     'Buy-to-Let 5 Year Fixed', 'fixed-5',    4.55, 4.80, 0.7, false, null,           '{investment}'),
-  ('Avant Money',       'Buy-to-Let Variable',     'variable',   4.75, 4.90, 0.7, false, null,           '{investment}'),
-  ('Bank of Ireland',   'Buy-to-Let 2 Year Fixed', 'fixed-2',    4.65, 4.90, 0.7, false, null,           '{investment}')
-) as seed(lender, name, rate_type, rate_percent, aprc_percent, max_ltv, green, cashback, audience)
+  ('Haven (AIB Group)', '4 Year Fixed',            'fixed-4',    3.20, 3.90, 0.9, true,  null::text,     3.95::numeric, null::numeric, '{first-time,trading-up,switch}'::text[]),
+  ('AIB',               '5 Year Fixed',            'fixed-5',    3.25, 3.86, 0.9, true,  null,           3.75, null, '{first-time,trading-up,switch}'),
+  ('Avant Money',       'Full-term Fixed',         'fixed-full', 3.40, 3.48, 0.9, false, '1% cashback',  null, 1,    '{first-time,trading-up,switch}'),
+  ('Avant Money',       '4 Year Fixed',            'fixed-4',    3.40, 3.70, 0.9, false, '2% cashback',  3.85, 2,    '{first-time,trading-up,switch}'),
+  ('Avant Money',       '3 Year Fixed',            'fixed-3',    3.60, 3.80, 0.9, false, null,           3.85, null, '{first-time,trading-up,switch}'),
+  ('Avant Money',       '7 Year Fixed',            'fixed-7',    3.45, 3.60, 0.8, false, null,           3.85, null, '{first-time,trading-up,switch}'),
+  ('Avant Money',       '10 Year Fixed',           'fixed-10',   3.50, 3.60, 0.8, false, null,           3.85, null, '{first-time,trading-up,switch}'),
+  ('Bank of Ireland',   '2 Year Fixed',            'fixed-2',    3.65, 4.00, 0.9, false, '2% cashback',  4.15, 2,    '{first-time,trading-up,switch}'),
+  ('Bank of Ireland',   '4 Year Fixed',            'fixed-4',    3.45, 3.90, 0.9, false, '2% cashback',  4.15, 2,    '{first-time,trading-up,switch}'),
+  ('Bank of Ireland',   'Standard Variable',       'variable',   4.15, 4.30, 0.9, false, null,           null, null, '{first-time,trading-up,switch}'),
+  ('PTSB',              '3 Year Fixed',            'fixed-3',    3.70, 4.10, 0.9, false, '2% cashback',  4.70, 2,    '{first-time,trading-up,switch}'),
+  ('PTSB',              '5 Year Fixed',            'fixed-5',    3.60, 4.00, 0.9, false, '2% cashback',  4.70, 2,    '{first-time,trading-up,switch}'),
+  ('AIB',               'Standard Variable',       'variable',   3.75, 3.90, 0.9, false, null,           null, null, '{first-time,trading-up,switch}'),
+  ('Haven (AIB Group)', 'Variable',                'variable',   3.95, 4.10, 0.9, false, null,           null, null, '{first-time,trading-up,switch}'),
+  ('ICS Mortgages',     '3 Year Fixed',            'fixed-3',    3.95, 4.20, 0.9, false, null,           4.30, null, '{first-time,trading-up,switch}'),
+  ('ICS Mortgages',     'Buy-to-Let 5 Year Fixed', 'fixed-5',    4.55, 4.80, 0.7, false, null,           5.00, null, '{investment}'),
+  ('Avant Money',       'Buy-to-Let Variable',     'variable',   4.75, 4.90, 0.7, false, null,           null, null, '{investment}'),
+  ('Bank of Ireland',   'Buy-to-Let 2 Year Fixed', 'fixed-2',    4.65, 4.90, 0.7, false, null,           4.95, null, '{investment}')
+) as seed(lender, name, rate_type, rate_percent, aprc_percent, max_ltv, green, cashback, revert_rate_percent, cashback_percent, audience)
 where not exists (select 1 from mortgage_products);
+
+-- Backfill revert/cashback for rows seeded before those fields existed.
+-- Only touches nulls, so admin edits are never overwritten (re-runnable).
+update mortgage_products p
+   set revert_rate_percent = coalesce(p.revert_rate_percent, b.revert),
+       cashback_percent    = coalesce(p.cashback_percent, b.cb)
+  from (values
+    ('Haven (AIB Group)', '4 Year Fixed',            3.95::numeric, null::numeric),
+    ('AIB',               '5 Year Fixed',            3.75, null),
+    ('Avant Money',       'Full-term Fixed',         null, 1),
+    ('Avant Money',       '4 Year Fixed',            3.85, 2),
+    ('Avant Money',       '3 Year Fixed',            3.85, null),
+    ('Avant Money',       '7 Year Fixed',            3.85, null),
+    ('Avant Money',       '10 Year Fixed',           3.85, null),
+    ('Bank of Ireland',   '2 Year Fixed',            4.15, 2),
+    ('Bank of Ireland',   '4 Year Fixed',            4.15, 2),
+    ('PTSB',              '3 Year Fixed',            4.70, 2),
+    ('PTSB',              '5 Year Fixed',            4.70, 2),
+    ('ICS Mortgages',     '3 Year Fixed',            4.30, null),
+    ('ICS Mortgages',     'Buy-to-Let 5 Year Fixed', 5.00, null),
+    ('Bank of Ireland',   'Buy-to-Let 2 Year Fixed', 4.95, null)
+  ) as b(lender, name, revert, cb)
+ where p.lender = b.lender and p.name = b.name
+   and (p.revert_rate_percent is null or p.cashback_percent is null);
 
 -- ── Ireland income tax calculator rates ─────────────────────────────────────
 -- One JSONB row per tax year holding the full YearRates config (income tax

@@ -14,6 +14,7 @@ import {
   type ComparisonResult,
   type LenderProduct,
   type MortgagePolicy,
+  type ProductQuote,
   type ProductType,
   type RateType,
 } from "../lib/ireland-mortgage";
@@ -33,6 +34,8 @@ const moneyWhole = (n: number) =>
     currency: "EUR",
     maximumFractionDigits: 0,
   }).format(Math.round(n));
+
+const pct = (n: number) => n.toFixed(n % 1 === 0 ? 0 : 2);
 
 /* ---------- button styles (match app/components/ui.tsx Button) ---------- */
 
@@ -289,65 +292,133 @@ function QuoteList({
             No products of this rate type for your loan.
           </p>
         )}
-        {quotes.map(({ product, monthly }) => (
-          <div
-            key={product.id}
-            className="flex flex-col gap-4 border-b border-line py-5 sm:grid sm:grid-cols-[1.4fr_1fr_1fr_auto] sm:items-center"
-          >
-            {/* lender + product */}
-            <div>
-              <p className="text-sm font-semibold text-ink">{product.lender}</p>
-              <p className="mt-0.5 text-sm text-muted">{product.name}</p>
-              <div className="mt-1.5 flex flex-wrap gap-1.5">
-                {product.green && (
-                  <span className="rounded-none bg-secondary-50 px-2 py-0.5 text-[11px] font-semibold text-secondary-600">
-                    Green Mortgage
-                  </span>
-                )}
-                {product.cashback && (
-                  <span className="rounded-none bg-primary-50 px-2 py-0.5 text-[11px] font-semibold text-primary-600">
-                    {product.cashback}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* monthly */}
-            <div className="sm:text-center">
-              <p className="font-display text-xl font-semibold tabular-nums text-ink">
-                {money(monthly)}
-              </p>
-              <p className="text-xs text-muted">monthly</p>
-            </div>
-
-            {/* rate + APRC */}
-            <div className="sm:text-center">
-              <p className="text-base font-semibold tabular-nums text-ink">
-                {product.ratePercent.toFixed(product.ratePercent % 1 === 0 ? 0 : 2)}%
-              </p>
-              <p className="text-xs text-muted">
-                interest rate · APRC {product.aprcPercent}%
-              </p>
-            </div>
-
-            {/* CTA */}
-            <div className="sm:justify-self-end">
-              <Link
-                href="/contact"
-                className={`${btnPrimary} !h-10 !px-5 !text-xs`}
-              >
-                Enquire Now →
-              </Link>
-            </div>
-          </div>
+        {quotes.map((q) => (
+          <QuoteCard key={q.product.id} quote={q} />
         ))}
       </div>
 
       {quotes.length > 0 && (
         <p className="mt-3 text-xs text-muted">
-          Repayments shown over a {termYears}-year term. APRC is each lender&apos;s
-          quoted Annual Percentage Rate of Charge.
+          Repayments shown over a {termYears}-year term. Fixed-rate quotes assume
+          the balance rolls to the lender&apos;s variable rate when the fixed
+          period ends. APRC is each lender&apos;s quoted Annual Percentage Rate
+          of Charge.
         </p>
+      )}
+    </div>
+  );
+}
+
+function QuoteCard({ quote }: { quote: ProductQuote }) {
+  const { product, monthly, totalRepayable, totalInterest, phases, cashbackValue } =
+    quote;
+  const [open, setOpen] = useState(false);
+  const detailsId = useId();
+  const twoPhase = phases.length > 1;
+
+  return (
+    <div className="border-b border-line py-5">
+      <div className="flex flex-col gap-4 sm:grid sm:grid-cols-[1.4fr_1fr_1fr_auto] sm:items-center">
+        {/* lender + product */}
+        <div>
+          <p className="text-sm font-semibold text-ink">{product.lender}</p>
+          <p className="mt-0.5 text-sm text-muted">{product.name}</p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {product.green && (
+              <span className="rounded-none bg-secondary-50 px-2 py-0.5 text-[11px] font-semibold text-secondary-600">
+                Green Mortgage
+              </span>
+            )}
+            {product.cashback && (
+              <span className="rounded-none bg-primary-50 px-2 py-0.5 text-[11px] font-semibold text-primary-600">
+                {product.cashback}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* monthly */}
+        <div className="sm:text-center">
+          <p className="font-display text-xl font-semibold tabular-nums text-ink">
+            {money(monthly)}
+          </p>
+          <p className="text-xs text-muted">
+            {twoPhase ? `monthly, first ${phases[0].years} yrs` : "monthly"}
+          </p>
+        </div>
+
+        {/* rate + APRC */}
+        <div className="sm:text-center">
+          <p className="text-base font-semibold tabular-nums text-ink">
+            {pct(product.ratePercent)}%
+          </p>
+          <p className="text-xs text-muted">
+            interest rate · APRC {product.aprcPercent}%
+          </p>
+        </div>
+
+        {/* CTA + details toggle */}
+        <div className="flex items-center gap-4 sm:flex-col sm:items-end sm:gap-2 sm:justify-self-end">
+          <Link href="/contact" className={`${btnPrimary} !h-10 !px-5 !text-xs`}>
+            Enquire Now →
+          </Link>
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls={detailsId}
+            onClick={() => setOpen((o) => !o)}
+            className="cursor-pointer text-xs font-medium text-primary-500 transition-colors duration-200 hover:text-primary-600"
+          >
+            {open ? "Hide details ▴" : "See details ▾"}
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <div
+          id={detailsId}
+          className="mt-4 rounded-none border border-line bg-surface-muted p-4"
+        >
+          <div className="flex flex-col gap-1">
+            {phases.map((p, i) => (
+              <p key={i} className="text-sm text-ink">
+                {p.years} {p.years === 1 ? "year" : "years"} of{" "}
+                <strong className="tabular-nums">{money(p.monthly)}</strong>/month{" "}
+                <span className="text-muted">
+                  ({pct(p.ratePercent)}%{" "}
+                  {twoPhase ? (i === 0 ? "fixed" : "variable") : "interest"} rate)
+                </span>
+              </p>
+            ))}
+          </div>
+
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            <div>
+              <p className="text-xs text-muted">Total cost</p>
+              <p className="text-sm font-semibold tabular-nums text-ink">
+                {moneyWhole(totalRepayable)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted">Total interest</p>
+              <p className="text-sm font-semibold tabular-nums text-ink">
+                {moneyWhole(totalInterest)}
+              </p>
+            </div>
+            {cashbackValue > 0 && (
+              <div>
+                <p className="text-xs text-muted">Cashback</p>
+                <p className="text-sm font-semibold tabular-nums text-secondary-600">
+                  {moneyWhole(cashbackValue)}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {product.details && (
+            <p className="mt-3 text-xs leading-5 text-muted">{product.details}</p>
+          )}
+        </div>
       )}
     </div>
   );
@@ -360,6 +431,8 @@ interface FormState {
   propertyValue: number;
   loanAmount: number;
   termYears: number;
+  /** Green-mortgage rates need a Building Energy Rating of B3 or better. */
+  ber: "b3plus" | "below";
   application: "single" | "joint";
   age1: number;
   income1: number;
@@ -372,6 +445,7 @@ const DEFAULTS: FormState = {
   propertyValue: 300_000,
   loanAmount: 200_000,
   termYears: 30,
+  ber: "b3plus",
   application: "single",
   age1: 30,
   income1: 0,
@@ -445,6 +519,7 @@ export function IrelandMortgageCalculator({
           termYears: form.termYears,
           age: joint ? Math.max(form.age1, form.age2) : form.age1,
           income: form.income1 + (joint ? form.income2 : 0),
+          berB3Plus: form.ber === "b3plus",
         },
         products,
         policy,
@@ -579,6 +654,20 @@ export function IrelandMortgageCalculator({
               suffix="years"
               max={maxTerm}
             />
+            <div>
+              <SegmentedField
+                label="Home energy rating (BER)"
+                value={form.ber}
+                onChange={(v) => set("ber", v)}
+                options={[
+                  { value: "b3plus", label: "B3 or better" },
+                  { value: "below", label: "Below B3 / not sure" },
+                ]}
+              />
+              <p className="mt-1 text-xs text-muted">
+                Green mortgage rates need a Building Energy Rating of B3 or better.
+              </p>
+            </div>
           </>
         ) : (
           <>
