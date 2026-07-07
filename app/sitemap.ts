@@ -10,6 +10,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/tools/ireland-income-tax",
     "/tools/ireland-vat",
     "/tools/ireland-corporation-tax",
+    "/tools/ireland-rd-tax-credit",
+    "/tools/ireland-capital-allowances",
     "/about",
     "/contact",
   ].map((path) => ({

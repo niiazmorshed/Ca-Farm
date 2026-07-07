@@ -21,23 +21,23 @@ test("Trading only — 12.5%", () => {
 
 test("Passive only — 25%", () => {
   const r = computeCorporationTax({ tradingProfit: 0, passiveIncome: 100_000 });
-  assert.equal(r.tradingTax, 0);
   assert.equal(r.passiveTax, 25_000);
+  assert.equal(r.tradingTax, 0);
   assert.equal(r.totalTax, 25_000);
   assert.equal(r.effectiveRate, 0.25);
 });
 
-test("Mixed — blended effective rate sits between the two rates", () => {
-  // 200k trading + 50k passive = 250k profit.
+test("Mixed — two streams, blended effective rate", () => {
+  // 200k trading + 50k passive = 250k base.
   const r = computeCorporationTax({ tradingProfit: 200_000, passiveIncome: 50_000 });
   assert.equal(r.tradingTax, 25_000); // 200k × 12.5%
   assert.equal(r.passiveTax, 12_500); //  50k × 25%
   assert.equal(r.totalTax, 37_500);
   assert.equal(r.totalProfit, 250_000);
-  assert.equal(r.effectiveRate, 0.15); // 37,500 / 250,000
+  assert.equal(r.effectiveRate, 37_500 / 250_000); // = 15%
 });
 
-test("Equal split — 50/50 blends to 18.75%", () => {
+test("Equal split — trading + passive blends to 18.75%", () => {
   const r = computeCorporationTax({ tradingProfit: 100_000, passiveIncome: 100_000 });
   assert.equal(r.totalTax, 37_500);
   assert.equal(r.effectiveRate, 0.1875);
@@ -48,7 +48,7 @@ test("Rounding — tax rounds to the cent", () => {
   assert.equal(r.tradingTax, 1_543.21); // 12,345.67 × 0.125 = 1,543.20875
 });
 
-test("Edge inputs — zero profit gives no divide-by-zero", () => {
+test("Edge inputs — zero base gives no divide-by-zero", () => {
   const r = computeCorporationTax({ tradingProfit: 0, passiveIncome: 0 });
   assert.equal(r.totalTax, 0);
   assert.equal(r.effectiveRate, 0); // not NaN

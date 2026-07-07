@@ -11,12 +11,22 @@ export const CALCULATOR_TOOLS = [
   {
     href: "/tools/ireland-vat",
     label: "VAT",
-    desc: "Add or remove VAT at every Irish rate",
+    desc: "Net VAT position — payable or receivable",
   },
   {
     href: "/tools/ireland-corporation-tax",
     label: "Corporation tax",
-    desc: "12.5% trading vs 25% passive income",
+    desc: "12.5% trading, 25% passive — total tax due",
+  },
+  {
+    href: "/tools/ireland-rd-tax-credit",
+    label: "R&D credit",
+    desc: "35% credit on qualifying R&D spend",
+  },
+  {
+    href: "/tools/ireland-capital-allowances",
+    label: "Capital allowances",
+    desc: "Capital allowances (tax) + working capital",
   },
   {
     href: "/tools/ireland",

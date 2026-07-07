@@ -1,13 +1,13 @@
 /* ──────────────────────────────────────────────────────────────────────────
-   Ireland Corporation Tax calculator — trading (12.5%) vs passive (25%).
+   Ireland Corporation Tax calculator — trading (12.5%) and passive (25%).
 
    PURE FUNCTIONS ONLY — no React, no I/O — so every figure is unit-testable.
    All rates live in the CT_RATES config below: this file is the SINGLE SOURCE
    OF TRUTH. Every number the UI shows reads from here.
 
-   The USER classifies which income is trading and which is passive — this
-   engine never guesses. Trading = active business profits. Passive =
-   rental income, interest, and most foreign dividends (Case III/IV/V).
+   The USER classifies which income is trading or passive — this engine never
+   guesses. Trading = active business profits. Passive = rental income,
+   interest, and most foreign dividends (Case III/IV/V).
 
    Sources (verified per line):
    - 12.5% / 25% basis of charge:
@@ -20,11 +20,13 @@
 
    ── NOT MODELLED (deliberate TODO hooks — do NOT build in Phase 1) ──
    These each change the final liability and must be added as explicit,
-   sourced steps, not silently folded into the two headline rates:
-   - TODO: R&D tax credit
-   - TODO: Knowledge Development Box (6.25% effective rate)
+   sourced steps, not silently folded into the headline rates:
+   - TODO: R&D tax credit (35% — now a standalone calculator, ireland-rd-tax-credit.ts)
+   - TODO: Knowledge Development Box (10% effective rate since 1 Oct 2023)
    - TODO: close company surcharge on undistributed investment/professional income
    - TODO: Section 486C start-up relief (first-3-years relief capped by employer PRSI)
+   - TODO: chargeable gains (effective 33%; no annual exemption for companies;
+           participation exemption on qualifying share disposals, development-land CGT)
    ────────────────────────────────────────────────────────────────────────── */
 
 /** When the rates below were last checked against Revenue. */
@@ -46,7 +48,7 @@ export const CT_RATES = {
 export const PILLAR_TWO = {
   percent: 15,
   revenueThresholdEur: 750_000_000,
-  note: "A 15% minimum effective rate (Pillar Two) applies only to groups with consolidated annual revenue of €750 million or more. It does not affect the standard 12.5% / 25% rates below.",
+  note: "A 15% minimum effective rate (Pillar Two) applies only to groups with consolidated annual revenue of €750 million or more. It does not affect the standard rates below.",
 } as const;
 
 /* ---------- maths ---------- */
@@ -66,11 +68,12 @@ export interface CorporationTaxInput {
 export interface CorporationTaxResult {
   tradingProfit: number;
   passiveIncome: number;
+  /** Combined taxable base: trading + passive. */
   totalProfit: number;
   tradingTax: number;
   passiveTax: number;
   totalTax: number;
-  /** Blended effective rate as a fraction (0.14 = 14%); 0 when there is no profit. */
+  /** Blended effective rate as a fraction (0.14 = 14%); 0 when there is no base. */
   effectiveRate: number;
 }
 

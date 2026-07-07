@@ -9,6 +9,7 @@ import assert from "node:assert/strict";
 import {
   addVat,
   removeVat,
+  vatPosition,
   round2,
   VAT_RATES,
   getVatRate,
@@ -64,6 +65,59 @@ test("Edge inputs — zero and negative clamp to zero", () => {
   assert.deepEqual(removeVat(0, 23), { net: 0, vat: 0, gross: 0, percent: 23 });
   assert.deepEqual(addVat(-500, 23), { net: 0, vat: 0, gross: 0, percent: 23 });
   assert.deepEqual(removeVat(-500, 23), { net: 0, vat: 0, gross: 0, percent: 23 });
+});
+
+test("Net position — more output than input VAT → payable to Revenue", () => {
+  assert.deepEqual(vatPosition(2_000, 500), {
+    outputVat: 2_000,
+    inputVat: 500,
+    netVat: 1_500,
+    direction: "payable",
+  });
+});
+
+test("Net position — more input than output VAT → receivable from Revenue", () => {
+  // Paid €2.5M VAT on purchases, charged €2M on sales → €0.5M back.
+  assert.deepEqual(vatPosition(2_000_000, 2_500_000), {
+    outputVat: 2_000_000,
+    inputVat: 2_500_000,
+    netVat: 500_000,
+    direction: "receivable",
+  });
+});
+
+test("Net position — equal totals balance to zero", () => {
+  assert.deepEqual(vatPosition(1_234.56, 1_234.56), {
+    outputVat: 1_234.56,
+    inputVat: 1_234.56,
+    netVat: 0,
+    direction: "balanced",
+  });
+});
+
+test("Net position — composed from add/remove VAT, nets to the cent", () => {
+  // Sold €10,000 net @ 23%; bought €5,000 gross @ 13.5%.
+  const output = addVat(10_000, 23).vat; // 2,300.00
+  const input = removeVat(5_000, 13.5).vat; // 594.71
+  const pos = vatPosition(output, input);
+  assert.equal(pos.netVat, round2(output - input));
+  assert.equal(pos.netVat, 1_705.29);
+  assert.equal(pos.direction, "payable");
+});
+
+test("Net position — zero and negative inputs clamp to zero", () => {
+  assert.deepEqual(vatPosition(0, 0), {
+    outputVat: 0,
+    inputVat: 0,
+    netVat: 0,
+    direction: "balanced",
+  });
+  assert.deepEqual(vatPosition(-100, 250), {
+    outputVat: 0,
+    inputVat: 250,
+    netVat: 250,
+    direction: "receivable",
+  });
 });
 
 test("round2 absorbs binary-float error", () => {
