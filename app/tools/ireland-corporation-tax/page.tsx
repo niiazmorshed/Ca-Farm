@@ -8,21 +8,21 @@ import { CT_LAST_REVIEWED } from "../../lib/ireland-corporation-tax";
 export const metadata: Metadata = {
   title: "Ireland Corporation Tax Calculator — 12.5% Trading, 25% Passive",
   description:
-    "Estimate Irish corporation tax on trading profit (12.5%) and passive/non-trading income (25%), with the blended effective rate. Republic of Ireland.",
+    "Estimate Irish corporation tax on trading profit (12.5%) and passive/non-trading income (25%), with the total tax due and blended effective rate. Republic of Ireland.",
 };
 
 const notes = [
   {
     title: "Two rates, your split",
-    body: "12.5% on active trading profit and 25% on passive income — rent, interest and most foreign dividends. You classify each figure; the tool never guesses.",
+    body: "12.5% on active trading profit and 25% on passive income (rent, interest, most foreign dividends). You classify each figure; the tool never guesses.",
   },
   {
-    title: "Blended effective rate",
-    body: "See total tax and the blended rate across both income types, so a company with mixed income knows its real overall corporation-tax cost.",
+    title: "Total tax & blended rate",
+    body: "See the total corporation tax due and the blended effective rate across both streams, so a company with mixed income knows its real overall cost.",
   },
   {
     title: "Reliefs come next",
-    body: "R&D credit, the Knowledge Development Box, the close-company surcharge and start-up relief change the final bill — that's a conversation, not a slider.",
+    body: "Chargeable gains, the R&D credit, Knowledge Development Box, close-company surcharge and start-up relief change the final bill — that's a conversation, not a slider.",
   },
 ];
 
@@ -41,7 +41,7 @@ export default function IrelandCorporationTaxPage() {
           />
         }
         title="Ireland corporation tax calculator"
-        lede={`Estimate corporation tax on trading and passive income, with the blended effective rate — figures current as of ${CT_LAST_REVIEWED}.`}
+        lede={`Estimate the total corporation tax on trading income and passive income, with the blended effective rate — figures current as of ${CT_LAST_REVIEWED}.`}
       />
 
       <Container className="py-16 sm:py-20">

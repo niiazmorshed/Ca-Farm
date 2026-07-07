@@ -1,8 +1,8 @@
 "use client";
 
-/* Ireland Corporation Tax calculator — trading (12.5%) vs passive (25%).
-   The user classifies which income is which; this component never guesses.
-   All maths + rates live in ../lib/ireland-corporation-tax (single source of
+/* Ireland Corporation Tax calculator — trading (12.5%) and passive (25%). The
+   user classifies which income is which; this component never guesses. All
+   maths + rates live in ../lib/ireland-corporation-tax (single source of
    truth); this renders and computes live via that pure engine. */
 
 import { useMemo, useState } from "react";
@@ -35,36 +35,28 @@ const pct2 = (fraction: number) =>
     maximumFractionDigits: 2,
   }).format(fraction);
 
-const share = (fraction: number) =>
-  new Intl.NumberFormat("en-IE", {
-    style: "percent",
-    maximumFractionDigits: 0,
-  }).format(fraction);
-
-/* One breakdown line: colour swatch · label · (share of tax) · amount. */
+/* One breakdown line: colour swatch · label + derivation (base × rate) · tax. */
 function BreakdownRow({
   dotClass,
   label,
+  sub,
   value,
-  shareOfTotal,
 }: {
   dotClass: string;
   label: string;
+  sub: string;
   value: string;
-  shareOfTotal: number | null;
 }) {
   return (
     <div className="flex items-baseline justify-between gap-4 px-5 py-3.5 sm:px-6">
       <div className="flex items-baseline gap-2.5">
         <LegendDot className={dotClass} />
-        <span className="text-sm text-ink-body">{label}</span>
+        <div>
+          <span className="text-sm text-ink-body">{label}</span>
+          <span className="mt-0.5 block text-xs text-muted tabular-nums">{sub}</span>
+        </div>
       </div>
-      <div className="flex items-baseline gap-3">
-        {shareOfTotal !== null && (
-          <span className="text-xs text-muted tabular-nums">{share(shareOfTotal)}</span>
-        )}
-        <span className="text-sm font-medium text-ink tabular-nums">{value}</span>
-      </div>
+      <span className="text-sm font-medium text-ink tabular-nums">{value}</span>
     </div>
   );
 }
@@ -77,8 +69,6 @@ export function IrelandCorporationTaxCalculator() {
     () => computeCorporationTax({ tradingProfit, passiveIncome }),
     [tradingProfit, passiveIncome],
   );
-
-  const hasTax = result.totalTax > 0;
 
   return (
     <div className="grid gap-10 lg:grid-cols-2">
@@ -109,9 +99,17 @@ export function IrelandCorporationTaxCalculator() {
             Not included
           </p>
           <p className="mt-2 text-xs leading-5 text-muted">
-            Headline rates only. The R&amp;D credit, Knowledge Development Box,
-            close-company surcharge and start-up relief can each change the final
-            bill — that&rsquo;s a conversation, not a slider.
+            Trading and passive income only. Chargeable gains on disposals, the
+            Knowledge Development Box (10% effective), the close-company surcharge
+            and start-up relief can each change the final bill — that&rsquo;s a
+            conversation, not a slider. For the R&amp;D credit (35%), use the{" "}
+            <a
+              href="/tools/ireland-rd-tax-credit"
+              className="font-medium text-primary-500 underline-offset-2 hover:underline"
+            >
+              R&amp;D credit calculator
+            </a>
+            .
           </p>
         </div>
       </div>
@@ -126,14 +124,14 @@ export function IrelandCorporationTaxCalculator() {
                 Corporation tax
               </p>
               <span className="text-xs text-muted tabular-nums">
-                on {money(result.totalProfit)} profit
+                on {money(result.totalProfit)} taxable income
               </span>
             </div>
             <p className="mt-3 font-display text-[2.5rem] font-semibold leading-none tracking-tight text-ink tabular-nums">
               {money(result.totalTax)}
             </p>
             <p className="mt-2.5 text-sm text-muted">
-              Total tax ·{" "}
+              Total corporation tax ·{" "}
               <span className="font-semibold text-primary-600 tabular-nums">
                 {pct2(result.effectiveRate)}
               </span>{" "}
@@ -161,16 +159,24 @@ export function IrelandCorporationTaxCalculator() {
           <dl className="divide-y divide-line">
             <BreakdownRow
               dotClass="bg-primary-500"
-              label={`Trading tax @ ${CT_RATES.tradingPercent}%`}
+              label="Trading tax"
+              sub={`${money(result.tradingProfit)} × ${CT_RATES.tradingPercent}%`}
               value={money(result.tradingTax)}
-              shareOfTotal={hasTax ? result.tradingTax / result.totalTax : null}
             />
             <BreakdownRow
               dotClass="bg-navy-900"
-              label={`Passive tax @ ${CT_RATES.passivePercent}%`}
+              label="Passive tax"
+              sub={`${money(result.passiveIncome)} × ${CT_RATES.passivePercent}%`}
               value={money(result.passiveTax)}
-              shareOfTotal={hasTax ? result.passiveTax / result.totalTax : null}
             />
+            <div className="flex items-baseline justify-between gap-4 bg-surface-muted px-5 py-3.5 sm:px-6">
+              <span className="text-sm font-semibold text-ink">
+                Total corporation tax
+              </span>
+              <span className="font-display text-sm font-semibold text-ink tabular-nums">
+                {money(result.totalTax)}
+              </span>
+            </div>
           </dl>
         </div>
 
