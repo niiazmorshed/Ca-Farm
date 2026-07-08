@@ -9,8 +9,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   computeCapitalAllowance,
+  parseCaConfig,
   round2,
   MOTOR_CAP_EUR,
+  CA_CONFIG_DEFAULT,
   getAssetClass,
   getCo2Group,
   type CapitalAllowanceResult,
@@ -137,4 +139,58 @@ test("Config holds the documented statutory values", () => {
   assert.equal(getCo2Group("group1").factor, 1);
   assert.equal(getCo2Group("group2").factor, 0.5);
   assert.equal(getCo2Group("group3").factor, 0);
+});
+
+test("CA_CONFIG_DEFAULT references the module consts (no drift)", () => {
+  assert.equal(CA_CONFIG_DEFAULT.motorCapEur, MOTOR_CAP_EUR);
+  assert.equal(CA_CONFIG_DEFAULT.tradingCtPercent, 12.5);
+  assert.equal(
+    CA_CONFIG_DEFAULT.classes.find((c) => c.key === "plant-machinery")?.ratePercent,
+    12.5,
+  );
+});
+
+test("Custom config arg overrides rate, years and the car cap", () => {
+  const cfg = structuredClone(CA_CONFIG_DEFAULT);
+  const pm = cfg.classes.find((c) => c.key === "plant-machinery")!;
+  pm.ratePercent = 20; // 20% instead of 12.5%
+  pm.years = 5;
+  cfg.tradingCtPercent = 15;
+
+  const r = computeCapitalAllowance({ assetKey: "plant-machinery", cost: 100_000 }, cfg);
+  assert.equal(r.annualAllowance, 20_000); // 20%
+  assert.equal(r.years, 5);
+  assert.equal(r.taxSaving, 15_000); // 15% of 100,000
+});
+
+test("Custom config — a higher car cap raises the allowable cost", () => {
+  const cfg = structuredClone(CA_CONFIG_DEFAULT);
+  cfg.motorCapEur = 40_000;
+  const r = computeCapitalAllowance(
+    { assetKey: "motor-vehicle", cost: 35_000, co2Group: "group1" },
+    cfg,
+  );
+  assert.equal(r.allowableCost, 35_000); // under the raised 40k cap → not capped
+  assert.equal(r.restricted, false);
+});
+
+test("parseCaConfig — valid blob round-trips", () => {
+  const cfg = parseCaConfig(structuredClone(CA_CONFIG_DEFAULT));
+  assert.ok(cfg);
+  assert.equal(cfg?.classes.length, CA_CONFIG_DEFAULT.classes.length);
+  assert.equal(cfg?.motorCapEur, 24_000);
+});
+
+test("parseCaConfig — rejects bad / missing / out-of-range", () => {
+  assert.equal(parseCaConfig(null), null);
+  assert.equal(parseCaConfig({ classes: [], motorCapEur: 24_000, tradingCtPercent: 12.5 }), null);
+  const missingKey = structuredClone(CA_CONFIG_DEFAULT);
+  missingKey.classes = missingKey.classes.filter((c) => c.key !== "energy-efficient");
+  assert.equal(parseCaConfig(missingKey), null);
+  const badRate = structuredClone(CA_CONFIG_DEFAULT);
+  badRate.classes[0].ratePercent = 200;
+  assert.equal(parseCaConfig(badRate), null);
+  const badCap = structuredClone(CA_CONFIG_DEFAULT);
+  badCap.motorCapEur = -5;
+  assert.equal(parseCaConfig(badCap), null);
 });

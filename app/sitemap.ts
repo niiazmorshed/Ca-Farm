@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/tools/ireland-corporation-tax",
     "/tools/ireland-rd-tax-credit",
     "/tools/ireland-capital-allowances",
+    "/tools/ireland-cgt",
     "/about",
     "/contact",
   ].map((path) => ({

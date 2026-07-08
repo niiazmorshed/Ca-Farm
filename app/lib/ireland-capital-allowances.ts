@@ -4,8 +4,11 @@
    100% accelerated allowances for energy-efficient equipment).
 
    PURE FUNCTIONS ONLY — no React, no I/O — so every figure is unit-testable.
-   All rates/limits live in the config block below: this file is the SINGLE
-   SOURCE OF TRUTH. Every number the UI shows reads from here.
+   The EDITABLE rates/limits (per-class rate + years, the €24,000 car cap, the
+   trading CT rate) live in CA_CONFIG_DEFAULT below — the single code source of
+   truth (loader fallback AND the default arg of computeCapitalAllowance). The
+   CO2 emissions groups (CAR_CO2_GROUPS factors) and CAR_2027_NOTE are STATUTORY
+   and stay in code — not admin-editable.
 
    HOW IT WORKS
    - Capital allowances are tax depreciation: the cost of a qualifying asset is
@@ -149,6 +152,84 @@ export function getCo2Group(key: Co2GroupKey): Co2Group {
 export const CAR_2027_NOTE =
   "From 1 January 2027 the car bands change to €24,000 for 0–120 g/km, €12,000 for 121–140 g/km and nil above 140 g/km. These figures use the rules in force in 2026.";
 
+/* ---------- editable config (single source of truth) ---------- */
+
+/** The admin-editable slice: the four asset classes plus the two scalars. The
+    CO2 groups + notes are NOT here (statutory / prose, stay code). */
+export interface CaConfig {
+  classes: AssetClass[];
+  /** Car cost ceiling (specified amount), € — MOTOR_CAP_EUR. */
+  motorCapEur: number;
+  /** Trading CT rate used for the cash-value line, % — TRADING_CT_PERCENT. */
+  tradingCtPercent: number;
+}
+
+/** Editable fields: the loader fallback AND the default arg of the compute fn.
+    References the existing consts above so there is exactly ONE copy of each
+    number (no drift). */
+export const CA_CONFIG_DEFAULT: CaConfig = {
+  classes: ASSET_CLASSES,
+  motorCapEur: MOTOR_CAP_EUR,
+  tradingCtPercent: TRADING_CT_PERCENT,
+};
+
+/** The four asset keys that MUST be present in any stored config. */
+export const REQUIRED_ASSET_KEYS: AssetKey[] = ASSET_CLASSES.map((c) => c.key);
+
+const finiteNum = (v: unknown): number | null =>
+  typeof v === "number" && Number.isFinite(v) ? v : null;
+
+function parseAssetClass(raw: unknown): AssetClass | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const o = raw as Record<string, unknown>;
+  const key = o.key;
+  if (typeof key !== "string" || !REQUIRED_ASSET_KEYS.includes(key as AssetKey)) return null;
+  const rate = finiteNum(o.ratePercent);
+  const years = finiteNum(o.years);
+  if (rate === null || rate < 0 || rate > 100) return null;
+  if (years === null || years < 1 || !Number.isInteger(years)) return null;
+  if (typeof o.label !== "string" || !o.label.trim()) return null;
+  if (typeof o.note !== "string" || !o.note.trim()) return null;
+  if (typeof o.firstYearFull !== "boolean") return null;
+  const cls: AssetClass = {
+    key: key as AssetKey,
+    label: o.label,
+    ratePercent: rate,
+    years,
+    firstYearFull: o.firstYearFull,
+    note: o.note,
+  };
+  if (o.co2Restricted === true) cls.co2Restricted = true;
+  return cls;
+}
+
+/** Validate a stored config blob; null on any bad/missing/out-of-range field.
+    Enforces all four statutory asset keys present exactly once. Pure, so both
+    ca-data.ts and the tests can use it without the DB layer. */
+export function parseCaConfig(raw: unknown): CaConfig | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const o = raw as Record<string, unknown>;
+  if (!Array.isArray(o.classes)) return null;
+
+  const motorCapEur = finiteNum(o.motorCapEur);
+  const tradingCtPercent = finiteNum(o.tradingCtPercent);
+  if (motorCapEur === null || motorCapEur < 0) return null;
+  if (tradingCtPercent === null || tradingCtPercent < 0 || tradingCtPercent > 100) return null;
+
+  const classes: AssetClass[] = [];
+  for (const item of o.classes) {
+    const cls = parseAssetClass(item);
+    if (!cls) return null;
+    classes.push(cls);
+  }
+
+  const keys = classes.map((c) => c.key);
+  for (const k of REQUIRED_ASSET_KEYS) if (!keys.includes(k)) return null;
+  if (keys.length !== REQUIRED_ASSET_KEYS.length) return null;
+
+  return { classes, motorCapEur, tradingCtPercent };
+}
+
 /* ---------- maths ---------- */
 
 /** Round to 2 decimal places, absorbing binary-float error. */
@@ -195,14 +276,18 @@ export interface CapitalAllowanceResult {
  */
 export function computeCapitalAllowance(
   input: CapitalAllowanceInput,
+  config: CaConfig = CA_CONFIG_DEFAULT,
 ): CapitalAllowanceResult {
-  const cls = getAssetClass(input.assetKey);
+  // Resolve the class from the (possibly edited) config, not the module const,
+  // so admin rate/years edits flow through. CO2 groups stay statutory.
+  const cls = config.classes.find((a) => a.key === input.assetKey);
+  if (!cls) throw new Error(`Unknown asset class: ${input.assetKey}`);
   const cost = round2(Math.max(0, input.cost));
 
   let allowableCost = cost;
   let restricted = false;
   if (cls.co2Restricted) {
-    const capped = Math.min(cost, MOTOR_CAP_EUR);
+    const capped = Math.min(cost, config.motorCapEur);
     const group = getCo2Group(input.co2Group ?? "group1");
     allowableCost = round2(capped * group.factor);
     restricted = allowableCost !== cost;
@@ -234,7 +319,7 @@ export function computeCapitalAllowance(
     firstYearAllowance,
     finalYearAllowance,
     totalAllowances: allowableCost,
-    taxSaving: round2(allowableCost * (TRADING_CT_PERCENT / 100)),
+    taxSaving: round2(allowableCost * (config.tradingCtPercent / 100)),
     restricted,
   };
 }

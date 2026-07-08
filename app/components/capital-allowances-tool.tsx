@@ -8,6 +8,7 @@
 import { useState } from "react";
 import { IrelandCapitalAllowancesCalculator } from "./ireland-capital-allowances-calculator";
 import { WorkingCapitalCalculator } from "./working-capital-calculator";
+import type { CaConfig } from "../lib/ireland-capital-allowances";
 
 type Mode = "tax" | "finance";
 
@@ -42,7 +43,7 @@ const NOTES: Record<Mode, { title: string; body: string }[]> = {
   ],
 };
 
-export function CapitalAllowancesTool() {
+export function CapitalAllowancesTool({ config }: { config: CaConfig }) {
   const [mode, setMode] = useState<Mode>("tax");
 
   return (
@@ -78,7 +79,7 @@ export function CapitalAllowancesTool() {
 
       <div className="rounded-none border border-line bg-canvas p-6 sm:p-8 lg:p-10">
         {mode === "tax" ? (
-          <IrelandCapitalAllowancesCalculator />
+          <IrelandCapitalAllowancesCalculator config={config} />
         ) : (
           <WorkingCapitalCalculator />
         )}

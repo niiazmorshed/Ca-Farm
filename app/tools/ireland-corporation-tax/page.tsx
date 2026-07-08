@@ -4,6 +4,7 @@ import { ContactCta } from "../../components/sections";
 import { CalculatorTabs } from "../../components/calculator-tabs";
 import { IrelandCorporationTaxCalculator } from "../../components/ireland-corporation-tax-calculator";
 import { CT_LAST_REVIEWED } from "../../lib/ireland-corporation-tax";
+import { getCorporationTaxData } from "../../lib/corporation-tax-data";
 
 export const metadata: Metadata = {
   title: "Ireland Corporation Tax Calculator — 12.5% Trading, 25% Passive",
@@ -26,7 +27,9 @@ const notes = [
   },
 ];
 
-export default function IrelandCorporationTaxPage() {
+export default async function IrelandCorporationTaxPage() {
+  const { config } = await getCorporationTaxData();
+
   return (
     <>
       <PageHero
@@ -48,7 +51,7 @@ export default function IrelandCorporationTaxPage() {
         <CalculatorTabs current="/tools/ireland-corporation-tax" />
 
         <div className="rounded-none border border-line bg-canvas p-6 sm:p-8 lg:p-10">
-          <IrelandCorporationTaxCalculator />
+          <IrelandCorporationTaxCalculator config={config} />
         </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-3">

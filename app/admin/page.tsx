@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { query } from "../lib/db";
 import { requireAdmin } from "../lib/supabase/guards";
+import { loadReviewStatus } from "../lib/editable-calculators";
+import { markCalculatorReviewedAction } from "./review-actions";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -25,6 +28,12 @@ const fmt = new Intl.DateTimeFormat("en-GB", {
   minute: "2-digit",
 });
 
+const dateFmt = new Intl.DateTimeFormat("en-GB", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+});
+
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="rounded-none border border-line bg-white p-5">
@@ -39,7 +48,7 @@ function StatCard({ label, value }: { label: string; value: string | number }) {
 export default async function AdminPage() {
   const user = await requireAdmin();
 
-  const [{ rows }, { rows: countRows }] = await Promise.all([
+  const [{ rows }, { rows: countRows }, reviews] = await Promise.all([
     query<EnquiryRow>(
       `select id, name, email, company, service, message, created_at
          from enquiries
@@ -47,10 +56,12 @@ export default async function AdminPage() {
         limit 200`,
     ),
     query<{ total: string }>(`select count(*)::text as total from enquiries`),
+    loadReviewStatus(),
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
   const latest = rows[0] ? fmt.format(new Date(rows[0].created_at)) : "—";
+  const dueReviews = reviews.filter((r) => r.due);
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -61,6 +72,51 @@ export default async function AdminPage() {
           <span className="font-medium text-ink-body">{user.email}</span>.
         </p>
       </header>
+
+      {dueReviews.length > 0 && (
+        <div className="mb-8 space-y-4">
+          {dueReviews.map((r) => {
+            const reviewedLabel = r.reviewedAt
+              ? dateFmt.format(new Date(r.reviewedAt))
+              : null;
+            return (
+              <div
+                key={r.key}
+                className="rounded-none border-l-2 border-primary-500 bg-primary-50 p-5"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <p className="font-display text-base font-semibold text-ink">
+                      {r.label} review due
+                    </p>
+                    <p className="mt-1 text-sm text-ink-body">
+                      {reviewedLabel
+                        ? `Last reviewed ${reviewedLabel}.`
+                        : "Not reviewed yet."}{" "}
+                      Check the rates against Revenue for the next Budget.
+                    </p>
+                    <Link
+                      href={r.adminHref}
+                      className="mt-3 inline-block text-sm font-semibold text-primary-600 transition-colors duration-200 hover:text-primary-500"
+                    >
+                      Open {r.label} →
+                    </Link>
+                  </div>
+                  <form action={markCalculatorReviewedAction}>
+                    <input type="hidden" name="key" value={r.key} />
+                    <button
+                      type="submit"
+                      className="inline-flex h-9 cursor-pointer items-center rounded-none border border-primary-500 px-4 text-xs font-semibold text-primary-600 transition-colors duration-200 hover:bg-primary-500 hover:text-white"
+                    >
+                      Mark reviewed
+                    </button>
+                  </form>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <div className="mb-10 grid gap-4 sm:grid-cols-3">
         <StatCard label="Total enquiries" value={total} />

@@ -9,8 +9,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   computeRdCredit,
+  parseRdConfig,
   round2,
   RD_CREDIT,
+  RD_CONFIG_DEFAULT,
   type RdCreditResult,
 } from "./ireland-rd-tax-credit.ts";
 
@@ -115,4 +117,36 @@ test("Config holds the documented statutory values", () => {
   assert.equal(RD_CREDIT.ratePercent, 35);
   assert.equal(RD_CREDIT.firstYearThresholdEur, 87_500);
   assert.equal(RD_CREDIT.secondInstalmentFraction, 0.6);
+});
+
+test("RD_CREDIT is derived from RD_CONFIG_DEFAULT (no drift)", () => {
+  assert.equal(RD_CREDIT.ratePercent, RD_CONFIG_DEFAULT.ratePercent);
+  assert.equal(RD_CREDIT.firstYearThresholdEur, RD_CONFIG_DEFAULT.firstYearThresholdEur);
+  assert.equal(RD_CREDIT.secondInstalmentFraction, RD_CONFIG_DEFAULT.secondInstalmentFraction);
+  assert.equal(RD_CREDIT.tradingDeductionPercent, RD_CONFIG_DEFAULT.tradingDeductionPercent);
+});
+
+test("Custom config arg overrides the defaults", () => {
+  // Hypothetical: 40% credit, threshold €100k, fixed 50/30/20 for a big claim.
+  const r = computeRdCredit(1_000_000, 0, {
+    ratePercent: 40,
+    tradingDeductionPercent: 12.5,
+    firstYearThresholdEur: 100_000,
+    secondInstalmentFraction: 0.6,
+  });
+  assert.equal(r.credit, 400_000); // 40%
+  assert.equal(r.instalments.year1, 200_000); // 50% beats the 100k floor
+  assert.equal(round2(r.instalments.year1 + r.instalments.year2 + r.instalments.year3), r.credit);
+});
+
+test("parseRdConfig — valid blob round-trips", () => {
+  const cfg = parseRdConfig(structuredClone(RD_CONFIG_DEFAULT));
+  assert.deepEqual(cfg, RD_CONFIG_DEFAULT);
+});
+
+test("parseRdConfig — rejects bad / out-of-range / missing", () => {
+  assert.equal(parseRdConfig(null), null);
+  assert.equal(parseRdConfig({ ratePercent: 35 }), null); // missing fields
+  assert.equal(parseRdConfig({ ...RD_CONFIG_DEFAULT, ratePercent: 250 }), null); // range
+  assert.equal(parseRdConfig({ ...RD_CONFIG_DEFAULT, secondInstalmentFraction: 2 }), null); // >1
 });

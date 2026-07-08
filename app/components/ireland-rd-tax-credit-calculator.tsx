@@ -3,8 +3,10 @@
 /* Ireland R&D Corporation Tax Credit calculator — 35% of qualifying R&D spend,
    paid over three annual instalments (greater of 50% / €87,500 in year one,
    then 3/5 and the balance). The user enters only spend they judge eligible;
-   this component never decides what qualifies. All maths + config live in
-   ../lib/ireland-rd-tax-credit (single source of truth). */
+   this component never decides what qualifies. The editable rates/thresholds
+   arrive as `config` (admin-editable, DB-backed with a code fallback); the
+   maths + the two prose-only fields (effectiveBenefitPercent, effectiveFrom)
+   live in ../lib/ireland-rd-tax-credit. */
 
 import { useMemo, useState } from "react";
 import {
@@ -13,6 +15,7 @@ import {
   RD_QUALIFYING_NOTE,
   RD_LAST_REVIEWED,
   RD_SOURCE_URL,
+  type RdConfig,
 } from "../lib/ireland-rd-tax-credit";
 import {
   CurrencyField,
@@ -62,19 +65,19 @@ function InstalmentRow({
   );
 }
 
-export function IrelandRdTaxCreditCalculator() {
+export function IrelandRdTaxCreditCalculator({ config }: { config: RdConfig }) {
   const [spend, setSpend] = useState(0);
   const [grant, setGrant] = useState(0);
 
-  const r = useMemo(() => computeRdCredit(spend, grant), [spend, grant]);
+  const r = useMemo(() => computeRdCredit(spend, grant, config), [spend, grant, config]);
   const { year1, year2, year3 } = r.instalments;
 
   // Explain which arm of the instalment rule applied, in plain words.
   const instalmentNote = r.paidInFullYearOne
-    ? `Your credit is ${eur0(RD_CREDIT.firstYearThresholdEur)} or less, so the full amount is payable in year one.`
-    : year1 === RD_CREDIT.firstYearThresholdEur
-      ? `The first ${eur0(RD_CREDIT.firstYearThresholdEur)} is payable in year one (it beats 50% of your credit); the balance follows over years two and three.`
-      : `Year one is 50% of the credit (it beats the ${eur0(RD_CREDIT.firstYearThresholdEur)} floor); the balance splits 30% / 20% across years two and three.`;
+    ? `Your credit is ${eur0(config.firstYearThresholdEur)} or less, so the full amount is payable in year one.`
+    : year1 === config.firstYearThresholdEur
+      ? `The first ${eur0(config.firstYearThresholdEur)} is payable in year one (it beats 50% of your credit); the balance follows over years two and three.`
+      : `Year one is 50% of the credit (it beats the ${eur0(config.firstYearThresholdEur)} floor); the balance splits 30% / 20% across years two and three.`;
 
   return (
     <div className="grid gap-10 lg:grid-cols-2">
@@ -82,8 +85,8 @@ export function IrelandRdTaxCreditCalculator() {
       <div className="flex flex-col gap-5">
         <div className="border-l-[3px] border-primary-500 bg-surface-muted px-4 py-3 text-xs leading-5 text-ink-body">
           <span className="font-semibold text-ink">A credit, not a deduction.</span>{" "}
-          The R&amp;D credit is {RD_CREDIT.ratePercent}% of qualifying spend and comes
-          on top of the normal {RD_CREDIT.tradingDeductionPercent}% trading deduction
+          The R&amp;D credit is {config.ratePercent}% of qualifying spend and comes
+          on top of the normal {config.tradingDeductionPercent}% trading deduction
           — a combined benefit of about {RD_CREDIT.effectiveBenefitPercent}%. It&rsquo;s
           paid to you over three years, or set against tax you owe.
         </div>
@@ -121,6 +124,7 @@ export function IrelandRdTaxCreditCalculator() {
             subcontractor and grant limits, and the capital/revenue split all shape a
             real claim — and Revenue can audit it. Treat this as a sizing estimate,
             then let us build the claim. Applies to {RD_CREDIT.effectiveFrom}.
+            {/* effectiveFrom is prose-only, not editable — stays in code. */}
           </p>
         </div>
       </div>
@@ -135,7 +139,7 @@ export function IrelandRdTaxCreditCalculator() {
                 R&amp;D tax credit
               </p>
               <span className="text-xs text-muted tabular-nums">
-                {RD_CREDIT.ratePercent}% of {money(r.qualifyingSpend)}
+                {config.ratePercent}% of {money(r.qualifyingSpend)}
               </span>
             </div>
             <p className="mt-3 font-display text-[2.5rem] font-semibold leading-none tracking-tight text-ink tabular-nums">
@@ -200,7 +204,7 @@ export function IrelandRdTaxCreditCalculator() {
           <p className="mt-2 text-xs leading-5 text-muted">
             The credit isn&rsquo;t netted against your Corporation Tax first — you
             elect, for each instalment, to offset it against tax due or take it as a
-            cash refund. A claim of {eur0(RD_CREDIT.firstYearThresholdEur)} or less is
+            cash refund. A claim of {eur0(config.firstYearThresholdEur)} or less is
             paid in full in year one.
           </p>
         </div>

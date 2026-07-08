@@ -7,26 +7,40 @@ const items = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/mortgage-rates", label: "Mortgage rates" },
   { href: "/admin/tax-rates", label: "Tax rates" },
+  { href: "/admin/cgt-rates", label: "CGT rates" },
+  { href: "/admin/ct-rates", label: "Corporation tax" },
+  { href: "/admin/vat-rates", label: "VAT rates" },
+  { href: "/admin/rd-rates", label: "R&D tax credit" },
+  { href: "/admin/capital-allowances-rates", label: "Capital allowances" },
 ];
 
-export function AdminNav() {
+export function AdminNav({ dueHrefs = [] }: { dueHrefs?: string[] }) {
   const pathname = usePathname();
+  const dueSet = new Set(dueHrefs);
   return (
     <nav className="flex flex-col gap-1 p-3" aria-label="Admin">
       {items.map((item) => {
         const active = pathname === item.href;
+        const showBadge = dueSet.has(item.href);
         return (
           <Link
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`rounded-none px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+            className={`flex items-center justify-between gap-2 rounded-none px-3 py-2 text-sm font-medium transition-colors duration-200 ${
               active
                 ? "bg-white/10 text-white"
                 : "text-white/60 hover:bg-white/5 hover:text-white"
             }`}
           >
-            {item.label}
+            <span>{item.label}</span>
+            {showBadge && (
+              <span
+                className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary-400"
+                title="Review due"
+                aria-label="Review due"
+              />
+            )}
           </Link>
         );
       })}

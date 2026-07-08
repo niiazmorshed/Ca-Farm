@@ -1,17 +1,18 @@
 "use client";
 
 /* Ireland Corporation Tax calculator — trading (12.5%) and passive (25%). The
-   user classifies which income is which; this component never guesses. All
-   maths + rates live in ../lib/ireland-corporation-tax (single source of
-   truth); this renders and computes live via that pure engine. */
+   user classifies which income is which; this component never guesses. The
+   editable rates arrive as `config` (admin-editable, DB-backed with a code
+   fallback); the maths + statute notes live in ../lib/ireland-corporation-tax
+   and this computes live via that pure engine. */
 
 import { useMemo, useState } from "react";
 import {
   computeCorporationTax,
-  CT_RATES,
   CT_LAST_REVIEWED,
   CT_SOURCE_URL,
   PILLAR_TWO,
+  type CtConfig,
 } from "../lib/ireland-corporation-tax";
 import {
   CurrencyField,
@@ -61,13 +62,13 @@ function BreakdownRow({
   );
 }
 
-export function IrelandCorporationTaxCalculator() {
+export function IrelandCorporationTaxCalculator({ config }: { config: CtConfig }) {
   const [tradingProfit, setTradingProfit] = useState(0);
   const [passiveIncome, setPassiveIncome] = useState(0);
 
   const result = useMemo(
-    () => computeCorporationTax({ tradingProfit, passiveIncome }),
-    [tradingProfit, passiveIncome],
+    () => computeCorporationTax({ tradingProfit, passiveIncome }, config),
+    [tradingProfit, passiveIncome, config],
   );
 
   return (
@@ -160,13 +161,13 @@ export function IrelandCorporationTaxCalculator() {
             <BreakdownRow
               dotClass="bg-primary-500"
               label="Trading tax"
-              sub={`${money(result.tradingProfit)} × ${CT_RATES.tradingPercent}%`}
+              sub={`${money(result.tradingProfit)} × ${config.tradingPercent}%`}
               value={money(result.tradingTax)}
             />
             <BreakdownRow
               dotClass="bg-navy-900"
               label="Passive tax"
-              sub={`${money(result.passiveIncome)} × ${CT_RATES.passivePercent}%`}
+              sub={`${money(result.passiveIncome)} × ${config.passivePercent}%`}
               value={money(result.passiveTax)}
             />
             <div className="flex items-baseline justify-between gap-4 bg-surface-muted px-5 py-3.5 sm:px-6">

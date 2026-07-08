@@ -29,6 +29,11 @@ export const CALCULATOR_TOOLS = [
     desc: "Capital allowances (tax) + working capital",
   },
   {
+    href: "/tools/ireland-cgt",
+    label: "CGT",
+    desc: "Capital gains tax with indexation relief",
+  },
+  {
     href: "/tools/ireland",
     label: "Mortgage",
     desc: "Compare repayments across Irish lenders",
