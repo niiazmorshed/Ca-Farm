@@ -7,6 +7,7 @@ const items = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/mortgage-rates", label: "Mortgage rates" },
   { href: "/admin/tax-rates", label: "Tax rates" },
+  { href: "/admin/cgt-rates", label: "CGT rates" },
 ];
 
 export function AdminNav() {
