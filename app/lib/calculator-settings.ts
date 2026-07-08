@@ -61,13 +61,20 @@ export async function saveCalculatorConfig(key: string, config: unknown): Promis
 }
 
 /**
- * Stamp reviewed_at = now() without touching config. No-op if the row doesn't
- * exist yet (nothing has been saved, so there is nothing to "review"). Never
- * throws — a review stamp must not block the admin.
+ * Stamp reviewed_at = now() without touching config. If the calculator has no
+ * row yet (serving code defaults), inserts a CONFIG-LESS row (config stays null
+ * → the code fallback remains authoritative, so no rate drift) purely to record
+ * the review date — this lets the admin dismiss the reminder for an
+ * un-customised calculator. Never throws — a review stamp must not block the admin.
  */
 export async function markCalculatorReviewed(key: string): Promise<void> {
   try {
-    await query(`update calculator_settings set reviewed_at = now() where key = $1`, [key]);
+    await query(
+      `insert into calculator_settings (key, reviewed_at, updated_at)
+       values ($1, now(), now())
+       on conflict (key) do update set reviewed_at = now(), updated_at = now()`,
+      [key],
+    );
   } catch (err) {
     console.error(`[calc:${key}] mark reviewed failed:`, err);
   }
