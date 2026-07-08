@@ -155,7 +155,7 @@ test("parseVatConfig — the code default round-trips", () => {
 test("parseVatConfig — rejects bad blobs", () => {
   assert.equal(parseVatConfig(null), null);
   assert.equal(parseVatConfig({ rates: [], thresholds: { goods: 1, services: 1, since: "x" } }), null); // missing keys
-  const missingThreshold = structuredClone(VAT_CONFIG_DEFAULT) as Record<string, unknown>;
+  const missingThreshold = structuredClone(VAT_CONFIG_DEFAULT) as unknown as Record<string, unknown>;
   delete missingThreshold.thresholds;
   assert.equal(parseVatConfig(missingThreshold), null);
   const badPct = structuredClone(VAT_CONFIG_DEFAULT);
