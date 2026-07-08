@@ -1,5 +1,7 @@
 /* ──────────────────────────────────────────────────────────────────────────
-   Ireland VAT calculator — Add VAT (net → gross) and Remove VAT (gross → net).
+   Ireland VAT calculator — Add VAT (net → gross), Remove VAT (gross → net)
+   and the net VAT position (output VAT on sales − input VAT on purchases →
+   payable to / receivable from Revenue, as on the VAT3 return).
 
    PURE FUNCTIONS ONLY — no React, no I/O — so every figure is unit-testable.
    All rates and thresholds live in the config block below: this file is the
@@ -173,4 +175,46 @@ export function removeVat(gross: number, percent: number): VatBreakdown {
   const net = round2(g / (1 + percent / 100));
   const vat = round2(g - net);
   return { net, vat, gross: g, percent };
+}
+
+/* ---------- net VAT position (the VAT3 return) ----------
+   A registered business charges VAT on its sales (output VAT — owed to
+   Revenue) and pays VAT on its purchases (input VAT — reclaimable). At the
+   end of the period the two are netted on the VAT3 return:
+
+     T1  VAT on sales      (output)
+     T2  VAT on purchases  (input)
+     T3  = T1 − T2  if positive  → VAT PAYABLE to Revenue
+     T4  = T2 − T1  if positive  → VAT REPAYABLE by Revenue
+
+   e.g. paid €2.5M input VAT but only charged €2M output VAT
+        → €0.5M receivable from Revenue. */
+
+export type VatDirection = "payable" | "receivable" | "balanced";
+
+export interface VatPosition {
+  /** T1 — VAT charged on sales, owed to Revenue. */
+  outputVat: number;
+  /** T2 — VAT paid on purchases, reclaimable. */
+  inputVat: number;
+  /** |T1 − T2| — the amount that changes hands. */
+  netVat: number;
+  /** Which way the net amount flows. */
+  direction: VatDirection;
+}
+
+/**
+ * Net two VAT totals into the period position.
+ *   netVat = |outputVat − inputVat|, direction from the sign.
+ */
+export function vatPosition(outputVat: number, inputVat: number): VatPosition {
+  const t1 = round2(Math.max(0, outputVat));
+  const t2 = round2(Math.max(0, inputVat));
+  const diff = round2(t1 - t2);
+  return {
+    outputVat: t1,
+    inputVat: t2,
+    netVat: Math.abs(diff),
+    direction: diff > 0 ? "payable" : diff < 0 ? "receivable" : "balanced",
+  };
 }
