@@ -8,7 +8,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   computeCorporationTax,
+  parseCorporationTaxConfig,
   CT_RATES,
+  CT_CONFIG_DEFAULT,
 } from "./ireland-corporation-tax.ts";
 
 test("Trading only — 12.5%", () => {
@@ -64,4 +66,31 @@ test("Edge inputs — negatives clamp to zero", () => {
 test("Rates are the documented statutory values", () => {
   assert.equal(CT_RATES.tradingPercent, 12.5);
   assert.equal(CT_RATES.passivePercent, 25);
+});
+
+test("CT_RATES is the same object as CT_CONFIG_DEFAULT (no drift)", () => {
+  assert.equal(CT_RATES, CT_CONFIG_DEFAULT);
+});
+
+test("Custom config arg overrides the defaults", () => {
+  // A hypothetical Budget: trading 15%, passive 30%.
+  const r = computeCorporationTax(
+    { tradingProfit: 100_000, passiveIncome: 100_000 },
+    { tradingPercent: 15, passivePercent: 30 },
+  );
+  assert.equal(r.tradingTax, 15_000);
+  assert.equal(r.passiveTax, 30_000);
+  assert.equal(r.totalTax, 45_000);
+});
+
+test("parseCorporationTaxConfig — valid blob round-trips", () => {
+  const cfg = parseCorporationTaxConfig({ tradingPercent: 10, passivePercent: 20 });
+  assert.deepEqual(cfg, { tradingPercent: 10, passivePercent: 20 });
+});
+
+test("parseCorporationTaxConfig — rejects bad / out-of-range / missing", () => {
+  assert.equal(parseCorporationTaxConfig(null), null);
+  assert.equal(parseCorporationTaxConfig({ tradingPercent: 12.5 }), null); // missing passive
+  assert.equal(parseCorporationTaxConfig({ tradingPercent: "12.5", passivePercent: 25 }), null); // string
+  assert.equal(parseCorporationTaxConfig({ tradingPercent: 12.5, passivePercent: 250 }), null); // range
 });

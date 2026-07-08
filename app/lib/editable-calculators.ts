@@ -13,6 +13,7 @@
    `key` doubles as the audit-area prefix (`<key>-settings`). */
 
 import { getCgtData } from "./cgt-data";
+import { getCorporationTaxData } from "./corporation-tax-data";
 import { isReviewDue } from "./ireland-cgt";
 
 export interface EditableCalculator {
@@ -29,6 +30,12 @@ export const EDITABLE_CALCULATORS: EditableCalculator[] = [
     label: "CGT rates",
     adminHref: "/admin/cgt-rates",
     getReviewedAt: async () => (await getCgtData()).reviewedAt,
+  },
+  {
+    key: "corporation-tax",
+    label: "Corporation tax rates",
+    adminHref: "/admin/ct-rates",
+    getReviewedAt: async () => (await getCorporationTaxData()).reviewedAt,
   },
 ];
 

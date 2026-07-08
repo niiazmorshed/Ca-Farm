@@ -2,8 +2,10 @@
    Ireland Corporation Tax calculator — trading (12.5%) and passive (25%).
 
    PURE FUNCTIONS ONLY — no React, no I/O — so every figure is unit-testable.
-   All rates live in the CT_RATES config below: this file is the SINGLE SOURCE
-   OF TRUTH. Every number the UI shows reads from here.
+   The editable rates live in CT_CONFIG_DEFAULT below — the SINGLE code source
+   of truth: it is BOTH the fallback used when no DB row exists AND the default
+   argument of computeCorporationTax. When an admin saves rates, the loader
+   passes the stored config in; otherwise these numbers apply.
 
    The USER classifies which income is trading or passive — this engine never
    guesses. Trading = active business profits. Passive = rental income,
@@ -36,12 +38,37 @@ export const CT_SOURCE_URL =
 
 /* ---------- rates (single source of truth) ---------- */
 
-export const CT_RATES = {
-  /** Trading (active business) income. */
+export interface CtConfig {
+  /** Trading (active business) income rate, e.g. 12.5. */
+  tradingPercent: number;
+  /** Passive / non-trading income rate, e.g. 25. */
+  passivePercent: number;
+}
+
+/** Editable rates: the code fallback AND the default arg of computeCorporationTax. */
+export const CT_CONFIG_DEFAULT: CtConfig = {
   tradingPercent: 12.5,
-  /** Passive / non-trading income: rent, interest, most foreign dividends. */
   passivePercent: 25,
-} as const;
+};
+
+/** Back-compat alias — same object as CT_CONFIG_DEFAULT, so there is no drift. */
+export const CT_RATES = CT_CONFIG_DEFAULT;
+
+const finiteNum = (v: unknown): number | null =>
+  typeof v === "number" && Number.isFinite(v) ? v : null;
+
+/** Validate a stored config blob; null on any bad/missing/out-of-range field.
+    Pure, so both corporation-tax-data.ts and the tests can use it without the
+    DB layer. */
+export function parseCorporationTaxConfig(raw: unknown): CtConfig | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const o = raw as Record<string, unknown>;
+  const t = finiteNum(o.tradingPercent);
+  const p = finiteNum(o.passivePercent);
+  if (t === null || p === null) return null;
+  if (t < 0 || t > 100 || p < 0 || p > 100) return null;
+  return { tradingPercent: t, passivePercent: p };
+}
 
 /* 15% minimum applies ONLY to groups with €750M+ consolidated revenue — shown
    as an info note in the UI, never as a live input on this calculator. */
@@ -79,13 +106,14 @@ export interface CorporationTaxResult {
 
 export function computeCorporationTax(
   input: CorporationTaxInput,
+  config: CtConfig = CT_CONFIG_DEFAULT,
 ): CorporationTaxResult {
   const tradingProfit = round2(Math.max(0, input.tradingProfit));
   const passiveIncome = round2(Math.max(0, input.passiveIncome));
   const totalProfit = round2(tradingProfit + passiveIncome);
 
-  const tradingTax = round2(tradingProfit * (CT_RATES.tradingPercent / 100));
-  const passiveTax = round2(passiveIncome * (CT_RATES.passivePercent / 100));
+  const tradingTax = round2(tradingProfit * (config.tradingPercent / 100));
+  const passiveTax = round2(passiveIncome * (config.passivePercent / 100));
   const totalTax = round2(tradingTax + passiveTax);
 
   const effectiveRate = totalProfit > 0 ? totalTax / totalProfit : 0;
