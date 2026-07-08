@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { query } from "../lib/db";
 import { requireAdmin } from "../lib/supabase/guards";
+import { getCgtData } from "../lib/cgt-data";
+import { isReviewDue } from "../lib/ireland-cgt";
+import { markReviewed } from "./cgt-rates/actions";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -25,6 +29,12 @@ const fmt = new Intl.DateTimeFormat("en-GB", {
   minute: "2-digit",
 });
 
+const dateFmt = new Intl.DateTimeFormat("en-GB", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+});
+
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="rounded-none border border-line bg-white p-5">
@@ -39,7 +49,7 @@ function StatCard({ label, value }: { label: string; value: string | number }) {
 export default async function AdminPage() {
   const user = await requireAdmin();
 
-  const [{ rows }, { rows: countRows }] = await Promise.all([
+  const [{ rows }, { rows: countRows }, { reviewedAt }] = await Promise.all([
     query<EnquiryRow>(
       `select id, name, email, company, service, message, created_at
          from enquiries
@@ -47,10 +57,13 @@ export default async function AdminPage() {
         limit 200`,
     ),
     query<{ total: string }>(`select count(*)::text as total from enquiries`),
+    getCgtData(),
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
   const latest = rows[0] ? fmt.format(new Date(rows[0].created_at)) : "—";
+  const cgtReviewDue = isReviewDue(reviewedAt);
+  const cgtReviewedLabel = reviewedAt ? dateFmt.format(new Date(reviewedAt)) : null;
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -61,6 +74,39 @@ export default async function AdminPage() {
           <span className="font-medium text-ink-body">{user.email}</span>.
         </p>
       </header>
+
+      {cgtReviewDue && (
+        <div className="mb-8 rounded-none border-l-2 border-primary-500 bg-primary-50 p-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="font-display text-base font-semibold text-ink">
+                CGT rates review due
+              </p>
+              <p className="mt-1 text-sm text-ink-body">
+                {cgtReviewedLabel
+                  ? `Last reviewed ${cgtReviewedLabel}.`
+                  : "Not reviewed yet."}{" "}
+                Check the rates and indexation table against Revenue for the next
+                Budget.
+              </p>
+              <Link
+                href="/admin/cgt-rates"
+                className="mt-3 inline-block text-sm font-semibold text-primary-600 transition-colors duration-200 hover:text-primary-500"
+              >
+                Open CGT rates →
+              </Link>
+            </div>
+            <form action={markReviewed}>
+              <button
+                type="submit"
+                className="inline-flex h-9 cursor-pointer items-center rounded-none border border-primary-500 px-4 text-xs font-semibold text-primary-600 transition-colors duration-200 hover:bg-primary-500 hover:text-white"
+              >
+                Mark reviewed
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className="mb-10 grid gap-4 sm:grid-cols-3">
         <StatCard label="Total enquiries" value={total} />

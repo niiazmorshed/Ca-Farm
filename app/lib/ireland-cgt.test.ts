@@ -13,6 +13,7 @@ import {
   computeCgt,
   parseCgtConfig,
   slugifyYearKey,
+  isReviewDue,
   CGT_CONFIG_DEFAULT,
   CGT_MULTIPLIERS_DEFAULT,
 } from "./ireland-cgt.ts";
@@ -200,4 +201,12 @@ test("slugifyYearKey derives a stable key from a label", () => {
   assert.equal(slugifyYearKey("  Pre 1974 "), "pre-1974");
   assert.equal(slugifyYearKey("2010/11"), "2010-11");
   assert.equal(slugifyYearKey("!!!"), "");
+});
+
+test("isReviewDue flags rates older than 12 months", () => {
+  const now = Date.UTC(2027, 0, 1);
+  assert.equal(isReviewDue("2025-06-01T00:00:00Z", now), true); // ~19 months
+  assert.equal(isReviewDue("2026-11-01T00:00:00Z", now), false); // ~2 months
+  assert.equal(isReviewDue(null, now), false); // unknown → don't nag
+  assert.equal(isReviewDue("not-a-date", now), false);
 });

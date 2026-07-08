@@ -17,6 +17,7 @@ import {
   deleteCgtMultiplierRow,
   addCgtMultiplier,
   importCgtMultipliers,
+  resetCgtDefaults,
   type ActionState,
   type TwoPhaseState,
 } from "./actions";
@@ -298,6 +299,44 @@ function AuditPanel({ entries }: { entries: RateAuditRow[] }) {
   );
 }
 
+function ResetForm() {
+  const [state, action, pending] = useActionState(resetCgtDefaults, IDLE_TWO);
+  const previewing = state.status === "preview";
+  return (
+    <form action={action} className="rounded-none border border-line bg-white p-5">
+      <h3 className="font-display text-base font-semibold text-ink">Reset to Revenue defaults</h3>
+      <p className="mt-1 text-xs text-muted">
+        Restore the standard rates and the official 1974–2002 multiplier table. This
+        replaces the whole table — any years you added are removed.
+      </p>
+      {state.status === "preview" && (
+        <div className="mt-3 border border-line bg-surface-muted p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Confirm reset</p>
+          <DiffList diff={state.diff} />
+          <input type="hidden" name="payload" value="defaults" />
+        </div>
+      )}
+      <div className="mt-4 flex items-center gap-3">
+        {previewing ? (
+          <>
+            <button type="submit" disabled={pending} className={primaryBtn}>
+              {pending ? "Resetting…" : "Confirm reset"}
+            </button>
+            <button type="submit" name="cancel" value="1" formNoValidate disabled={pending} className={outlineBtn}>
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button type="submit" disabled={pending} className={outlineBtn}>
+            {pending ? "…" : "Reset to defaults"}
+          </button>
+        )}
+        <TwoPhaseNote state={state} />
+      </div>
+    </form>
+  );
+}
+
 export function CgtRatesManager({
   config,
   multipliers,
@@ -311,6 +350,7 @@ export function CgtRatesManager({
     <div className="flex flex-col gap-8">
       <SettingsForm config={config} />
       <MultipliersForm multipliers={multipliers} />
+      <ResetForm />
       <AuditPanel entries={audit} />
     </div>
   );

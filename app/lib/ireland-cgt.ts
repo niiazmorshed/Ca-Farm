@@ -162,6 +162,15 @@ export function slugifyYearKey(label: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+/** True when the rates were last reviewed more than `months` ago — drives the
+    admin "review due" reminder. null (unknown) → not due, so a DB blip doesn't nag. */
+export function isReviewDue(reviewedAt: string | null, now: number = Date.now(), months = 12): boolean {
+  if (!reviewedAt) return false;
+  const t = new Date(reviewedAt).getTime();
+  if (!Number.isFinite(t)) return false;
+  return now - t > months * 30.44 * 24 * 60 * 60 * 1000;
+}
+
 /* ---------- maths ---------- */
 
 export type RateMode = "standard" | "entrepreneur" | "rate40" | "rate15";

@@ -12,7 +12,12 @@
 import { revalidatePath } from "next/cache";
 import { query } from "../../lib/db";
 import { requireAdmin } from "../../lib/supabase/guards";
-import { slugifyYearKey, type CgtMultiplier } from "../../lib/ireland-cgt";
+import {
+  slugifyYearKey,
+  CGT_CONFIG_DEFAULT,
+  CGT_MULTIPLIERS_DEFAULT,
+  type CgtMultiplier,
+} from "../../lib/ireland-cgt";
 import { validateCgtConfig, validateMultiplier } from "../../lib/cgt-guardrails";
 import { parseMultiplierCsv, mergeMultipliers } from "../../lib/csv";
 import { diffRecords, type DiffEntry } from "../../lib/rate-diff";
@@ -306,6 +311,85 @@ export async function importCgtMultipliers(
     { label: "Untouched (kept)", from: "", to: String(current.length - changed.length), kind: "unchanged" },
   ];
   return { status: "preview", payload: JSON.stringify(rows), diff };
+}
+
+/* ---------- reset to Revenue defaults: two-phase (replace-all) ---------- */
+
+export async function resetCgtDefaults(
+  _prev: TwoPhaseState,
+  formData: FormData,
+): Promise<TwoPhaseState> {
+  const user = await requireAdmin();
+
+  if (formData.get("cancel")) return { status: "idle" };
+
+  // Phase 2 — confirm.
+  if (formData.get("payload") === "defaults") {
+    try {
+      await query(
+        `insert into cgt_settings (id, config, reviewed_at) values (1, $1, now())
+         on conflict (id) do update set config = excluded.config, reviewed_at = now(), updated_at = now()`,
+        [JSON.stringify(CGT_CONFIG_DEFAULT)],
+      );
+      // Replace-all: the defaults ARE the whole table (removes any added years).
+      // If the re-insert failed, an empty table falls back to the code defaults,
+      // so the calculator stays correct and a retry restores the rows.
+      await query(`delete from cgt_multipliers`);
+      const tuples: string[] = [];
+      const params: unknown[] = [];
+      CGT_MULTIPLIERS_DEFAULT.forEach((r, i) => {
+        const b = i * 4;
+        tuples.push(`($${b + 1}::text, $${b + 2}::text, $${b + 3}::int, $${b + 4}::numeric)`);
+        params.push(r.yearKey, r.yearLabel, r.sortOrder, r.multiplier);
+      });
+      await query(
+        `insert into cgt_multipliers (year_key, year_label, sort_order, multiplier) values ${tuples.join(", ")}`,
+        params,
+      );
+    } catch (err) {
+      console.error("[cgt] reset failed:", err);
+      return { status: "error", message: "Could not reset — try again." };
+    }
+    await recordAudit({
+      area: "cgt-settings",
+      action: "reset",
+      summary: "Reset CGT rates + multipliers to Revenue defaults",
+      changedBy: user.email ?? "admin",
+    });
+    revalidate();
+    return { status: "saved", message: "Reset to Revenue defaults." };
+  }
+
+  // Phase 1 — preview.
+  const { config, multipliers } = await getCgtData();
+  const cfgDiff = diffRecords(
+    config as unknown as Record<string, unknown>,
+    CGT_CONFIG_DEFAULT as unknown as Record<string, unknown>,
+    [
+      { key: "standardRatePercent", label: "Standard rate", format: pctFmt },
+      { key: "annualExemptionEur", label: "Annual exemption", format: euroFmt },
+      { key: "entrepreneurRatePercent", label: "Entrepreneur rate", format: pctFmt },
+      { key: "entrepreneurLifetimeCapEur", label: "Entrepreneur cap", format: euroFmt },
+    ],
+  );
+  const defaultKeys = new Set(CGT_MULTIPLIERS_DEFAULT.map((m) => m.yearKey));
+  const removed = multipliers.filter((m) => !defaultKeys.has(m.yearKey)).map((m) => m.yearKey);
+  const diff: DiffEntry[] = [
+    ...cfgDiff,
+    {
+      label: "Multiplier rows",
+      from: String(multipliers.length),
+      to: String(CGT_MULTIPLIERS_DEFAULT.length),
+      kind: multipliers.length !== CGT_MULTIPLIERS_DEFAULT.length ? "changed" : "unchanged",
+    },
+    {
+      label: "Years removed",
+      from: "",
+      to: removed.length ? removed.join(", ") : "none",
+      kind: removed.length ? "removed" : "unchanged",
+    },
+  ];
+  return { status: "preview", payload: "defaults", diff };
 }
 
 /* ---------- review reminder ---------- */
