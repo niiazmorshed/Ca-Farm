@@ -12,8 +12,9 @@
 import { revalidatePath } from "next/cache";
 import { query } from "../../lib/db";
 import { requireAdmin } from "../../lib/supabase/guards";
-import { slugifyYearKey } from "../../lib/ireland-cgt";
+import { slugifyYearKey, type CgtMultiplier } from "../../lib/ireland-cgt";
 import { validateCgtConfig, validateMultiplier } from "../../lib/cgt-guardrails";
+import { parseMultiplierCsv, mergeMultipliers } from "../../lib/csv";
 import { diffRecords, type DiffEntry } from "../../lib/rate-diff";
 import { recordAudit } from "../../lib/rate-audit";
 import { getCgtData } from "../../lib/cgt-data";
@@ -204,6 +205,107 @@ export async function addCgtMultiplier(
   });
   revalidate();
   return { status: "saved", message: `Added ${label}.` };
+}
+
+/* ---------- CSV merge-import: two-phase ---------- */
+
+export async function importCgtMultipliers(
+  _prev: TwoPhaseState,
+  formData: FormData,
+): Promise<TwoPhaseState> {
+  const user = await requireAdmin();
+
+  if (formData.get("cancel")) return { status: "idle" };
+
+  // Phase 2 — confirm: upsert the previewed rows.
+  const payloadRaw = formData.get("payload");
+  if (typeof payloadRaw === "string" && payloadRaw) {
+    let rows: CgtMultiplier[];
+    try {
+      rows = JSON.parse(payloadRaw);
+    } catch {
+      return { status: "error", message: "Could not read the import." };
+    }
+    if (!Array.isArray(rows) || rows.length === 0)
+      return { status: "error", message: "Nothing to import." };
+    // Re-validate — never trust the round-tripped payload.
+    for (const r of rows) {
+      if (
+        !r ||
+        typeof r.yearKey !== "string" ||
+        !r.yearKey ||
+        typeof r.yearLabel !== "string" ||
+        !Number.isFinite(r.sortOrder) ||
+        !validateMultiplier(r.multiplier)
+      )
+        return { status: "error", message: "The import contains an invalid row." };
+    }
+
+    const tuples: string[] = [];
+    const params: unknown[] = [];
+    rows.forEach((r, i) => {
+      const b = i * 4;
+      tuples.push(`($${b + 1}::text, $${b + 2}::text, $${b + 3}::int, $${b + 4}::numeric)`);
+      params.push(r.yearKey, r.yearLabel, r.sortOrder, r.multiplier);
+    });
+    try {
+      await query(
+        `insert into cgt_multipliers (year_key, year_label, sort_order, multiplier)
+         values ${tuples.join(", ")}
+         on conflict (year_key) do update set
+           year_label = excluded.year_label,
+           sort_order = excluded.sort_order,
+           multiplier = excluded.multiplier,
+           updated_at = now()`,
+        params,
+      );
+    } catch (err) {
+      console.error("[cgt] import failed:", err);
+      return { status: "error", message: "Could not apply the import." };
+    }
+    await recordAudit({
+      area: "cgt-multipliers",
+      action: "import",
+      summary: `Imported ${rows.length} multiplier row(s)`,
+      details: { count: rows.length },
+      changedBy: user.email ?? "admin",
+    });
+    revalidate();
+    return { status: "saved", message: `Imported ${rows.length} row(s).` };
+  }
+
+  // Phase 1 — preview: parse the uploaded file.
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0)
+    return { status: "error", message: "Choose a CSV file first." };
+
+  const { rows, errors } = parseMultiplierCsv(await file.text());
+  if (errors.length)
+    return {
+      status: "error",
+      message: `CSV problems — ${errors.slice(0, 3).join("; ")}${errors.length > 3 ? " …" : ""}`,
+    };
+  if (rows.length === 0) return { status: "error", message: "No valid rows in the file." };
+
+  const { multipliers: current } = await getCgtData();
+  const { added, changed } = mergeMultipliers(current, rows);
+  const diff: DiffEntry[] = [
+    { label: "Rows in file", from: "", to: String(rows.length), kind: "unchanged" },
+    {
+      label: "New years",
+      from: "",
+      to: added.length ? added.join(", ") : "none",
+      kind: added.length ? "added" : "unchanged",
+    },
+    {
+      label: "Changed years",
+      from: "",
+      to: changed.length ? changed.join(", ") : "none",
+      kind: changed.length ? "changed" : "unchanged",
+    },
+    { label: "Untouched (kept)", from: "", to: String(current.length - changed.length), kind: "unchanged" },
+  ];
+  return { status: "preview", payload: JSON.stringify(rows), diff };
 }
 
 /* ---------- review reminder ---------- */

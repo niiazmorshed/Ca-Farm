@@ -10,11 +10,13 @@
 import { useActionState } from "react";
 import type { CgtConfig, CgtMultiplier } from "../../lib/ireland-cgt";
 import type { RateAuditRow } from "../../lib/rate-audit";
+import type { DiffEntry } from "../../lib/rate-diff";
 import {
   saveCgtSettings,
   saveCgtMultiplierRow,
   deleteCgtMultiplierRow,
   addCgtMultiplier,
+  importCgtMultipliers,
   type ActionState,
   type TwoPhaseState,
 } from "./actions";
@@ -65,6 +67,26 @@ function TwoPhaseNote({ state }: { state: TwoPhaseState }) {
   );
 }
 
+function DiffList({ diff }: { diff: DiffEntry[] }) {
+  return (
+    <ul className="mt-2 space-y-1">
+      {diff.map((d) => {
+        const text =
+          d.kind === "changed" && d.from
+            ? `${d.from} → ${d.to}`
+            : d.kind === "unchanged" && d.from
+              ? `${d.from} (unchanged)`
+              : d.to || d.from || "—";
+        return (
+          <li key={d.label} className={`text-sm tabular-nums ${d.kind !== "unchanged" ? "text-ink" : "text-muted"}`}>
+            {d.label}: {text}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 /* ---------- rates: two-phase ---------- */
 
 function SettingsForm({ config }: { config: CgtConfig }) {
@@ -97,13 +119,7 @@ function SettingsForm({ config }: { config: CgtConfig }) {
       {state.status === "preview" && (
         <div className="mt-4 border border-line bg-surface-muted p-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted">Confirm change</p>
-          <ul className="mt-2 space-y-1">
-            {state.diff.map((d) => (
-              <li key={d.label} className={`text-sm tabular-nums ${d.kind === "changed" ? "text-ink" : "text-muted"}`}>
-                {d.label}: {d.kind === "changed" ? `${d.from} → ${d.to}` : `${d.from} (unchanged)`}
-              </li>
-            ))}
-          </ul>
+          <DiffList diff={state.diff} />
           <input type="hidden" name="payload" value={state.payload} />
         </div>
       )}
@@ -178,6 +194,56 @@ function AddYearForm() {
   );
 }
 
+function ImportForm() {
+  const [state, action, pending] = useActionState(importCgtMultipliers, IDLE_TWO);
+  const previewing = state.status === "preview";
+  return (
+    <form action={action} className="mt-6 border-t border-line pt-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted">Bulk update (CSV)</p>
+      <p className="mt-1 text-xs text-muted">
+        Download the current table, edit in Excel, and re-upload. Import merges by
+        year — it updates and adds rows, never deletes.
+      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <a href="/admin/cgt-rates/export" className={outlineBtn}>
+          Download CSV
+        </a>
+        <input
+          type="file"
+          name="file"
+          accept=".csv,text/csv"
+          disabled={previewing}
+          className="max-w-full text-xs text-muted file:mr-3 file:cursor-pointer file:rounded-none file:border file:border-line file:bg-white file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-ink"
+        />
+      </div>
+      {state.status === "preview" && (
+        <div className="mt-3 border border-line bg-surface-muted p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Confirm import</p>
+          <DiffList diff={state.diff} />
+          <input type="hidden" name="payload" value={state.payload} />
+        </div>
+      )}
+      <div className="mt-3 flex items-center gap-3">
+        {previewing ? (
+          <>
+            <button type="submit" disabled={pending} className={primaryBtn}>
+              {pending ? "Importing…" : "Confirm import"}
+            </button>
+            <button type="submit" name="cancel" value="1" formNoValidate disabled={pending} className={outlineBtn}>
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button type="submit" disabled={pending} className={primaryBtn}>
+            {pending ? "Reading…" : "Preview import"}
+          </button>
+        )}
+        <TwoPhaseNote state={state} />
+      </div>
+    </form>
+  );
+}
+
 function MultipliersForm({ multipliers }: { multipliers: CgtMultiplier[] }) {
   return (
     <div className="rounded-none border border-line bg-white p-5">
@@ -193,6 +259,7 @@ function MultipliersForm({ multipliers }: { multipliers: CgtMultiplier[] }) {
         ))}
       </div>
       <AddYearForm />
+      <ImportForm />
     </div>
   );
 }
