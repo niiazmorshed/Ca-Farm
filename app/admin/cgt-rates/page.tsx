@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "../../lib/supabase/guards";
 import { getCgtData } from "../../lib/cgt-data";
+import { getRecentAudit } from "../../lib/rate-audit";
 import { CgtRatesManager } from "./cgt-rates-manager";
 
 export const metadata: Metadata = {
@@ -12,8 +13,11 @@ export default async function CgtRatesPage() {
   await requireAdmin();
 
   // DB row when present and valid, otherwise the versioned fallback — exactly
-  // what the public calculator uses.
-  const { config, multipliers } = await getCgtData();
+  // what the public calculator uses. Audit trail covers all cgt-* areas.
+  const [{ config, multipliers }, audit] = await Promise.all([
+    getCgtData(),
+    getRecentAudit("cgt-%", 20),
+  ]);
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -32,7 +36,7 @@ export default async function CgtRatesPage() {
         </p>
       </header>
 
-      <CgtRatesManager config={config} multipliers={multipliers} />
+      <CgtRatesManager config={config} multipliers={multipliers} audit={audit} />
     </div>
   );
 }

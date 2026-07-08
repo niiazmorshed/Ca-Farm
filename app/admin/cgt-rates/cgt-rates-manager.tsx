@@ -1,23 +1,34 @@
 "use client";
 
-/* Admin editor for the CGT calculator. Two forms: the scalar rates, and the
-   indexation multiplier table. Saving upserts the DB and revalidates the public
-   calculator — no deploy. All values here override the code fallbacks. */
+/* Admin editor for the CGT calculator.
+   - Rates form: TWO-PHASE — "Review change" previews a diff, "Confirm" writes.
+     Inputs are disabled during the preview so you commit exactly what you saw.
+   - Multiplier table: edit / add / delete rows, each immediate + audited.
+   - Recent changes: read-only audit trail.
+   Saving upserts the DB and revalidates the public calculator — no deploy. */
 
 import { useActionState } from "react";
 import type { CgtConfig, CgtMultiplier } from "../../lib/ireland-cgt";
+import type { RateAuditRow } from "../../lib/rate-audit";
 import {
   saveCgtSettings,
   saveCgtMultiplierRow,
   deleteCgtMultiplierRow,
   addCgtMultiplier,
   type ActionState,
+  type TwoPhaseState,
 } from "./actions";
 
 const IDLE: ActionState = { status: "idle" };
+const IDLE_TWO: TwoPhaseState = { status: "idle" };
 
 const inputClass =
-  "h-9 w-full rounded-none border border-line bg-white px-2.5 text-sm text-ink tabular-nums transition-colors duration-200 focus:border-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/40";
+  "h-9 w-full rounded-none border border-line bg-white px-2.5 text-sm text-ink tabular-nums transition-colors duration-200 focus:border-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/40 disabled:opacity-60";
+
+const primaryBtn =
+  "inline-flex h-9 shrink-0 cursor-pointer items-center rounded-none bg-primary-500 px-4 text-xs font-semibold text-white transition-colors duration-200 hover:bg-primary-600 disabled:opacity-60";
+const outlineBtn =
+  "inline-flex h-9 shrink-0 cursor-pointer items-center rounded-none border border-line px-4 text-xs font-semibold text-muted transition-colors duration-200 hover:border-ink/40 hover:text-ink disabled:opacity-60";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -35,29 +46,31 @@ function StateNote({ state }: { state: ActionState }) {
   return (
     <p
       role="status"
-      className={`text-xs font-medium ${
-        state.status === "saved" ? "text-secondary-600" : "text-primary-600"
-      }`}
+      className={`text-xs font-medium ${state.status === "saved" ? "text-secondary-600" : "text-primary-600"}`}
     >
       {state.message}
     </p>
   );
 }
 
-function SaveButton({ pending, label }: { pending: boolean; label: string }) {
+function TwoPhaseNote({ state }: { state: TwoPhaseState }) {
+  if (state.status !== "saved" && state.status !== "error") return null;
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="inline-flex h-9 cursor-pointer items-center rounded-none bg-primary-500 px-4 text-xs font-semibold text-white transition-colors duration-200 hover:bg-primary-600 disabled:opacity-60"
+    <p
+      role="status"
+      className={`text-xs font-medium ${state.status === "saved" ? "text-secondary-600" : "text-primary-600"}`}
     >
-      {pending ? "Saving…" : label}
-    </button>
+      {state.message}
+    </p>
   );
 }
 
+/* ---------- rates: two-phase ---------- */
+
 function SettingsForm({ config }: { config: CgtConfig }) {
-  const [state, action, pending] = useActionState(saveCgtSettings, IDLE);
+  const [state, action, pending] = useActionState(saveCgtSettings, IDLE_TWO);
+  const previewing = state.status === "preview";
+
   return (
     <form action={action} className="rounded-none border border-line bg-white p-5">
       <h3 className="font-display text-base font-semibold text-ink">Rates &amp; exemption</h3>
@@ -65,7 +78,8 @@ function SettingsForm({ config }: { config: CgtConfig }) {
         The standard rate, annual exemption and Entrepreneur Relief. Foreign-life (40%)
         and VC-fund (15%) rates are fixed in statute and not editable here.
       </p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+
+      <fieldset disabled={previewing} className="mt-4 grid min-w-0 gap-3 border-0 p-0 sm:grid-cols-2">
         <Field label="Standard CGT rate (%)">
           <input name="standard_rate" type="number" step="any" min="0" max="100" defaultValue={config.standardRatePercent} className={inputClass} required />
         </Field>
@@ -78,39 +92,55 @@ function SettingsForm({ config }: { config: CgtConfig }) {
         <Field label="Entrepreneur Relief lifetime cap (€)">
           <input name="entrepreneur_cap" type="number" step="any" min="0" defaultValue={config.entrepreneurLifetimeCapEur} className={inputClass} required />
         </Field>
-      </div>
+      </fieldset>
+
+      {state.status === "preview" && (
+        <div className="mt-4 border border-line bg-surface-muted p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Confirm change</p>
+          <ul className="mt-2 space-y-1">
+            {state.diff.map((d) => (
+              <li key={d.label} className={`text-sm tabular-nums ${d.kind === "changed" ? "text-ink" : "text-muted"}`}>
+                {d.label}: {d.kind === "changed" ? `${d.from} → ${d.to}` : `${d.from} (unchanged)`}
+              </li>
+            ))}
+          </ul>
+          <input type="hidden" name="payload" value={state.payload} />
+        </div>
+      )}
+
       <div className="mt-5 flex items-center gap-3">
-        <SaveButton pending={pending} label="Save rates" />
-        <StateNote state={state} />
+        {previewing ? (
+          <>
+            <button type="submit" disabled={pending} className={primaryBtn}>
+              {pending ? "Saving…" : "Confirm"}
+            </button>
+            <button type="submit" name="cancel" value="1" formNoValidate disabled={pending} className={outlineBtn}>
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button type="submit" disabled={pending} className={primaryBtn}>
+            {pending ? "…" : "Review change"}
+          </button>
+        )}
+        <TwoPhaseNote state={state} />
       </div>
     </form>
   );
 }
 
+/* ---------- multiplier table: immediate CRUD ---------- */
+
 const rowBtn =
   "inline-flex h-9 shrink-0 cursor-pointer items-center rounded-none px-3 text-xs font-semibold transition-colors duration-200 disabled:opacity-60";
 
-/* One editable year: multiplier input + Save (edit) + Delete. Save goes through
-   useActionState for feedback; Delete uses a button formAction and relies on
-   revalidation to drop the row. */
 function MultiplierRow({ m }: { m: CgtMultiplier }) {
   const [state, action, pending] = useActionState(saveCgtMultiplierRow, IDLE);
   return (
-    <form
-      action={action}
-      className="flex flex-wrap items-center gap-2 border-b border-line py-2 last:border-0"
-    >
+    <form action={action} className="flex flex-wrap items-center gap-2 border-b border-line py-2 last:border-0">
       <input type="hidden" name="year_key" value={m.yearKey} />
       <span className="w-44 shrink-0 text-sm text-ink">{m.yearLabel}</span>
-      <input
-        name="multiplier"
-        type="number"
-        step="any"
-        min="0"
-        defaultValue={m.multiplier}
-        className={`${inputClass} max-w-[7rem]`}
-        required
-      />
+      <input name="multiplier" type="number" step="any" min="0" defaultValue={m.multiplier} className={`${inputClass} max-w-[7rem]`} required />
       <button type="submit" disabled={pending} className={`${rowBtn} bg-primary-500 text-white hover:bg-primary-600`}>
         {pending ? "…" : "Save"}
       </button>
@@ -167,17 +197,54 @@ function MultipliersForm({ multipliers }: { multipliers: CgtMultiplier[] }) {
   );
 }
 
+/* ---------- audit trail ---------- */
+
+const auditTime = (iso: string) =>
+  new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(iso));
+
+function AuditPanel({ entries }: { entries: RateAuditRow[] }) {
+  return (
+    <div className="rounded-none border border-line bg-white p-5">
+      <h3 className="font-display text-base font-semibold text-ink">Recent changes</h3>
+      {entries.length === 0 ? (
+        <p className="mt-2 text-xs text-muted">No changes recorded yet.</p>
+      ) : (
+        <ul className="mt-3 divide-y divide-line">
+          {entries.map((e) => (
+            <li key={e.id} className="flex items-baseline justify-between gap-4 py-2">
+              <div>
+                <span className="text-sm text-ink-body">{e.summary}</span>
+                <span className="mt-0.5 block text-xs text-muted">{e.changedBy ?? "—"}</span>
+              </div>
+              <span className="shrink-0 text-xs text-muted tabular-nums">{auditTime(e.changedAt)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export function CgtRatesManager({
   config,
   multipliers,
+  audit,
 }: {
   config: CgtConfig;
   multipliers: CgtMultiplier[];
+  audit: RateAuditRow[];
 }) {
   return (
     <div className="flex flex-col gap-8">
       <SettingsForm config={config} />
       <MultipliersForm multipliers={multipliers} />
+      <AuditPanel entries={audit} />
     </div>
   );
 }

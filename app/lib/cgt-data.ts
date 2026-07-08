@@ -19,6 +19,8 @@ import {
 export interface CgtData {
   config: CgtConfig;
   multipliers: CgtMultiplier[];
+  /** When the CGT rates were last reviewed/changed (ISO string), or null. */
+  reviewedAt: string | null;
 }
 
 /**
@@ -28,13 +30,16 @@ export interface CgtData {
 export async function getCgtData(): Promise<CgtData> {
   try {
     const [{ rows: cfgRows }, { rows: multRows }] = await Promise.all([
-      query<{ config: unknown }>(`select config from cgt_settings where id = 1`),
+      query<{ config: unknown; reviewed_at: string | null }>(
+        `select config, reviewed_at from cgt_settings where id = 1`,
+      ),
       query<{ year_key: string; year_label: string; sort_order: number; multiplier: string }>(
         `select year_key, year_label, sort_order, multiplier from cgt_multipliers order by sort_order`,
       ),
     ]);
 
     const config = parseCgtConfig(cfgRows[0]?.config) ?? CGT_CONFIG_DEFAULT;
+    const reviewedAt = cfgRows[0]?.reviewed_at ?? null;
 
     // pg returns numeric as a string — coerce and drop any invalid row.
     let multipliers: CgtMultiplier[] = CGT_MULTIPLIERS_DEFAULT;
@@ -50,9 +55,9 @@ export async function getCgtData(): Promise<CgtData> {
       if (parsed.length > 0) multipliers = parsed;
     }
 
-    return { config, multipliers };
+    return { config, multipliers, reviewedAt };
   } catch (err) {
     console.error("[cgt] DB read failed, using static defaults:", err);
-    return { config: CGT_CONFIG_DEFAULT, multipliers: CGT_MULTIPLIERS_DEFAULT };
+    return { config: CGT_CONFIG_DEFAULT, multipliers: CGT_MULTIPLIERS_DEFAULT, reviewedAt: null };
   }
 }
