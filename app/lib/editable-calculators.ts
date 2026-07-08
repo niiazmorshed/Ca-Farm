@@ -15,6 +15,7 @@
 import { getCgtData } from "./cgt-data";
 import { getCorporationTaxData } from "./corporation-tax-data";
 import { getVatData } from "./vat-data";
+import { getRdData } from "./rd-data";
 import { isReviewDue } from "./ireland-cgt";
 
 export interface EditableCalculator {
@@ -43,6 +44,12 @@ export const EDITABLE_CALCULATORS: EditableCalculator[] = [
     label: "VAT rates",
     adminHref: "/admin/vat-rates",
     getReviewedAt: async () => (await getVatData()).reviewedAt,
+  },
+  {
+    key: "rd-credit",
+    label: "R&D tax credit rates",
+    adminHref: "/admin/rd-rates",
+    getReviewedAt: async () => (await getRdData()).reviewedAt,
   },
 ];
 
