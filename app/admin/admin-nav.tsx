@@ -11,6 +11,7 @@ const items = [
   { href: "/admin/ct-rates", label: "Corporation tax" },
   { href: "/admin/vat-rates", label: "VAT rates" },
   { href: "/admin/rd-rates", label: "R&D tax credit" },
+  { href: "/admin/capital-allowances-rates", label: "Capital allowances" },
 ];
 
 export function AdminNav({ dueHrefs = [] }: { dueHrefs?: string[] }) {
