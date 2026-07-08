@@ -10,13 +10,14 @@ const items = [
   { href: "/admin/cgt-rates", label: "CGT rates" },
 ];
 
-export function AdminNav({ reviewDue = false }: { reviewDue?: boolean }) {
+export function AdminNav({ dueHrefs = [] }: { dueHrefs?: string[] }) {
   const pathname = usePathname();
+  const dueSet = new Set(dueHrefs);
   return (
     <nav className="flex flex-col gap-1 p-3" aria-label="Admin">
       {items.map((item) => {
         const active = pathname === item.href;
-        const showBadge = reviewDue && item.href === "/admin/cgt-rates";
+        const showBadge = dueSet.has(item.href);
         return (
           <Link
             key={item.href}

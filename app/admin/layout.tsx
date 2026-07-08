@@ -4,8 +4,7 @@ import { requireAdmin } from "../lib/supabase/guards";
 import { signOutAction } from "../auth/actions";
 import { LogoutButton } from "../components/logout-button";
 import { AdminNav } from "./admin-nav";
-import { getCgtData } from "../lib/cgt-data";
-import { isReviewDue } from "../lib/ireland-cgt";
+import { loadReviewStatus } from "../lib/editable-calculators";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -14,8 +13,8 @@ export const metadata: Metadata = {
 export default async function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [user, { reviewedAt }] = await Promise.all([requireAdmin(), getCgtData()]);
-  const cgtReviewDue = isReviewDue(reviewedAt);
+  const [user, reviews] = await Promise.all([requireAdmin(), loadReviewStatus()]);
+  const dueHrefs = reviews.filter((r) => r.due).map((r) => r.adminHref);
 
   return (
     <div className="flex min-h-screen bg-surface-muted">
@@ -32,7 +31,7 @@ export default async function AdminLayout({
             CA Farm
           </span>
         </Link>
-        <AdminNav reviewDue={cgtReviewDue} />
+        <AdminNav dueHrefs={dueHrefs} />
         <div className="mt-auto border-t border-white/10 p-3">
           <Link
             href="/"
