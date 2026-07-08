@@ -9,6 +9,7 @@ const items = [
   { href: "/admin/tax-rates", label: "Tax rates" },
   { href: "/admin/cgt-rates", label: "CGT rates" },
   { href: "/admin/ct-rates", label: "Corporation tax" },
+  { href: "/admin/vat-rates", label: "VAT rates" },
 ];
 
 export function AdminNav({ dueHrefs = [] }: { dueHrefs?: string[] }) {

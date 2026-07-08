@@ -12,7 +12,9 @@ import {
   vatPosition,
   round2,
   VAT_RATES,
+  VAT_CONFIG_DEFAULT,
   getVatRate,
+  parseVatConfig,
   type VatBreakdown,
 } from "./ireland-vat.ts";
 
@@ -129,4 +131,34 @@ test("Rate table is the single source of truth", () => {
   assert.equal(getVatRate("standard").percent, 23);
   assert.equal(getVatRate("second-reduced").percent, 9);
   assert.throws(() => getVatRate("nope" as never));
+});
+
+test("VAT_RATES is derived from VAT_CONFIG_DEFAULT (no drift)", () => {
+  assert.equal(VAT_RATES, VAT_CONFIG_DEFAULT.rates);
+});
+
+test("getVatRate resolves against a passed-in rate table", () => {
+  const custom = structuredClone(VAT_CONFIG_DEFAULT).rates;
+  custom[0].percent = 24;
+  assert.equal(getVatRate("standard", custom).percent, 24);
+});
+
+test("parseVatConfig — the code default round-trips", () => {
+  const cfg = parseVatConfig(structuredClone(VAT_CONFIG_DEFAULT));
+  assert.notEqual(cfg, null);
+  if (cfg) {
+    assert.equal(cfg.rates.length, 5);
+    assert.equal(cfg.thresholds.goods, 85_000);
+  }
+});
+
+test("parseVatConfig — rejects bad blobs", () => {
+  assert.equal(parseVatConfig(null), null);
+  assert.equal(parseVatConfig({ rates: [], thresholds: { goods: 1, services: 1, since: "x" } }), null); // missing keys
+  const missingThreshold = structuredClone(VAT_CONFIG_DEFAULT) as Record<string, unknown>;
+  delete missingThreshold.thresholds;
+  assert.equal(parseVatConfig(missingThreshold), null);
+  const badPct = structuredClone(VAT_CONFIG_DEFAULT);
+  badPct.rates[0].percent = 250;
+  assert.equal(parseVatConfig(badPct), null);
 });

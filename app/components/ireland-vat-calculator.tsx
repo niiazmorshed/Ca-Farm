@@ -18,12 +18,13 @@ import {
   removeVat,
   vatPosition,
   getVatRate,
-  VAT_RATES,
   VAT_CATEGORIES,
-  VAT_THRESHOLDS,
   VAT_LAST_REVIEWED,
   VAT_SOURCE_URL,
+  type VatConfig,
   type VatPosition,
+  type VatRate,
+  type VatThresholds,
 } from "../lib/ireland-vat";
 import {
   CurrencyField,
@@ -60,15 +61,17 @@ function CategorySelect({
   value,
   onChange,
   hint,
+  rates,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   hint?: React.ReactNode;
+  rates: VatRate[];
 }) {
   return (
     <SelectField label={label} value={value} onChange={onChange} hint={hint}>
-      {VAT_RATES.map((r) => {
+      {rates.map((r) => {
         const items = VAT_CATEGORIES.filter((c) => c.rateKey === r.key);
         if (items.length === 0) return null;
         return (
@@ -183,7 +186,7 @@ function VerdictCard({ pos }: { pos: VatPosition }) {
 
 /* ---------- registration thresholds ---------- */
 
-function ThresholdsCard() {
+function ThresholdsCard({ thresholds }: { thresholds: VatThresholds }) {
   return (
     <div className="mt-5 border border-line bg-surface p-5">
       <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">
@@ -192,15 +195,15 @@ function ThresholdsCard() {
       <div className="mt-3 flex flex-wrap gap-x-8 gap-y-2 text-sm text-ink-body">
         <span>
           Goods:{" "}
-          <span className="font-semibold text-ink">{eur0(VAT_THRESHOLDS.goods)}</span>
+          <span className="font-semibold text-ink">{eur0(thresholds.goods)}</span>
         </span>
         <span>
           Services:{" "}
-          <span className="font-semibold text-ink">{eur0(VAT_THRESHOLDS.services)}</span>
+          <span className="font-semibold text-ink">{eur0(thresholds.services)}</span>
         </span>
       </div>
       <p className="mt-2 text-xs leading-5 text-muted">
-        Turnover limits in any 12-month period, in force since {VAT_THRESHOLDS.since}.
+        Turnover limits in any 12-month period, in force since {thresholds.since}.
         You must register once turnover exceeds — or is likely to exceed — the limit
         for your activity.
       </p>
@@ -210,7 +213,8 @@ function ThresholdsCard() {
 
 /* ---------- calculator ---------- */
 
-export function IrelandVatCalculator() {
+export function IrelandVatCalculator({ config }: { config: VatConfig }) {
+  const { rates, thresholds } = config;
   const [side, setSide] = useState<Side>("received");
   const [salesAmount, setSalesAmount] = useState(0);
   const [purchaseAmount, setPurchaseAmount] = useState(0);
@@ -224,8 +228,8 @@ export function IrelandVatCalculator() {
   const purchaseCategory = purchaseCategoryOverride ?? salesCategory;
   const purchaseMirrored = purchaseCategoryOverride === null;
 
-  const salesRate = getVatRate(keyOf(salesCategory));
-  const purchaseRate = getVatRate(keyOf(purchaseCategory));
+  const salesRate = getVatRate(keyOf(salesCategory), rates);
+  const purchaseRate = getVatRate(keyOf(purchaseCategory), rates);
 
   // Sales entered net (you set prices before VAT); purchases entered gross
   // (supplier invoices show the total you actually paid).
@@ -306,6 +310,7 @@ export function IrelandVatCalculator() {
                   label="What you sell"
                   value={salesCategory}
                   onChange={setSalesCategory}
+                  rates={rates}
                   hint={
                     <>
                       {salesRate.label.split(" — ")[0]} rate — {salesRate.applies}.
@@ -318,6 +323,7 @@ export function IrelandVatCalculator() {
                   label="What you buy"
                   value={purchaseCategory}
                   onChange={setPurchaseCategoryOverride}
+                  rates={rates}
                   hint={
                     <>
                       {purchaseRate.label.split(" — ")[0]} rate — {purchaseRate.applies}.
@@ -402,7 +408,7 @@ export function IrelandVatCalculator() {
       {/* result — computed verdict */}
       <div className="flex flex-col">
         <VerdictCard pos={pos} />
-        <ThresholdsCard />
+        <ThresholdsCard thresholds={thresholds} />
         <ResultDisclaimer asOf={VAT_LAST_REVIEWED} sourceUrl={VAT_SOURCE_URL} />
       </div>
     </div>

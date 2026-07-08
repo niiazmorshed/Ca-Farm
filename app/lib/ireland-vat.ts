@@ -4,9 +4,12 @@
    payable to / receivable from Revenue, as on the VAT3 return).
 
    PURE FUNCTIONS ONLY — no React, no I/O — so every figure is unit-testable.
-   All rates and thresholds live in the config block below: this file is the
-   SINGLE SOURCE OF TRUTH. Every number the UI shows reads from here, so a
-   Budget change is a one-line data edit, not a code hunt.
+   The editable rates + thresholds live in VAT_CONFIG_DEFAULT below — the single
+   code source of truth (VAT_RATES / VAT_THRESHOLDS are derived from it). It is
+   the fallback used when no DB row exists; when an admin saves, the loader
+   passes the stored config to the component. The compute fns already take the
+   rate as an argument, so they are unchanged. VAT_CATEGORIES (the taxonomy of
+   what maps to which rate) stays in code.
 
    Sources (verified per line):
    - VAT rates:      revenue.ie/en/vat/vat-rates
@@ -42,45 +45,119 @@ export interface VatRate {
   note?: string;
 }
 
+export interface VatThresholds {
+  /** Goods registration threshold in euro. */
+  goods: number;
+  /** Services registration threshold in euro. */
+  services: number;
+  /** Human "in force since" label. */
+  since: string;
+}
+
+export interface VatConfig {
+  rates: VatRate[];
+  thresholds: VatThresholds;
+}
+
+/** Editable rates + thresholds: the code fallback AND the shape the admin edits.
+    Single source — VAT_RATES / VAT_THRESHOLDS below are derived from this. */
+export const VAT_CONFIG_DEFAULT: VatConfig = {
+  // Order = selector order.
+  rates: [
+    {
+      key: "standard",
+      percent: 23,
+      label: "Standard — 23%",
+      applies: "Most goods and services",
+    },
+    {
+      key: "reduced",
+      percent: 13.5,
+      label: "Reduced — 13.5%",
+      applies: "Fuel, electricity, construction, general repairs",
+    },
+    {
+      key: "second-reduced",
+      percent: 9,
+      label: "Second reduced — 9%",
+      applies: "Food & catering, hairdressing, newspapers, sporting facilities",
+      note: "Food & catering and hairdressing moved from 13.5% to 9% on 1 July 2026.",
+    },
+    {
+      key: "livestock",
+      percent: 4.8,
+      label: "Livestock — 4.8%",
+      applies: "Livestock, greyhounds and the hire of horses",
+    },
+    {
+      key: "zero",
+      percent: 0,
+      label: "Zero — 0%",
+      applies: "Most food, children's clothing/footwear, oral medicines, exports",
+    },
+  ],
+  // A rise to €100k / €50k has been discussed but is NOT law — do not use it.
+  thresholds: { goods: 85_000, services: 42_500, since: "1 January 2025" },
+};
+
 /* One source of truth for the rate table. Order = selector order. */
-export const VAT_RATES: VatRate[] = [
-  {
-    key: "standard",
-    percent: 23,
-    label: "Standard — 23%",
-    applies: "Most goods and services",
-  },
-  {
-    key: "reduced",
-    percent: 13.5,
-    label: "Reduced — 13.5%",
-    applies: "Fuel, electricity, construction, general repairs",
-  },
-  {
-    key: "second-reduced",
-    percent: 9,
-    label: "Second reduced — 9%",
-    applies: "Food & catering, hairdressing, newspapers, sporting facilities",
-    note: "Food & catering and hairdressing moved from 13.5% to 9% on 1 July 2026.",
-  },
-  {
-    key: "livestock",
-    percent: 4.8,
-    label: "Livestock — 4.8%",
-    applies: "Livestock, greyhounds and the hire of horses",
-  },
-  {
-    key: "zero",
-    percent: 0,
-    label: "Zero — 0%",
-    applies: "Most food, children's clothing/footwear, oral medicines, exports",
-  },
+export const VAT_RATES: VatRate[] = VAT_CONFIG_DEFAULT.rates;
+
+/** The five statutory rate keys — every stored config must carry each exactly once. */
+export const REQUIRED_VAT_KEYS: VatRateKey[] = [
+  "standard",
+  "reduced",
+  "second-reduced",
+  "livestock",
+  "zero",
 ];
 
-export function getVatRate(key: VatRateKey): VatRate {
-  const rate = VAT_RATES.find((r) => r.key === key);
+const finiteNum = (v: unknown): number | null =>
+  typeof v === "number" && Number.isFinite(v) ? v : null;
+
+/** Resolve a rate by key against a rate table (defaults to the code table). */
+export function getVatRate(key: VatRateKey, rates: VatRate[] = VAT_RATES): VatRate {
+  const rate = rates.find((r) => r.key === key);
   if (!rate) throw new Error(`Unknown VAT rate: ${key}`);
   return rate;
+}
+
+/** Validate a stored config blob; null on any bad/missing/out-of-range field.
+    Requires all five statutory rate keys present exactly once (categories map
+    to them). Pure, so both vat-data.ts and the tests can use it without the DB
+    layer. */
+export function parseVatConfig(raw: unknown): VatConfig | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const o = raw as Record<string, unknown>;
+  if (!Array.isArray(o.rates)) return null;
+
+  const rates: VatRate[] = [];
+  for (const item of o.rates) {
+    if (typeof item !== "object" || item === null) return null;
+    const r = item as Record<string, unknown>;
+    const percent = finiteNum(r.percent);
+    if (typeof r.key !== "string" || !REQUIRED_VAT_KEYS.includes(r.key as VatRateKey)) return null;
+    if (percent === null || percent < 0 || percent > 100) return null;
+    if (typeof r.label !== "string" || r.label.trim() === "") return null;
+    if (typeof r.applies !== "string" || r.applies.trim() === "") return null;
+    const rate: VatRate = { key: r.key as VatRateKey, percent, label: r.label, applies: r.applies };
+    if (typeof r.note === "string" && r.note.trim() !== "") rate.note = r.note;
+    rates.push(rate);
+  }
+  const keys = rates.map((r) => r.key);
+  if (keys.length !== REQUIRED_VAT_KEYS.length) return null;
+  for (const k of REQUIRED_VAT_KEYS) if (!keys.includes(k)) return null;
+
+  const t = o.thresholds;
+  if (typeof t !== "object" || t === null) return null;
+  const to = t as Record<string, unknown>;
+  const goods = finiteNum(to.goods);
+  const services = finiteNum(to.services);
+  if (goods === null || goods < 0) return null;
+  if (services === null || services < 0) return null;
+  if (typeof to.since !== "string" || to.since.trim() === "") return null;
+
+  return { rates, thresholds: { goods, services, since: to.since } };
 }
 
 /* ---------- goods/service categories → rate ----------
@@ -128,12 +205,8 @@ export const VAT_CATEGORIES: VatCategory[] = [
 
 /* ---------- registration thresholds (since 1 Jan 2025) ---------- */
 
-/* A rise to €100k / €50k has been discussed but is NOT law — do not use it. */
-export const VAT_THRESHOLDS = {
-  goods: 85_000,
-  services: 42_500,
-  since: "1 January 2025",
-} as const;
+/* Derived from VAT_CONFIG_DEFAULT — one source, no drift. */
+export const VAT_THRESHOLDS: VatThresholds = VAT_CONFIG_DEFAULT.thresholds;
 
 /* ---------- maths ---------- */
 
