@@ -3,7 +3,8 @@ import { Breadcrumbs, Container, PageHero } from "../../components/ui";
 import { ContactCta } from "../../components/sections";
 import { CalculatorTabs } from "../../components/calculator-tabs";
 import { IrelandRdTaxCreditCalculator } from "../../components/ireland-rd-tax-credit-calculator";
-import { RD_CREDIT, RD_LAST_REVIEWED } from "../../lib/ireland-rd-tax-credit";
+import { RD_LAST_REVIEWED } from "../../lib/ireland-rd-tax-credit";
+import { getRdData } from "../../lib/rd-data";
 
 export const metadata: Metadata = {
   title: "Ireland R&D Tax Credit Calculator — 35% Credit & 3-Year Instalments",
@@ -26,7 +27,9 @@ const notes = [
   },
 ];
 
-export default function IrelandRdTaxCreditPage() {
+export default async function IrelandRdTaxCreditPage() {
+  const { config } = await getRdData();
+
   return (
     <>
       <PageHero
@@ -41,14 +44,14 @@ export default function IrelandRdTaxCreditPage() {
           />
         }
         title="Ireland R&D tax credit calculator"
-        lede={`Estimate the ${RD_CREDIT.ratePercent}% R&D Corporation Tax Credit and how it's paid out over three years — figures current as of ${RD_LAST_REVIEWED}.`}
+        lede={`Estimate the ${config.ratePercent}% R&D Corporation Tax Credit and how it's paid out over three years — figures current as of ${RD_LAST_REVIEWED}.`}
       />
 
       <Container className="py-16 sm:py-20">
         <CalculatorTabs current="/tools/ireland-rd-tax-credit" />
 
         <div className="rounded-none border border-line bg-canvas p-6 sm:p-8 lg:p-10">
-          <IrelandRdTaxCreditCalculator />
+          <IrelandRdTaxCreditCalculator config={config} />
         </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-3">

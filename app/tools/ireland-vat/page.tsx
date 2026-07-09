@@ -4,6 +4,7 @@ import { ContactCta } from "../../components/sections";
 import { CalculatorTabs } from "../../components/calculator-tabs";
 import { IrelandVatCalculator } from "../../components/ireland-vat-calculator";
 import { VAT_LAST_REVIEWED } from "../../lib/ireland-vat";
+import { getVatData } from "../../lib/vat-data";
 
 export const metadata: Metadata = {
   title: "Ireland VAT Calculator — Net VAT Payable or Receivable (VAT3)",
@@ -26,7 +27,9 @@ const notes = [
   },
 ];
 
-export default function IrelandVatPage() {
+export default async function IrelandVatPage() {
+  const { config } = await getVatData();
+
   return (
     <>
       <PageHero
@@ -48,7 +51,7 @@ export default function IrelandVatPage() {
         <CalculatorTabs current="/tools/ireland-vat" />
 
         <div className="rounded-none border border-line bg-canvas p-6 sm:p-8 lg:p-10">
-          <IrelandVatCalculator />
+          <IrelandVatCalculator config={config} />
         </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-3">

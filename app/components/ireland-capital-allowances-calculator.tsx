@@ -3,21 +3,20 @@
 /* Ireland Capital Allowances calculator — wear & tear / writing-down allowances
    on plant & machinery (12.5%/8yr), cars (12.5%/8yr, €24k cap + CO2 restriction),
    industrial buildings (4%/25yr) and energy-efficient equipment (100% ACA).
-   The user picks the asset class; this component never guesses. All maths +
-   rates live in ../lib/ireland-capital-allowances (single source of truth). */
+   The user picks the asset class; this component never guesses. The editable
+   rates/limits arrive as `config` (admin-editable, DB-backed with a code
+   fallback); the maths + the statutory CO2 groups live in
+   ../lib/ireland-capital-allowances. */
 
 import { useMemo, useState } from "react";
 import {
   computeCapitalAllowance,
-  getAssetClass,
-  ASSET_CLASSES,
   CAR_CO2_GROUPS,
   CAR_2027_NOTE,
-  MOTOR_CAP_EUR,
-  TRADING_CT_PERCENT,
   CA_LAST_REVIEWED,
   CA_SOURCE_URL,
   type AssetKey,
+  type CaConfig,
   type Co2GroupKey,
 } from "../lib/ireland-capital-allowances";
 import {
@@ -84,17 +83,18 @@ function Row({
   );
 }
 
-export function IrelandCapitalAllowancesCalculator() {
+export function IrelandCapitalAllowancesCalculator({ config }: { config: CaConfig }) {
   const [assetKey, setAssetKey] = useState<AssetKey>("plant-machinery");
   const [cost, setCost] = useState(0);
   const [co2Group, setCo2Group] = useState<Co2GroupKey>("group1");
 
-  const cls = getAssetClass(assetKey);
+  // Resolve from the (possibly edited) config, not the module const.
+  const cls = config.classes.find((a) => a.key === assetKey) ?? config.classes[0];
   const isCar = cls.co2Restricted === true;
 
   const r = useMemo(
-    () => computeCapitalAllowance({ assetKey, cost, co2Group }),
-    [assetKey, cost, co2Group],
+    () => computeCapitalAllowance({ assetKey, cost, co2Group }, config),
+    [assetKey, cost, co2Group, config],
   );
 
   const heroLabel = r.firstYearFull ? "First-year allowance" : "Annual allowance";
@@ -120,7 +120,7 @@ export function IrelandCapitalAllowancesCalculator() {
           onChange={(v) => setAssetKey(v as AssetKey)}
           hint={cls.note}
         >
-          {ASSET_CLASSES.map((a) => (
+          {config.classes.map((a) => (
             <option key={a.key} value={a.key}>
               {a.label}
             </option>
@@ -153,7 +153,7 @@ export function IrelandCapitalAllowancesCalculator() {
           onChange={setCost}
           hint={
             isCar
-              ? `Full purchase cost. Allowances are capped at ${eur0(MOTOR_CAP_EUR)} and adjusted for CO₂.`
+              ? `Full purchase cost. Allowances are capped at ${eur0(config.motorCapEur)} and adjusted for CO₂.`
               : "Capital cost of the qualifying asset."
           }
         />
@@ -206,7 +206,7 @@ export function IrelandCapitalAllowancesCalculator() {
                 sub={
                   co2Group === "group3"
                     ? "no relief for this CO₂ band"
-                    : `capped at ${eur0(MOTOR_CAP_EUR)}${
+                    : `capped at ${eur0(config.motorCapEur)}${
                         co2Group === "group2" ? " × 50% (CO₂)" : ""
                       }`
                 }
@@ -230,7 +230,7 @@ export function IrelandCapitalAllowancesCalculator() {
             <Row label="Total allowances" value={money(r.totalAllowances)} strong />
             <Row
               dotClass="bg-primary-300"
-              label={`Tax saving at ${TRADING_CT_PERCENT}%`}
+              label={`Tax saving at ${config.tradingCtPercent}%`}
               sub="cash value over the write-off period"
               value={money(r.taxSaving)}
             />

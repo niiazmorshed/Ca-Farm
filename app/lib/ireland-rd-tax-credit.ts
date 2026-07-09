@@ -2,8 +2,10 @@
    Ireland R&D (Research & Development) Corporation Tax Credit calculator.
 
    PURE FUNCTIONS ONLY — no React, no I/O — so every figure is unit-testable.
-   All rates/thresholds live in the RD_CREDIT config below: this file is the
-   SINGLE SOURCE OF TRUTH. Every number the UI shows reads from here.
+   The editable rates/thresholds live in RD_CONFIG_DEFAULT below — the single
+   code source of truth (fallback + default arg of computeRdCredit). RD_CREDIT
+   is derived from it plus two PROSE-ONLY fields (effectiveBenefitPercent,
+   effectiveFrom) that are never used in the maths and stay in code.
 
    HOW THE CREDIT WORKS
    - A company gets a credit of 35% of its qualifying R&D expenditure. This is
@@ -44,20 +46,61 @@ export const RD_SOURCE_URL =
 
 /* ---------- config (single source of truth) ---------- */
 
-export const RD_CREDIT = {
+export interface RdConfig {
   /** Credit as a % of qualifying R&D expenditure. */
-  ratePercent: 35,
-  /** Standard trading deduction the same spend also attracts (context only). */
-  tradingDeductionPercent: 12.5,
-  /** Credit + deduction headline: ~47.5% effective benefit. */
-  effectiveBenefitPercent: 47.5,
+  ratePercent: number;
+  /** Standard trading deduction the same spend also attracts. */
+  tradingDeductionPercent: number;
   /** Max of the credit payable in year one before the instalment split kicks in. */
-  firstYearThresholdEur: 87_500,
+  firstYearThresholdEur: number;
   /** Fraction of the post-first-instalment balance paid as the 2nd instalment. */
+  secondInstalmentFraction: number;
+}
+
+/** Editable fields (drive the maths): the code fallback AND the default arg of
+    computeRdCredit. */
+export const RD_CONFIG_DEFAULT: RdConfig = {
+  ratePercent: 35,
+  tradingDeductionPercent: 12.5,
+  firstYearThresholdEur: 87_500,
   secondInstalmentFraction: 0.6,
-  /** When these figures take effect. */
+};
+
+/* The editable numbers + two PROSE-ONLY fields that are never used in the maths
+   (combinedBenefit is DERIVED from credit + deduction, not effectiveBenefitPercent;
+   effectiveFrom is a display date). Derived from RD_CONFIG_DEFAULT — no drift. */
+export const RD_CREDIT = {
+  ...RD_CONFIG_DEFAULT,
+  /** Credit + deduction headline: ~47.5% effective benefit (prose only). */
+  effectiveBenefitPercent: 47.5,
+  /** When these figures take effect (prose only). */
   effectiveFrom: "accounting periods commencing on or after 1 January 2026",
-} as const;
+};
+
+const finiteNum = (v: unknown): number | null =>
+  typeof v === "number" && Number.isFinite(v) ? v : null;
+
+/** Validate a stored config blob; null on any bad/missing/out-of-range field.
+    Pure, so both rd-data.ts and the tests can use it without the DB layer. */
+export function parseRdConfig(raw: unknown): RdConfig | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const o = raw as Record<string, unknown>;
+  const rate = finiteNum(o.ratePercent);
+  const trading = finiteNum(o.tradingDeductionPercent);
+  const threshold = finiteNum(o.firstYearThresholdEur);
+  const frac = finiteNum(o.secondInstalmentFraction);
+  if (rate === null || trading === null || threshold === null || frac === null) return null;
+  if (rate < 0 || rate > 100) return null;
+  if (trading < 0 || trading > 100) return null;
+  if (threshold < 0) return null;
+  if (frac < 0 || frac > 1) return null;
+  return {
+    ratePercent: rate,
+    tradingDeductionPercent: trading,
+    firstYearThresholdEur: threshold,
+    secondInstalmentFraction: frac,
+  };
+}
 
 /** Shown beside the qualifying-spend input. */
 export const RD_QUALIFYING_NOTE =
@@ -113,28 +156,29 @@ export interface RdCreditResult {
 export function computeRdCredit(
   grossExpenditure: number,
   grantFunding = 0,
+  config: RdConfig = RD_CONFIG_DEFAULT,
 ): RdCreditResult {
   const gross = round2(Math.max(0, grossExpenditure));
   // Grant can't exceed the spend it funds.
   const grant = round2(Math.min(Math.max(0, grantFunding), gross));
   const spend = round2(gross - grant);
-  const credit = round2(spend * (RD_CREDIT.ratePercent / 100));
+  const credit = round2(spend * (config.ratePercent / 100));
 
-  const firstCap = Math.min(RD_CREDIT.firstYearThresholdEur, credit);
+  const firstCap = Math.min(config.firstYearThresholdEur, credit);
   const year1 = round2(Math.max(credit * 0.5, firstCap));
   const balance = round2(credit - year1);
-  const year2 = round2(balance * RD_CREDIT.secondInstalmentFraction);
+  const year2 = round2(balance * config.secondInstalmentFraction);
   const year3 = round2(balance - year2); // remainder — keeps the sum exact
 
   const tradingDeductionValue = round2(
-    spend * (RD_CREDIT.tradingDeductionPercent / 100),
+    spend * (config.tradingDeductionPercent / 100),
   );
 
   return {
     grossExpenditure: gross,
     grantFunding: grant,
     qualifyingSpend: spend,
-    ratePercent: RD_CREDIT.ratePercent,
+    ratePercent: config.ratePercent,
     credit,
     tradingDeductionValue,
     combinedBenefit: round2(credit + tradingDeductionValue),

@@ -4,6 +4,7 @@ import { ContactCta } from "../../components/sections";
 import { CalculatorTabs } from "../../components/calculator-tabs";
 import { CapitalAllowancesTool } from "../../components/capital-allowances-tool";
 import { CA_LAST_REVIEWED } from "../../lib/ireland-capital-allowances";
+import { getCaData } from "../../lib/ca-data";
 
 export const metadata: Metadata = {
   title: "Ireland Capital Allowances & Working Capital Calculator",
@@ -11,7 +12,9 @@ export const metadata: Metadata = {
     "Two tools in one: Irish capital allowances (tax) — plant & machinery 12.5% over 8 years, cars capped at €24,000 with CO2 limits, industrial buildings 4%, and 100% accelerated allowances for energy-efficient equipment — plus working capital (finance): current assets minus current liabilities with the current and quick ratios. Republic of Ireland.",
 };
 
-export default function IrelandCapitalAllowancesPage() {
+export default async function IrelandCapitalAllowancesPage() {
+  const { config } = await getCaData();
+
   return (
     <>
       <PageHero
@@ -31,7 +34,7 @@ export default function IrelandCapitalAllowancesPage() {
 
       <Container className="py-16 sm:py-20">
         <CalculatorTabs current="/tools/ireland-capital-allowances" />
-        <CapitalAllowancesTool />
+        <CapitalAllowancesTool config={config} />
       </Container>
 
       <ContactCta />
