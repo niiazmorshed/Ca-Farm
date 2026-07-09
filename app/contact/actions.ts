@@ -48,6 +48,11 @@ async function sendEnquiryEmail(values: {
         // collects name/email/company/service/message; service is also exposed
         // as {{budget}} and {{title}} for templates that use those names.
         template_params: {
+          // The EmailJS template's "To email" is {{to_email}} — it MUST be sent
+          // or the API rejects with 422 "recipients address is corrupted".
+          // This is the firm's monitored inbox; reply_to is the enquirer.
+          to_email: "idublinfourir@gmail.com",
+          to_name: "CA Farm",
           name: values.name,
           email: values.email,
           reply_to: values.email,
