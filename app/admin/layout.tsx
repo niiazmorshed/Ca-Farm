@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { requireAdmin } from "../lib/supabase/guards";
-import { signOutAction } from "../auth/actions";
-import { LogoutButton } from "../components/logout-button";
-import { AdminNav } from "./admin-nav";
+import { DashboardShell } from "../components/dashboard-ui";
+import type { DashNavItem } from "../components/dashboard-nav";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
+
+const navItems: DashNavItem[] = [
+  { href: "/admin", label: "Dashboard", icon: "home" },
+  { href: "/admin/mortgage-rates", label: "Mortgage rates", icon: "banknotes", prefix: true },
+  { href: "/admin/tax-rates", label: "Tax rates", icon: "receiptPercent", prefix: true },
+];
 
 export default async function AdminLayout({
   children,
@@ -15,58 +19,17 @@ export default async function AdminLayout({
   const user = await requireAdmin();
 
   return (
-    <div className="flex min-h-screen bg-surface-muted">
-      {/* Sidebar */}
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-navy-900 text-white md:flex">
-        <Link
-          href="/"
-          className="flex h-16 items-center gap-2.5 border-b border-white/10 px-5 transition-colors duration-200 hover:bg-white/5"
-        >
-          <span className="grid h-8 w-8 place-items-center rounded-none bg-primary-500 font-display text-sm font-semibold text-white">
-            CA
-          </span>
-          <span className="font-display text-base font-semibold tracking-tight">
-            CA Farm
-          </span>
-        </Link>
-        <AdminNav />
-        <div className="mt-auto border-t border-white/10 p-3">
-          <Link
-            href="/"
-            className="block rounded-none px-3 py-2 text-sm text-white/60 transition-colors duration-200 hover:bg-white/5 hover:text-white"
-          >
-            ← Back to site
-          </Link>
-        </div>
-      </aside>
-
-      {/* Main column */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* Topbar */}
-        <header className="flex h-16 items-center justify-between gap-4 border-b border-line bg-white px-5 sm:px-8">
-          <div className="flex items-center gap-3">
-            <span className="grid h-8 w-8 place-items-center rounded-none bg-navy-900 font-display text-sm font-semibold text-primary-400 md:hidden">
-              CA
-            </span>
-            <h1 className="font-display text-lg font-semibold text-ink">Admin</h1>
-          </div>
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="hidden text-right sm:block">
-              <p className="text-xs text-muted">Signed in as</p>
-              <p className="text-sm font-medium text-ink">{user.email}</p>
-            </div>
-            <span className="hidden rounded-full bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-600 sm:inline">
-              Admin
-            </span>
-            <form action={signOutAction}>
-              <LogoutButton />
-            </form>
-          </div>
-        </header>
-
-        {/* Content */}
-        <div className="flex-1 p-5 sm:p-8">{children}</div>
-      </div>
-    </div>
+    <DashboardShell
+      title="Admin console"
+      areaLabel="Admin"
+      badge="admin"
+      navItems={navItems}
+      user={{
+        email: user.email ?? "",
+        name: (user.user_metadata?.full_name as string | undefined) ?? null,
+      }}
+    >
+      {children}
+    </DashboardShell>
   );
 }
