@@ -61,7 +61,7 @@ function TabInner({ label, active }: { label: string; active: boolean }) {
       {/* top & bottom rule */}
       <span
         aria-hidden="true"
-        className={`absolute inset-0 origin-center border-y-2 border-primary-500 transition-all duration-300 ${
+        className={`pointer-events-none absolute inset-0 origin-center border-y-2 border-primary-500 transition-all duration-300 ${
           active
             ? "scale-y-100 opacity-100"
             : "scale-y-[2] opacity-0 group-hover:scale-y-100 group-hover:opacity-100 group-focus-visible:scale-y-100 group-focus-visible:opacity-100"
@@ -70,7 +70,7 @@ function TabInner({ label, active }: { label: string; active: boolean }) {
       {/* fill */}
       <span
         aria-hidden="true"
-        className={`absolute inset-x-0 inset-y-[2px] origin-top bg-primary-500 transition-all duration-300 ${
+        className={`pointer-events-none absolute inset-x-0 inset-y-[2px] origin-top bg-primary-500 transition-all duration-300 ${
           active
             ? "scale-100 opacity-100"
             : "scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:scale-100 group-focus-visible:opacity-100"
