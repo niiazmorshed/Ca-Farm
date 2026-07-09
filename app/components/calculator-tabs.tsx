@@ -34,6 +34,11 @@ export const CALCULATOR_TOOLS = [
     desc: "Capital gains tax with indexation relief",
   },
   {
+    href: "/tools/ireland-cat",
+    label: "CAT",
+    desc: "Gift & inheritance tax — thresholds & reliefs",
+  },
+  {
     href: "/tools/ireland",
     label: "Mortgage",
     desc: "Compare repayments across Irish lenders",
