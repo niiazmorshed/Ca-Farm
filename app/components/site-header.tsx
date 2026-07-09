@@ -340,7 +340,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                   toolsActive ? "text-primary-600" : "text-ink-body hover:text-ink"
                 }`}
               >
-                Tools
+                Accountants Hub
                 <Chevron className="text-muted transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" />
                 <span
                   className={`pointer-events-none absolute -bottom-1.5 left-0 h-0.5 w-full origin-left bg-primary-500 transition-transform duration-200 ease-snappy ${
@@ -525,7 +525,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                     : "text-ink-body hover:bg-secondary-50"
                 }`}
               >
-                Tools
+                Accountants Hub
                 <Chevron
                   className={`text-muted transition-transform duration-200 ${
                     mobileToolsOpen ? "rotate-180" : ""
