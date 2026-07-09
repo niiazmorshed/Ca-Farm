@@ -17,11 +17,13 @@ import { getCorporationTaxData } from "./corporation-tax-data";
 import { getVatData } from "./vat-data";
 import { getRdData } from "./rd-data";
 import { getCaData } from "./ca-data";
+import { getCatData } from "./cat-data";
 import { isReviewDue, CGT_LAST_REVIEWED } from "./ireland-cgt";
 import { CT_LAST_REVIEWED } from "./ireland-corporation-tax";
 import { VAT_LAST_REVIEWED } from "./ireland-vat";
 import { RD_LAST_REVIEWED } from "./ireland-rd-tax-credit";
 import { CA_LAST_REVIEWED } from "./ireland-capital-allowances";
+import { CAT_LAST_REVIEWED } from "./ireland-cat";
 
 export interface EditableCalculator {
   key: string;
@@ -70,6 +72,13 @@ export const EDITABLE_CALCULATORS: EditableCalculator[] = [
     adminHref: "/admin/capital-allowances-rates",
     getReviewedAt: async () => (await getCaData()).reviewedAt,
     codeReviewedAt: CA_LAST_REVIEWED,
+  },
+  {
+    key: "cat",
+    label: "CAT rates",
+    adminHref: "/admin/cat-rates",
+    getReviewedAt: async () => (await getCatData()).reviewedAt,
+    codeReviewedAt: CAT_LAST_REVIEWED,
   },
 ];
 
