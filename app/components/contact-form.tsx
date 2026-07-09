@@ -142,8 +142,19 @@ function SuccessCard() {
 }
 
 export function ContactForm() {
-  const [state, formAction, isPending] = useActionState(submitEnquiry, initialState);
   const [step, setStep] = useState(1);
+  const [state, formAction, isPending] = useActionState(
+    async (prev: EnquiryState, formData: FormData) => {
+      const next = await submitEnquiry(prev, formData);
+      // If the server rejects, jump to the step holding the errored field.
+      if (next.status === "error" && next.errors) {
+        if (next.errors.message) setStep(2);
+        else if (next.errors.name || next.errors.email) setStep(3);
+      }
+      return next;
+    },
+    initialState,
+  );
   const [service, setService] = useState("Not sure yet");
   const [message, setMessage] = useState("");
   const [name, setName] = useState("");
@@ -156,14 +167,6 @@ export function ContactForm() {
   useEffect(() => {
     promptRef.current?.focus();
   }, [step]);
-
-  // If the server rejects, jump to the step holding the errored field.
-  useEffect(() => {
-    if (state.status === "error" && state.errors) {
-      if (state.errors.message) setStep(2);
-      else if (state.errors.name || state.errors.email) setStep(3);
-    }
-  }, [state]);
 
   if (state.status === "success") return <SuccessCard />;
 

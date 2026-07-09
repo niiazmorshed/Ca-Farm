@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
 /**
@@ -27,11 +27,10 @@ export function RouteProgress() {
   const failsafeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const firstRender = useRef(true);
 
-  // Complete + hide, clearing pending timers. Kept in a ref so the click
-  // listener and timers always call the latest version. Safe to call anytime;
-  // if the bar isn't showing it just no-ops visually.
-  const finish = useRef(() => {});
-  finish.current = () => {
+  // Complete + hide, clearing pending timers. Stable identity (only touches
+  // refs and setState functions), so timers and effects can safely close over
+  // it. Safe to call anytime; if the bar isn't showing it just no-ops visually.
+  const finish = useCallback(() => {
     clearTimeout(failsafeTimer.current);
     clearTimeout(hideTimer.current);
     setFast(true);
@@ -41,7 +40,7 @@ export function RouteProgress() {
       setWidth(0);
       setFast(false);
     }, 280);
-  };
+  }, []);
 
   // Start when an internal link is clicked (capture phase, before navigation).
   useEffect(() => {
@@ -79,11 +78,11 @@ export function RouteProgress() {
       );
       // Failsafe: if the navigation never lands (prevented / aborted / hung /
       // redirect to the same path), finish anyway so the bar can't get stuck.
-      failsafeTimer.current = setTimeout(() => finish.current(), FAILSAFE_MS);
+      failsafeTimer.current = setTimeout(finish, FAILSAFE_MS);
     }
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
-  }, []);
+  }, [finish]);
 
   // Complete when the route actually changes (the fast, normal path).
   useEffect(() => {
@@ -91,8 +90,8 @@ export function RouteProgress() {
       firstRender.current = false;
       return;
     }
-    finish.current();
-  }, [pathname]);
+    finish();
+  }, [pathname, finish]);
 
   // Clear timers on unmount.
   useEffect(
