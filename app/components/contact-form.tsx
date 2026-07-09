@@ -21,10 +21,36 @@ const initialState: EnquiryState = { status: "idle" };
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const STEP_META = [
-  { title: "Topic", prompt: "What can we help you with?" },
-  { title: "Your enquiry", prompt: "How can we help?" },
-  { title: "Your details", prompt: "How should we contact you?" },
+  {
+    title: "Topic",
+    prompt: "What can we help you with?",
+    sub: "Pick the closest area — you can explain in detail next.",
+  },
+  {
+    title: "Your enquiry",
+    prompt: "How can we help?",
+    sub: "A sentence or two on where things stand and what you want to happen.",
+  },
+  {
+    title: "Your details",
+    prompt: "How should we contact you?",
+    sub: "A partner reads every enquiry and replies within one business day.",
+  },
 ];
+
+function Check({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M4 10.5l4 4L16 6"
+        stroke="currentColor"
+        strokeWidth="2.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 const inputClasses =
   "w-full rounded-none border border-line bg-canvas px-4 py-3 text-[15px] text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500";
@@ -45,31 +71,48 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 
 function Stepper({ step }: { step: number }) {
   return (
-    <ol className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold uppercase tracking-[0.16em]">
-      {STEP_META.map((s, i) => {
-        const n = i + 1;
-        const active = n === step;
-        const done = n < step;
-        return (
-          <li key={s.title} className="flex items-center gap-2">
-            <span
-              aria-current={active ? "step" : undefined}
-              className={`grid h-6 w-6 place-items-center rounded-none text-[11px] ${
-                active
-                  ? "bg-navy-900 text-primary-300"
-                  : done
-                    ? "bg-primary-500 text-white"
-                    : "border border-line text-muted"
-              }`}
-            >
-              {n}
-            </span>
-            <span className={active ? "text-ink" : "text-muted"}>{s.title}</span>
-            {n < STEP_META.length && <span aria-hidden className="ml-1 text-line">/</span>}
-          </li>
-        );
-      })}
-    </ol>
+    <div className="flex flex-col gap-3" role="group" aria-label={`Step ${step} of ${STEP_META.length}`}>
+      <ol className="grid grid-cols-3 gap-3">
+        {STEP_META.map((s, i) => {
+          const n = i + 1;
+          const active = n === step;
+          const done = n < step;
+          return (
+            <li key={s.title} className="flex min-w-0 items-center gap-2.5">
+              <span
+                aria-current={active ? "step" : undefined}
+                className={`grid h-7 w-7 shrink-0 place-items-center rounded-none text-xs font-semibold transition-colors duration-300 ${
+                  active
+                    ? "bg-navy-900 text-primary-300"
+                    : done
+                      ? "bg-primary-500 text-white"
+                      : "border border-line text-muted"
+                }`}
+              >
+                {done ? <Check className="h-3.5 w-3.5" /> : n}
+              </span>
+              <span
+                className={`truncate text-xs font-semibold uppercase tracking-[0.14em] ${
+                  active ? "text-ink" : "text-muted"
+                }`}
+              >
+                {s.title}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+      <div className="grid grid-cols-3 gap-1.5" aria-hidden="true">
+        {STEP_META.map((s, i) => (
+          <span
+            key={s.title}
+            className={`h-1 transition-colors duration-300 ${
+              i + 1 <= step ? "bg-primary-500" : "bg-line"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -170,18 +213,21 @@ export function ContactForm() {
     <form action={formAction} noValidate onSubmit={onSubmit} className="flex flex-col gap-6">
       <Stepper step={step} />
 
-      <h2
-        ref={promptRef}
-        tabIndex={-1}
-        className="font-display text-xl font-medium tracking-tight text-ink outline-none"
-      >
-        {STEP_META[step - 1].prompt}
-      </h2>
+      <div className="border-t border-line pt-6">
+        <h2
+          ref={promptRef}
+          tabIndex={-1}
+          className="font-display text-2xl font-medium tracking-tight text-ink outline-none"
+        >
+          {STEP_META[step - 1].prompt}
+        </h2>
+        <p className="mt-1.5 text-sm leading-6 text-muted">{STEP_META[step - 1].sub}</p>
+      </div>
 
       {/* Step 1 — topic */}
       <fieldset hidden={step !== 1} className="border-0 p-0">
         <legend className="sr-only">Choose a topic</legend>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2.5">
           {["Not sure yet", ...serviceCategories.map((c) => c.title)].map((t) => {
             const selected = service === t;
             return (
@@ -190,12 +236,13 @@ export function ContactForm() {
                 type="button"
                 aria-pressed={selected}
                 onClick={() => setService(t)}
-                className={`rounded-none border px-4 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
+                className={`inline-flex items-center gap-2 rounded-none border px-4 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
                   selected
                     ? "border-primary-500 bg-primary-500 text-white"
-                    : "border-line bg-canvas text-ink-body hover:border-ink/40"
+                    : "border-line bg-canvas text-ink-body hover:border-primary-400 hover:text-ink"
                 }`}
               >
+                {selected && <Check className="h-3.5 w-3.5" />}
                 {t}
               </button>
             );
@@ -311,33 +358,36 @@ export function ContactForm() {
         </p>
       )}
 
-      <div className="flex flex-wrap items-center gap-3">
-        {step > 1 && (
-          <button type="button" onClick={handleBack} className={ghostBtn}>
-            Back
-          </button>
-        )}
-        {step < STEP_META.length && (
-          <button type="button" onClick={handleNext} className={primaryBtn}>
-            Next
-          </button>
-        )}
-        {step === STEP_META.length && (
-          <button type="submit" disabled={isPending} className={primaryBtn}>
-            {isPending && (
-              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" />
-                <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      <div className="flex flex-col gap-4 border-t border-line pt-5">
+        <div className="flex items-center gap-3">
+          {step > 1 && (
+            <button type="button" onClick={handleBack} className={ghostBtn}>
+              Back
+            </button>
+          )}
+          {step < STEP_META.length && (
+            <button type="button" onClick={handleNext} className={primaryBtn}>
+              Next
+              <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4" aria-hidden="true">
+                <path d="M4 10h11m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            )}
-            {isPending ? "Sending…" : "Send enquiry"}
-          </button>
-        )}
-        {step === 1 && (
-          <p className="text-xs text-muted">
-            We reply within one business day. No newsletters, no spam.
-          </p>
-        )}
+            </button>
+          )}
+          {step === STEP_META.length && (
+            <button type="submit" disabled={isPending} className={primaryBtn}>
+              {isPending && (
+                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" />
+                  <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                </svg>
+              )}
+              {isPending ? "Sending…" : "Send enquiry"}
+            </button>
+          )}
+        </div>
+        <p className="text-xs text-muted">
+          A partner replies within one business day. No newsletters, no spam.
+        </p>
       </div>
     </form>
   );
