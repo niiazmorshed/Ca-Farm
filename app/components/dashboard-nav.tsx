@@ -20,11 +20,15 @@ export interface DashNavItem {
 export function DashNav({
   items,
   ariaLabel,
+  dueHrefs = [],
 }: {
   items: DashNavItem[];
   ariaLabel: string;
+  /** Hrefs that should show a "review due" dot (e.g. stale calculator rates). */
+  dueHrefs?: string[];
 }) {
   const pathname = usePathname();
+  const dueSet = new Set(dueHrefs);
   return (
     <nav className="flex flex-col gap-1 p-3" aria-label={ariaLabel}>
       <p className="px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/35">
@@ -57,7 +61,14 @@ export function DashNav({
                 active ? "text-primary-300" : "text-white/40 group-hover:text-white/70"
               }`}
             />
-            {item.label}
+            <span className="min-w-0 flex-1 truncate">{item.label}</span>
+            {dueSet.has(item.href) && (
+              <span
+                className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary-400"
+                title="Review due"
+                aria-label="Review due"
+              />
+            )}
           </Link>
         );
       })}

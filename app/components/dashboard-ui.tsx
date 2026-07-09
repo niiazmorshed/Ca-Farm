@@ -47,6 +47,7 @@ export function DashboardShell({
   areaLabel,
   badge,
   navItems,
+  dueHrefs,
   user,
   children,
 }: {
@@ -56,6 +57,8 @@ export function DashboardShell({
   areaLabel: string;
   badge: keyof typeof badgeTones;
   navItems: DashNavItem[];
+  /** Nav hrefs flagged with a "review due" dot. */
+  dueHrefs?: string[];
   user: { email: string; name?: string | null };
   children: ReactNode;
 }) {
@@ -83,7 +86,7 @@ export function DashboardShell({
           </span>
         </Link>
 
-        <DashNav items={navItems} ariaLabel={areaLabel} />
+        <DashNav items={navItems} ariaLabel={areaLabel} dueHrefs={dueHrefs} />
 
         <div className="mt-auto border-t border-white/10 p-3">
           <div className="mb-2 flex items-center gap-3 px-3 py-2">
