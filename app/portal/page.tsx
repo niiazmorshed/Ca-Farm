@@ -7,14 +7,32 @@ import {
   initialsOf,
   Panel,
   StatusChip,
+  timeAgo,
+  type StatusTone,
 } from "../components/dashboard-ui";
 
 interface EnquiryRow {
   id: string;
   service: string | null;
   message: string;
+  status: string;
   created_at: Date;
 }
+
+/**
+ * Client-facing view of the admin triage state: "new" reads as "Received"
+ * (we have it), in_progress as "In review", resolved as "Resolved".
+ */
+const STATUS_META: Record<
+  string,
+  { label: string; tone: StatusTone; step: 1 | 2 | 3 }
+> = {
+  new: { label: "Received", tone: "green", step: 1 },
+  in_progress: { label: "In review", tone: "dark", step: 2 },
+  resolved: { label: "Resolved", tone: "muted", step: 3 },
+};
+
+const PROGRESS_STEPS = ["Received", "In review", "Resolved"] as const;
 
 const fmt = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
@@ -54,7 +72,7 @@ export default async function PortalPage() {
       [user.id],
     ),
     query<EnquiryRow>(
-      `select id, service, message, created_at
+      `select id, service, message, status, created_at
          from enquiries
         where lower(email) = lower($1)
         order by created_at desc
@@ -68,22 +86,29 @@ export default async function PortalPage() {
   const firstName = profile?.full_name?.split(" ")[0];
   const initials = initialsOf(profile?.full_name, user.email ?? "");
   const latest = enquiries[0] ? new Date(enquiries[0].created_at) : null;
+  const open = enquiries.filter((e) => e.status !== "resolved").length;
+  const resolved = enquiries.length - open;
 
   const heroStats = [
     {
       label: "Enquiries sent",
       value: String(enquiries.length),
-      hint: enquiries.length === 0 ? "None yet" : "To the team",
+      hint: enquiries.length === 0 ? "None yet" : "All time",
+    },
+    {
+      label: "Open requests",
+      value: String(open),
+      hint: open === 0 ? "Nothing waiting" : "With the team",
+    },
+    {
+      label: "Resolved",
+      value: String(resolved),
+      hint: resolved === 0 ? "None yet" : "Completed",
     },
     {
       label: "Last activity",
-      value: latest ? fmt.format(latest) : "—",
-      hint: latest ? "Most recent enquiry" : "No activity yet",
-    },
-    {
-      label: "Member since",
-      value: profile?.created_at ? fmt.format(new Date(profile.created_at)) : "—",
-      hint: "Account created",
+      value: latest ? timeAgo(latest) : "—",
+      hint: latest ? fmt.format(latest) : "No activity yet",
     },
   ];
 
@@ -132,16 +157,16 @@ export default async function PortalPage() {
             </div>
           </div>
 
-          <dl className="mt-8 grid border-t border-white/10 sm:grid-cols-3 sm:divide-x sm:divide-white/10">
+          <dl className="mt-8 grid grid-cols-2 gap-y-1 border-t border-white/10 lg:grid-cols-4 lg:divide-x lg:divide-white/10">
             {heroStats.map((stat) => (
               <div
                 key={stat.label}
-                className="py-4 sm:px-8 sm:py-5 sm:first:pl-0 sm:last:pr-0"
+                className="py-4 lg:px-8 lg:py-5 lg:first:pl-0 lg:last:pr-0"
               >
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
                   {stat.label}
                 </dt>
-                <dd className="mt-1 flex items-baseline gap-2">
+                <dd className="mt-1 flex flex-wrap items-baseline gap-x-2">
                   <span className="text-xl font-semibold tabular-nums tracking-tight text-white">
                     {stat.value}
                   </span>
@@ -185,10 +210,19 @@ export default async function PortalPage() {
       <div className="mt-10 grid items-start gap-8 lg:grid-cols-[1.6fr_1fr]">
         {/* My enquiries */}
         <section>
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-xl font-semibold tracking-tight text-ink">
-              Your enquiries
-            </h3>
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h3 className="font-display text-xl font-semibold tracking-tight text-ink">
+                Your enquiries
+              </h3>
+              {enquiries.length > 0 && (
+                <p className="mt-0.5 text-xs text-muted">
+                  {enquiries.length} total
+                  {open > 0 && ` · ${open} open with the team`} — tap one to see
+                  its full message and progress.
+                </p>
+              )}
+            </div>
             <Link
               href="/contact"
               className="text-sm font-semibold text-primary-600 transition-colors duration-200 hover:text-primary-500"
@@ -217,31 +251,101 @@ export default async function PortalPage() {
             </div>
           ) : (
             <ul className="mt-5 flex flex-col gap-4">
-              {enquiries.map((enquiry) => (
-                <li
-                  key={enquiry.id}
-                  className="group relative rounded-none border border-line bg-white p-5 transition-colors duration-200 hover:border-primary-400/60"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-y-0 left-0 w-0.5 bg-primary-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-                  />
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-display text-sm font-semibold text-ink">
-                      {enquiry.service ?? "General enquiry"}
-                    </span>
-                    <span className="text-xs text-muted">
-                      {fmt.format(new Date(enquiry.created_at))}
-                    </span>
-                  </div>
-                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-ink-body">
-                    {enquiry.message}
-                  </p>
-                  <div className="mt-3">
-                    <StatusChip label="Received" />
-                  </div>
-                </li>
-              ))}
+              {enquiries.map((enquiry) => {
+                const meta = STATUS_META[enquiry.status] ?? STATUS_META.new;
+                return (
+                  <li key={enquiry.id}>
+                    <details className="group relative rounded-none border border-line bg-white transition-colors duration-200 open:border-primary-400/60 hover:border-primary-400/60">
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-y-0 left-0 w-0.5 bg-primary-400 opacity-0 transition-opacity duration-200 group-open:opacity-100 group-hover:opacity-100"
+                      />
+                      <summary className="flex cursor-pointer list-none items-start gap-4 p-5 [&::-webkit-details-marker]:hidden">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <span className="font-display text-sm font-semibold text-ink">
+                              {enquiry.service ?? "General enquiry"}
+                            </span>
+                            <span className="flex items-center gap-3 text-xs text-muted">
+                              <span className="tabular-nums">
+                                Ref #{enquiry.id.padStart(4, "0")}
+                              </span>
+                              {fmt.format(new Date(enquiry.created_at))}
+                            </span>
+                          </div>
+                          <p className="mt-2 line-clamp-2 text-sm leading-6 text-ink-body group-open:hidden">
+                            {enquiry.message}
+                          </p>
+                          <div className="mt-3">
+                            <StatusChip label={meta.label} tone={meta.tone} />
+                          </div>
+                        </div>
+                        <Icon
+                          name="chevronDown"
+                          className="mt-1 h-4 w-4 shrink-0 text-muted transition-transform duration-200 group-open:rotate-180"
+                        />
+                      </summary>
+                      <div className="border-t border-line px-5 pb-5 pt-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
+                          Your message
+                        </p>
+                        <p className="mt-2 whitespace-pre-line text-sm leading-6 text-ink-body">
+                          {enquiry.message}
+                        </p>
+
+                        {/* Progress: Received → In review → Resolved */}
+                        <ol className="mt-5 flex items-center border-t border-line pt-4">
+                          {PROGRESS_STEPS.map((label, i) => {
+                            const done = i + 1 <= meta.step;
+                            const connectorDone = i + 1 < meta.step;
+                            return (
+                              <li
+                                key={label}
+                                className="flex flex-1 items-center last:flex-none"
+                              >
+                                <span className="flex items-center gap-2">
+                                  <span
+                                    className={`grid h-5 w-5 shrink-0 place-items-center rounded-full ${
+                                      done
+                                        ? "bg-primary-500 text-white"
+                                        : "border border-line bg-white"
+                                    }`}
+                                  >
+                                    {done ? (
+                                      <Icon
+                                        name="check"
+                                        className="h-3 w-3"
+                                        strokeWidth={2.5}
+                                      />
+                                    ) : (
+                                      <span className="h-1.5 w-1.5 rounded-full bg-line" />
+                                    )}
+                                  </span>
+                                  <span
+                                    className={`text-xs font-medium ${
+                                      done ? "text-ink" : "text-muted"
+                                    }`}
+                                  >
+                                    {label}
+                                  </span>
+                                </span>
+                                {i < PROGRESS_STEPS.length - 1 && (
+                                  <span
+                                    aria-hidden="true"
+                                    className={`mx-3 h-px flex-1 ${
+                                      connectorDone ? "bg-primary-500" : "bg-line"
+                                    }`}
+                                  />
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ol>
+                      </div>
+                    </details>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>
