@@ -17,7 +17,6 @@ interface EnquiryRow {
   message: string;
   status: string;
   created_at: Date;
-  total: string;
 }
 
 /**
@@ -60,36 +59,52 @@ const quickActions = [
     title: "Plans & pricing",
     body: "See what's included at each tier.",
   },
+  {
+    href: "/portal/settings",
+    icon: "settings",
+    title: "Account settings",
+    body: "Update your name or password.",
+  },
 ] as const;
 
 export default async function PortalPage() {
   const user = await requireClient();
 
-  // Profile + the client's own enquiries (their contact-form submissions),
-  // both from the pg pool and fetched in parallel.
-  const [profileResult, enquiriesResult] = await Promise.all([
+  // Profile, the client's own enquiries (owned by user_id, with an email
+  // fallback for pre-signup submissions) and accurate status counts across
+  // the full history — all from the pg pool and fetched in parallel.
+  const [profileResult, enquiriesResult, countsResult] = await Promise.all([
     query<{ full_name: string | null; role: string; created_at: Date }>(
       "select full_name, role, created_at from public.profiles where id = $1",
       [user.id],
     ),
     query<EnquiryRow>(
-      `select id, service, message, status, created_at, count(*) over() as total
+      `select id, service, message, status, created_at
          from enquiries
         where user_id = $1 or lower(email) = lower($2)
         order by created_at desc
         limit 50`,
       [user.id, user.email ?? ""],
     ),
+    query<{ total: number; open: number }>(
+      `select count(*)::int as total,
+              count(*) filter (where status <> 'resolved')::int as open
+         from enquiries
+        where user_id = $1 or lower(email) = lower($2)`,
+      [user.id, user.email ?? ""],
+    ),
   ]);
 
   const profile = profileResult.rows[0] ?? null;
   const enquiries = enquiriesResult.rows;
-  const totalEnquiries = enquiries[0] ? Number(enquiries[0].total) : 0;
+  const { total: totalEnquiries, open } = countsResult.rows[0] ?? {
+    total: 0,
+    open: 0,
+  };
+  const resolved = totalEnquiries - open;
   const firstName = profile?.full_name?.split(" ")[0];
   const initials = initialsOf(profile?.full_name, user.email ?? "");
   const latest = enquiries[0] ? new Date(enquiries[0].created_at) : null;
-  const open = enquiries.filter((e) => e.status !== "resolved").length;
-  const resolved = enquiries.length - open;
 
   const heroStats = [
     {
@@ -181,7 +196,7 @@ export default async function PortalPage() {
       </section>
 
       {/* Quick actions */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {quickActions.map((action) => (
           <Link
             key={action.href}
@@ -217,11 +232,13 @@ export default async function PortalPage() {
               <h3 className="font-display text-xl font-semibold tracking-tight text-ink">
                 Your enquiries
               </h3>
-              {enquiries.length > 0 && (
+              {totalEnquiries > 0 && (
                 <p className="mt-0.5 text-xs text-muted">
                   {totalEnquiries} total
                   {open > 0 && ` · ${open} open with the team`} — tap one to see
                   its full message and progress.
+                  {totalEnquiries > enquiries.length &&
+                    ` Showing the latest ${enquiries.length}.`}
                 </p>
               )}
             </div>
@@ -355,9 +372,18 @@ export default async function PortalPage() {
         {/* Right rail: account + documents */}
         <aside className="flex flex-col gap-6">
           <Panel accent className="p-6">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-              Your account
-            </h3>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+                Your account
+              </h3>
+              <Link
+                href="/portal/settings"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-primary-600 transition-colors duration-200 hover:text-primary-500"
+              >
+                <Icon name="settings" className="h-3.5 w-3.5" />
+                Settings
+              </Link>
+            </div>
             <div className="mt-4 flex items-center gap-3">
               <Avatar initials={initials} className="h-11 w-11 text-sm" />
               <div className="min-w-0 leading-tight">
