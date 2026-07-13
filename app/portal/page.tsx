@@ -16,6 +16,7 @@ interface EnquiryRow {
   service: string | null;
   message: string;
   created_at: Date;
+  total: string;
 }
 
 const fmt = new Intl.DateTimeFormat("en-GB", {
@@ -56,17 +57,18 @@ export default async function PortalPage() {
       [user.id],
     ),
     query<EnquiryRow>(
-      `select id, service, message, created_at
+      `select id, service, message, created_at, count(*) over() as total
          from enquiries
-        where lower(email) = lower($1)
+        where user_id = $1 or lower(email) = lower($2)
         order by created_at desc
         limit 50`,
-      [user.email ?? ""],
+      [user.id, user.email ?? ""],
     ),
   ]);
 
   const profile = profileResult.rows[0] ?? null;
   const enquiries = enquiriesResult.rows;
+  const totalEnquiries = enquiries[0] ? Number(enquiries[0].total) : 0;
   const firstName = profile?.full_name?.split(" ")[0];
   const initials = initialsOf(profile?.full_name, user.email ?? "");
   const latest = enquiries[0] ? new Date(enquiries[0].created_at) : null;
@@ -92,8 +94,8 @@ export default async function PortalPage() {
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         <StatTile
           label="Your enquiries"
-          value={enquiries.length}
-          hint={enquiries.length === 0 ? "None sent yet" : "Sent to the team"}
+          value={totalEnquiries}
+          hint={totalEnquiries === 0 ? "None sent yet" : "Sent to the team"}
           icon={<Icon name="chat" className="h-[18px] w-[18px]" />}
         />
         <StatTile
