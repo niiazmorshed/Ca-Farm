@@ -115,8 +115,18 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
   — SSR cookie not reliably readable client-side. `/admin` and `/portal` render
   own shells (sidebar + topbar); `ChromeGate` hides public header/footer there.
 - **Two data paths by design:** `lib/db.ts` (`pg`) for contact write, admin
-  enquiries read, all role lookups; `supabase-js` for auth/session. `enquiries`
-  keeps RLS on with no policy (anon denied, `pg` owner bypasses) — leave it.
+  enquiries read, all role lookups; `supabase-js` for auth/session.
+- **RLS deny-all is intentional on 8 tables** — `enquiries`, `rate_audit`,
+  `calculator_settings`, `cgt_settings`, `cgt_multipliers`, `mortgage_settings`,
+  `mortgage_products`, `tax_rates` all keep **RLS enabled with no policy**: the
+  public Supabase API (anon/`authenticated`) is denied; the server reaches them
+  via the `pg` owner connection, which **bypasses RLS**. The security advisor's
+  `rls_enabled_no_policy` INFO on these is **expected, not a bug** — leave it.
+  **Never add a permissive policy** (e.g. `using (true)`) to silence it: on
+  `enquiries` that leaks customer PII, on the rate/settings tables it lets the
+  public API tamper with tax rates. Each table carries a `comment on table`
+  spelling this out. Only add a policy if a specific read moves to client-side
+  `supabase-js`, and then scope it read-only to that need.
 - **Secrets** live in `.env.local` locally — `DATABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, **`SUPABASE_SERVICE_ROLE_KEY`** (server-only,
   never `NEXT_PUBLIC`), and `EmailJs_*` keys. Same keys set in **Vercel**
@@ -127,6 +137,35 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
   `'unsafe-inline'` (no nonce yet) and dev-only `'unsafe-eval'` + localhost ws; it
   allow-lists Supabase (`connect-src`) and Google avatar / Unsplash image hosts.
 
+### Editable calculator rates (CGT, VAT, Corp Tax, R&D, Capital Allowances, CAT)
+
+- Six calculators (`ireland-cgt`, `ireland-vat`, `ireland-corporation-tax`,
+  `ireland-rd-tax-credit`, `ireland-capital-allowances`, `ireland-cat`) share one
+  **DB-first-with-code-fallback** pattern so an admin updates rates after a
+  Budget with no redeploy:
+  - Each calculator's maths + rates live in a pure `app/lib/ireland-<x>.ts`
+    (`*_CONFIG_DEFAULT` is the code fallback, `parse<X>Config` validates a
+    stored blob) — no React/IO, unit-tested.
+  - `app/lib/<x>-data.ts` wraps the shared `getCalculatorConfig` (from
+    `app/lib/calculator-settings.ts`) to read one JSONB row per calculator from
+    `calculator_settings` (key = calculator slug); falls back to the code
+    default on a missing row, invalid value, or DB error — never throws, never
+    renders broken numbers.
+  - `app/admin/<x>-rates/{page,actions,‑manager}.tsx` is a **two-phase**
+    preview→confirm editor: phase 1 validates (`app/lib/<x>-guardrails.ts`) and
+    returns a diff (`app/lib/rate-diff.ts`); phase 2 re-parses the previewed
+    payload and writes via `saveCalculatorConfig`, then logs to `rate_audit`
+    (`app/lib/rate-audit.ts`, area `<x>-settings`). `requireAdmin` re-checked on
+    both phases.
+  - `app/lib/editable-calculators.ts` registers each calculator (label, admin
+    href, reviewed-at loader) so the admin dashboard's review-reminder + nav
+    badge cover all six.
+  - CGT is the one exception with extra state: it also keeps a
+    `cgt_multipliers` table (indexation multipliers) alongside `cgt_settings`.
+  - Adding a **new** editable calculator = clone this file set (cheapest
+    reference: `ireland-cat.ts` + `cat-data.ts` + `admin/cat-rates/*`, added
+    2026-07) — do not invent a new storage shape.
+
 ### Contact email (EmailJS)
 
 - `app/contact/actions.ts` saves enquiry to Postgres, then sends email via
@@ -134,13 +173,28 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
   blocks form response (best-effort — failures logged, not surfaced). Keys:
   `EmailJs_Gmail_serviceid_KEY`, `EmailJs_Template_KEY`, `EmailJs_PUBLIC_KEY`,
   `EmailJs_Private_KEY`.
+- **The template's "To email" field is `{{to_email}}`** — `template_params`
+  MUST include `to_email` (+ `to_name`) or EmailJS returns HTTP 422 "recipients
+  address is corrupted" and the notification silently never sends (the
+  best-effort `after()` call only logs it). `reply_to` is the enquirer;
+  `to_email` is the firm's monitored inbox. This broke once in production
+  silently — if you touch `template_params`, keep `to_email` in it.
+- `app/components/contact-form.tsx` is a 3-step wizard (topic → enquiry →
+  details) but posts as **one native form**: every step's `<fieldset>` stays
+  mounted and toggles via the `hidden` attribute, never conditional render —
+  FormData only serialises mounted inputs, so unmounting a step would silently
+  drop its fields from the submit. If you add a step, keep this mount-all/
+  hide-inactive shape.
 
 ### Testing
 
 - E2E via **Playwright** lives in `/e2e` (gitignored, installed `--no-save` — not a
   project dependency). Run: `npx playwright test --config e2e/playwright.config.ts`
-  (spins up prod server on `:3100`). Covers marketing pages, auth gating,
-  login/signup/logout, role routing, contact form.
+  (spins up prod server on `:3100`). Specs: `site.spec.ts` (marketing pages,
+  auth gating, login/signup/logout, role routing), `calculators.spec.ts` +
+  `cgt.spec.ts` (public calculators + admin rate editors), `contact-wizard.spec.ts`
+  (wizard steps, FAQ hints, validation). Creates `pw-*@example.com` users/enquiries —
+  clean up via Supabase MCP after a run.
 
 ---
 
