@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 
 const navItems: DashNavItem[] = [
   { href: "/portal", label: "Dashboard", icon: "home" },
+  { href: "/portal/settings", label: "Settings", icon: "settings" },
 ];
 
 export default async function PortalLayout({
