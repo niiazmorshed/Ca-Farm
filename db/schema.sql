@@ -13,6 +13,12 @@ create table if not exists enquiries (
 -- Speeds up "newest first" listing in the dashboard / admin.
 create index if not exists enquiries_created_at_idx on enquiries (created_at desc);
 
+-- Triage state for the admin inbox: new → in_progress → resolved.
+-- "if not exists" keeps the migration re-runnable on databases created
+-- before the column was introduced.
+alter table enquiries add column if not exists status text not null default 'new'
+  check (status in ('new', 'in_progress', 'resolved'));
+
 -- ── Ireland mortgage comparison ─────────────────────────────────────────────
 -- Lender rate products shown on /tools/ireland, editable in /admin/mortgage-rates
 -- so a repricing never needs a code deploy. Seeded below only when empty.
