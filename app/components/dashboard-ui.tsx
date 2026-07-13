@@ -202,7 +202,7 @@ export function StatTile({
   children?: ReactNode;
 }) {
   return (
-    <div className="group relative flex flex-col rounded-none border border-line bg-white p-5 transition-colors duration-200 hover:border-ink/20">
+    <div className="group relative flex flex-col rounded-none border border-line bg-white p-5 transition-all duration-200 hover:border-ink/20 hover:shadow-sm hover:shadow-navy-900/5">
       <span
         aria-hidden="true"
         className="absolute inset-x-0 top-0 h-0.5 bg-primary-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
@@ -224,12 +224,12 @@ export function StatTile({
         <p className="mt-1.5 flex items-center gap-1.5 text-xs text-muted">
           {delta && (
             <span
-              className={`inline-flex items-center gap-1 font-semibold ${
+              className={`inline-flex items-center gap-1 rounded-none px-1.5 py-0.5 font-semibold ${
                 delta.value > 0
-                  ? "text-primary-600"
+                  ? "bg-primary-50 text-primary-600"
                   : delta.value < 0
-                    ? "text-ink-body"
-                    : "text-muted"
+                    ? "bg-surface-muted text-ink-body"
+                    : "bg-surface-muted text-muted"
               }`}
             >
               {delta.value > 0 ? "▲" : delta.value < 0 ? "▼" : "–"}

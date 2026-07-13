@@ -5,9 +5,7 @@ import { Icon } from "../components/dashboard-icons";
 import {
   Avatar,
   initialsOf,
-  PageHeader,
   Panel,
-  StatTile,
   StatusChip,
 } from "../components/dashboard-ui";
 
@@ -71,125 +69,120 @@ export default async function PortalPage() {
   const initials = initialsOf(profile?.full_name, user.email ?? "");
   const latest = enquiries[0] ? new Date(enquiries[0].created_at) : null;
 
+  const heroStats = [
+    {
+      label: "Enquiries sent",
+      value: String(enquiries.length),
+      hint: enquiries.length === 0 ? "None yet" : "To the team",
+    },
+    {
+      label: "Last activity",
+      value: latest ? fmt.format(latest) : "—",
+      hint: latest ? "Most recent enquiry" : "No activity yet",
+    },
+    {
+      label: "Member since",
+      value: profile?.created_at ? fmt.format(new Date(profile.created_at)) : "—",
+      hint: "Account created",
+    },
+  ];
+
   return (
     <div className="mx-auto max-w-6xl">
-      <PageHeader
-        eyebrow="Your dashboard"
-        title={firstName ? `Welcome back, ${firstName}` : "Welcome back"}
-        lede="Your enquiries, documents and account — all in one place."
-        actions={
-          <Link
-            href="/contact"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-none bg-primary-500 px-5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600"
-          >
-            <Icon name="plus" className="h-4 w-4" />
-            New enquiry
-          </Link>
-        }
-      />
-
-      {/* Snapshot */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
-        <StatTile
-          label="Your enquiries"
-          value={enquiries.length}
-          hint={enquiries.length === 0 ? "None sent yet" : "Sent to the team"}
-          icon={<Icon name="chat" className="h-[18px] w-[18px]" />}
+      {/* Hero — dark brand card with greeting, CTAs and a stats strip */}
+      <section className="relative overflow-hidden rounded-none bg-navy-900 text-white">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-primary-500/25 blur-3xl"
         />
-        <StatTile
-          label="Last activity"
-          value={latest ? fmt.format(latest) : "—"}
-          hint={latest ? "Most recent enquiry" : "No activity yet"}
-          icon={<Icon name="clock" className="h-[18px] w-[18px]" />}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-32 -left-20 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl"
         />
-        <StatTile
-          label="Member since"
-          value={profile?.created_at ? fmt.format(new Date(profile.created_at)) : "—"}
-          hint="Account created"
-          icon={<Icon name="users" className="h-[18px] w-[18px]" />}
-        />
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-[1fr_1.6fr]">
-        {/* Left rail: account, quick actions, documents */}
-        <aside className="flex flex-col gap-6">
-          <Panel accent className="p-6">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-              Your account
-            </h3>
-            <div className="mt-4 flex items-center gap-3">
-              <Avatar initials={initials} className="h-11 w-11 text-sm" />
-              <div className="min-w-0 leading-tight">
-                <p className="truncate font-medium text-ink">
-                  {profile?.full_name ?? "—"}
-                </p>
-                <p className="truncate text-sm text-muted">{user.email}</p>
-              </div>
+        <div className="relative px-6 pt-8 sm:px-10 sm:pt-10">
+          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary-300">
+            <span aria-hidden="true" className="h-px w-7 bg-current opacity-60" />
+            Client portal
+          </p>
+          <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <h2 className="font-display text-3xl font-bold tracking-[-0.02em] text-white">
+                {firstName ? `Welcome back, ${firstName}` : "Welcome back"}
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-white/60">
+                Track your enquiries, run the tax calculators and keep
+                everything about your account in one place.
+              </p>
             </div>
-            <dl className="mt-5 flex flex-col gap-2 border-t border-line pt-4 text-sm">
-              <div className="flex items-center justify-between gap-3">
-                <dt className="text-muted">Member since</dt>
-                <dd className="font-medium text-ink">
-                  {profile?.created_at
-                    ? fmt.format(new Date(profile.created_at))
-                    : "—"}
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/contact"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-none bg-primary-500 px-5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-400"
+              >
+                <Icon name="plus" className="h-4 w-4" />
+                New enquiry
+              </Link>
+              <Link
+                href="/tools/ireland"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-none border border-white/20 px-5 text-sm font-semibold text-white/80 transition-colors duration-200 hover:border-white/45 hover:text-white"
+              >
+                <Icon name="calculator" className="h-4 w-4" />
+                Calculators
+              </Link>
+            </div>
+          </div>
+
+          <dl className="mt-8 grid border-t border-white/10 sm:grid-cols-3 sm:divide-x sm:divide-white/10">
+            {heroStats.map((stat) => (
+              <div
+                key={stat.label}
+                className="py-4 sm:px-8 sm:py-5 sm:first:pl-0 sm:last:pr-0"
+              >
+                <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
+                  {stat.label}
+                </dt>
+                <dd className="mt-1 flex items-baseline gap-2">
+                  <span className="text-xl font-semibold tabular-nums tracking-tight text-white">
+                    {stat.value}
+                  </span>
+                  <span className="text-xs text-white/45">{stat.hint}</span>
                 </dd>
               </div>
-              <div className="flex items-center justify-between gap-3">
-                <dt className="text-muted">Account type</dt>
-                <dd className="font-medium text-ink">Client</dd>
-              </div>
-            </dl>
-          </Panel>
+            ))}
+          </dl>
+        </div>
+      </section>
 
-          <Panel className="p-2">
-            <h3 className="px-4 pb-1 pt-4 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-              Quick actions
-            </h3>
-            <ul>
-              {quickActions.map((action) => (
-                <li key={action.href}>
-                  <Link
-                    href={action.href}
-                    className="group flex items-center gap-3 rounded-none px-4 py-3 transition-colors duration-200 hover:bg-surface-muted"
-                  >
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-none bg-primary-50 text-primary-600">
-                      <Icon name={action.icon} className="h-[18px] w-[18px]" />
-                    </span>
-                    <span className="min-w-0 leading-tight">
-                      <span className="block text-sm font-medium text-ink">
-                        {action.title}
-                      </span>
-                      <span className="block text-xs text-muted">
-                        {action.body}
-                      </span>
-                    </span>
-                    <Icon
-                      name="arrowUpRight"
-                      className="ml-auto h-4 w-4 shrink-0 text-muted transition-colors duration-200 group-hover:text-primary-600"
-                    />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Panel>
-
-          <Panel className="p-6">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-                Documents
-              </h3>
-              <span className="rounded-none bg-secondary-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-500">
-                Coming soon
+      {/* Quick actions */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        {quickActions.map((action) => (
+          <Link
+            key={action.href}
+            href={action.href}
+            className="group relative flex flex-col rounded-none border border-line bg-white p-5 transition-colors duration-200 hover:border-ink/20"
+          >
+            <span
+              aria-hidden="true"
+              className="absolute inset-x-0 top-0 h-0.5 bg-primary-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+            />
+            <div className="flex items-start justify-between gap-3">
+              <span className="grid h-10 w-10 place-items-center rounded-none bg-primary-50 text-primary-600">
+                <Icon name={action.icon} className="h-5 w-5" />
               </span>
+              <Icon
+                name="arrowUpRight"
+                className="h-4 w-4 text-muted transition-colors duration-200 group-hover:text-primary-600"
+              />
             </div>
-            <p className="mt-3 text-sm leading-6 text-muted">
-              Statements, returns and signed accounts will appear here once your
-              accountant shares them.
+            <p className="mt-4 font-display text-sm font-semibold tracking-tight text-ink">
+              {action.title}
             </p>
-          </Panel>
-        </aside>
+            <p className="mt-1 text-xs leading-5 text-muted">{action.body}</p>
+          </Link>
+        ))}
+      </div>
 
+      <div className="mt-10 grid items-start gap-8 lg:grid-cols-[1.6fr_1fr]">
         {/* My enquiries */}
         <section>
           <div className="flex items-center justify-between">
@@ -227,8 +220,12 @@ export default async function PortalPage() {
               {enquiries.map((enquiry) => (
                 <li
                   key={enquiry.id}
-                  className="group rounded-none border border-line bg-white p-5 shadow-sm shadow-navy-900/5 transition-colors duration-200 hover:border-primary-400/60"
+                  className="group relative rounded-none border border-line bg-white p-5 transition-colors duration-200 hover:border-primary-400/60"
                 >
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-y-0 left-0 w-0.5 bg-primary-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                  />
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-display text-sm font-semibold text-ink">
                       {enquiry.service ?? "General enquiry"}
@@ -248,6 +245,70 @@ export default async function PortalPage() {
             </ul>
           )}
         </section>
+
+        {/* Right rail: account + documents */}
+        <aside className="flex flex-col gap-6">
+          <Panel accent className="p-6">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+              Your account
+            </h3>
+            <div className="mt-4 flex items-center gap-3">
+              <Avatar initials={initials} className="h-11 w-11 text-sm" />
+              <div className="min-w-0 leading-tight">
+                <p className="truncate font-medium text-ink">
+                  {profile?.full_name ?? "—"}
+                </p>
+                <p className="truncate text-sm text-muted">{user.email}</p>
+              </div>
+            </div>
+            <dl className="mt-5 flex flex-col gap-2 border-t border-line pt-4 text-sm">
+              <div className="flex items-center justify-between gap-3">
+                <dt className="text-muted">Member since</dt>
+                <dd className="font-medium text-ink">
+                  {profile?.created_at
+                    ? fmt.format(new Date(profile.created_at))
+                    : "—"}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <dt className="text-muted">Account type</dt>
+                <dd className="font-medium text-ink">Client</dd>
+              </div>
+            </dl>
+          </Panel>
+
+          <Panel className="p-6">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+                Documents
+              </h3>
+              <span className="rounded-none bg-secondary-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-500">
+                Coming soon
+              </span>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-muted">
+              Statements, returns and signed accounts will appear here once your
+              accountant shares them.
+            </p>
+          </Panel>
+
+          <Panel className="p-6">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+              Need a hand?
+            </h3>
+            <p className="mt-3 text-sm leading-6 text-muted">
+              Questions about tax, VAT or your accounts — the team replies the
+              same working day.
+            </p>
+            <Link
+              href="/contact"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 transition-colors duration-200 hover:text-primary-500"
+            >
+              Contact the team
+              <Icon name="arrowUpRight" className="h-3.5 w-3.5" />
+            </Link>
+          </Panel>
+        </aside>
       </div>
     </div>
   );
