@@ -2,6 +2,7 @@
 
 import { after } from "next/server";
 import { query } from "../lib/db";
+import { createClient } from "../lib/supabase/server";
 
 export interface EnquiryState {
   status: "idle" | "success" | "error";
@@ -99,18 +100,32 @@ export async function submitEnquiry(
     return { status: "error", errors, values };
   }
 
-  // Save to Postgres (Supabase). Parameterised query ($1..$5) — never string
+  // Stamp the enquiry with the signed-in user's id when a session exists;
+  // logged-out (public) submissions stay null. Read via the SSR server client.
+  let userId: string | null = null;
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    userId = user?.id ?? null;
+  } catch (err) {
+    console.error("[enquiry] session read failed (continuing anonymous):", err);
+  }
+
+  // Save to Postgres (Supabase). Parameterised query ($1..$6) — never string
   // interpolation — so user input can't be used for SQL injection.
   try {
     await query(
-      `insert into enquiries (name, email, company, service, message)
-       values ($1, $2, $3, $4, $5)`,
+      `insert into enquiries (name, email, company, service, message, user_id)
+       values ($1, $2, $3, $4, $5, $6)`,
       [
         values.name,
         values.email,
         values.company || null,
         values.service || null,
         values.message.slice(0, 4000),
+        userId,
       ],
     );
   } catch (err) {

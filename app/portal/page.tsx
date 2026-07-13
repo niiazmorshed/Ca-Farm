@@ -5,34 +5,19 @@ import { Icon } from "../components/dashboard-icons";
 import {
   Avatar,
   initialsOf,
+  PageHeader,
   Panel,
+  StatTile,
   StatusChip,
-  timeAgo,
-  type StatusTone,
 } from "../components/dashboard-ui";
 
 interface EnquiryRow {
   id: string;
   service: string | null;
   message: string;
-  status: string;
   created_at: Date;
+  total: string;
 }
-
-/**
- * Client-facing view of the admin triage state: "new" reads as "Received"
- * (we have it), in_progress as "In review", resolved as "Resolved".
- */
-const STATUS_META: Record<
-  string,
-  { label: string; tone: StatusTone; step: 1 | 2 | 3 }
-> = {
-  new: { label: "Received", tone: "green", step: 1 },
-  in_progress: { label: "In review", tone: "dark", step: 2 },
-  resolved: { label: "Resolved", tone: "muted", step: 3 },
-};
-
-const PROGRESS_STEPS = ["Received", "In review", "Resolved"] as const;
 
 const fmt = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
@@ -72,285 +57,63 @@ export default async function PortalPage() {
       [user.id],
     ),
     query<EnquiryRow>(
-      `select id, service, message, status, created_at
+      `select id, service, message, created_at, count(*) over() as total
          from enquiries
-        where lower(email) = lower($1)
+        where user_id = $1 or lower(email) = lower($2)
         order by created_at desc
         limit 50`,
-      [user.email ?? ""],
+      [user.id, user.email ?? ""],
     ),
   ]);
 
   const profile = profileResult.rows[0] ?? null;
   const enquiries = enquiriesResult.rows;
+  const totalEnquiries = enquiries[0] ? Number(enquiries[0].total) : 0;
   const firstName = profile?.full_name?.split(" ")[0];
   const initials = initialsOf(profile?.full_name, user.email ?? "");
   const latest = enquiries[0] ? new Date(enquiries[0].created_at) : null;
-  const open = enquiries.filter((e) => e.status !== "resolved").length;
-  const resolved = enquiries.length - open;
-
-  const heroStats = [
-    {
-      label: "Enquiries sent",
-      value: String(enquiries.length),
-      hint: enquiries.length === 0 ? "None yet" : "All time",
-    },
-    {
-      label: "Open requests",
-      value: String(open),
-      hint: open === 0 ? "Nothing waiting" : "With the team",
-    },
-    {
-      label: "Resolved",
-      value: String(resolved),
-      hint: resolved === 0 ? "None yet" : "Completed",
-    },
-    {
-      label: "Last activity",
-      value: latest ? timeAgo(latest) : "—",
-      hint: latest ? fmt.format(latest) : "No activity yet",
-    },
-  ];
 
   return (
     <div className="mx-auto max-w-6xl">
-      {/* Hero — dark brand card with greeting, CTAs and a stats strip */}
-      <section className="relative overflow-hidden rounded-none bg-navy-900 text-white">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-primary-500/25 blur-3xl"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-32 -left-20 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl"
-        />
-        <div className="relative px-6 pt-8 sm:px-10 sm:pt-10">
-          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary-300">
-            <span aria-hidden="true" className="h-px w-7 bg-current opacity-60" />
-            Client portal
-          </p>
-          <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <h2 className="font-display text-3xl font-bold tracking-[-0.02em] text-white">
-                {firstName ? `Welcome back, ${firstName}` : "Welcome back"}
-              </h2>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-white/60">
-                Track your enquiries, run the tax calculators and keep
-                everything about your account in one place.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href="/contact"
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-none bg-primary-500 px-5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-400"
-              >
-                <Icon name="plus" className="h-4 w-4" />
-                New enquiry
-              </Link>
-              <Link
-                href="/tools/ireland"
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-none border border-white/20 px-5 text-sm font-semibold text-white/80 transition-colors duration-200 hover:border-white/45 hover:text-white"
-              >
-                <Icon name="calculator" className="h-4 w-4" />
-                Calculators
-              </Link>
-            </div>
-          </div>
-
-          <dl className="mt-8 grid grid-cols-2 gap-y-1 border-t border-white/10 lg:grid-cols-4 lg:divide-x lg:divide-white/10">
-            {heroStats.map((stat) => (
-              <div
-                key={stat.label}
-                className="py-4 lg:px-8 lg:py-5 lg:first:pl-0 lg:last:pr-0"
-              >
-                <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
-                  {stat.label}
-                </dt>
-                <dd className="mt-1 flex flex-wrap items-baseline gap-x-2">
-                  <span className="text-xl font-semibold tabular-nums tracking-tight text-white">
-                    {stat.value}
-                  </span>
-                  <span className="text-xs text-white/45">{stat.hint}</span>
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </section>
-
-      {/* Quick actions */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        {quickActions.map((action) => (
+      <PageHeader
+        eyebrow="Your dashboard"
+        title={firstName ? `Welcome back, ${firstName}` : "Welcome back"}
+        lede="Your enquiries, documents and account — all in one place."
+        actions={
           <Link
-            key={action.href}
-            href={action.href}
-            className="group relative flex flex-col rounded-none border border-line bg-white p-5 transition-colors duration-200 hover:border-ink/20"
+            href="/contact"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-none bg-primary-500 px-5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600"
           >
-            <span
-              aria-hidden="true"
-              className="absolute inset-x-0 top-0 h-0.5 bg-primary-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-            />
-            <div className="flex items-start justify-between gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-none bg-primary-50 text-primary-600">
-                <Icon name={action.icon} className="h-5 w-5" />
-              </span>
-              <Icon
-                name="arrowUpRight"
-                className="h-4 w-4 text-muted transition-colors duration-200 group-hover:text-primary-600"
-              />
-            </div>
-            <p className="mt-4 font-display text-sm font-semibold tracking-tight text-ink">
-              {action.title}
-            </p>
-            <p className="mt-1 text-xs leading-5 text-muted">{action.body}</p>
+            <Icon name="plus" className="h-4 w-4" />
+            New enquiry
           </Link>
-        ))}
+        }
+      />
+
+      {/* Snapshot */}
+      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+        <StatTile
+          label="Your enquiries"
+          value={totalEnquiries}
+          hint={totalEnquiries === 0 ? "None sent yet" : "Sent to the team"}
+          icon={<Icon name="chat" className="h-[18px] w-[18px]" />}
+        />
+        <StatTile
+          label="Last activity"
+          value={latest ? fmt.format(latest) : "—"}
+          hint={latest ? "Most recent enquiry" : "No activity yet"}
+          icon={<Icon name="clock" className="h-[18px] w-[18px]" />}
+        />
+        <StatTile
+          label="Member since"
+          value={profile?.created_at ? fmt.format(new Date(profile.created_at)) : "—"}
+          hint="Account created"
+          icon={<Icon name="users" className="h-[18px] w-[18px]" />}
+        />
       </div>
 
-      <div className="mt-10 grid items-start gap-8 lg:grid-cols-[1.6fr_1fr]">
-        {/* My enquiries */}
-        <section>
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <h3 className="font-display text-xl font-semibold tracking-tight text-ink">
-                Your enquiries
-              </h3>
-              {enquiries.length > 0 && (
-                <p className="mt-0.5 text-xs text-muted">
-                  {enquiries.length} total
-                  {open > 0 && ` · ${open} open with the team`} — tap one to see
-                  its full message and progress.
-                </p>
-              )}
-            </div>
-            <Link
-              href="/contact"
-              className="text-sm font-semibold text-primary-600 transition-colors duration-200 hover:text-primary-500"
-            >
-              New enquiry →
-            </Link>
-          </div>
-
-          {enquiries.length === 0 ? (
-            <div className="mt-5 rounded-none border border-dashed border-line bg-white p-10 text-center">
-              <span className="mx-auto grid h-12 w-12 place-items-center rounded-none bg-primary-50 text-primary-600">
-                <Icon name="chat" className="h-6 w-6" />
-              </span>
-              <p className="mt-4 text-[15px] font-medium text-ink">
-                No enquiries yet
-              </p>
-              <p className="mt-1 text-sm text-muted">
-                When you send us a message it&apos;ll show here with its status.
-              </p>
-              <Link
-                href="/contact"
-                className="mt-5 inline-flex h-11 items-center justify-center rounded-none bg-primary-500 px-6 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600"
-              >
-                Start an enquiry
-              </Link>
-            </div>
-          ) : (
-            <ul className="mt-5 flex flex-col gap-4">
-              {enquiries.map((enquiry) => {
-                const meta = STATUS_META[enquiry.status] ?? STATUS_META.new;
-                return (
-                  <li key={enquiry.id}>
-                    <details className="group relative rounded-none border border-line bg-white transition-colors duration-200 open:border-primary-400/60 hover:border-primary-400/60">
-                      <span
-                        aria-hidden="true"
-                        className="absolute inset-y-0 left-0 w-0.5 bg-primary-400 opacity-0 transition-opacity duration-200 group-open:opacity-100 group-hover:opacity-100"
-                      />
-                      <summary className="flex cursor-pointer list-none items-start gap-4 p-5 [&::-webkit-details-marker]:hidden">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <span className="font-display text-sm font-semibold text-ink">
-                              {enquiry.service ?? "General enquiry"}
-                            </span>
-                            <span className="flex items-center gap-3 text-xs text-muted">
-                              <span className="tabular-nums">
-                                Ref #{enquiry.id.padStart(4, "0")}
-                              </span>
-                              {fmt.format(new Date(enquiry.created_at))}
-                            </span>
-                          </div>
-                          <p className="mt-2 line-clamp-2 text-sm leading-6 text-ink-body group-open:hidden">
-                            {enquiry.message}
-                          </p>
-                          <div className="mt-3">
-                            <StatusChip label={meta.label} tone={meta.tone} />
-                          </div>
-                        </div>
-                        <Icon
-                          name="chevronDown"
-                          className="mt-1 h-4 w-4 shrink-0 text-muted transition-transform duration-200 group-open:rotate-180"
-                        />
-                      </summary>
-                      <div className="border-t border-line px-5 pb-5 pt-4">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
-                          Your message
-                        </p>
-                        <p className="mt-2 whitespace-pre-line text-sm leading-6 text-ink-body">
-                          {enquiry.message}
-                        </p>
-
-                        {/* Progress: Received → In review → Resolved */}
-                        <ol className="mt-5 flex items-center border-t border-line pt-4">
-                          {PROGRESS_STEPS.map((label, i) => {
-                            const done = i + 1 <= meta.step;
-                            const connectorDone = i + 1 < meta.step;
-                            return (
-                              <li
-                                key={label}
-                                className="flex flex-1 items-center last:flex-none"
-                              >
-                                <span className="flex items-center gap-2">
-                                  <span
-                                    className={`grid h-5 w-5 shrink-0 place-items-center rounded-full ${
-                                      done
-                                        ? "bg-primary-500 text-white"
-                                        : "border border-line bg-white"
-                                    }`}
-                                  >
-                                    {done ? (
-                                      <Icon
-                                        name="check"
-                                        className="h-3 w-3"
-                                        strokeWidth={2.5}
-                                      />
-                                    ) : (
-                                      <span className="h-1.5 w-1.5 rounded-full bg-line" />
-                                    )}
-                                  </span>
-                                  <span
-                                    className={`text-xs font-medium ${
-                                      done ? "text-ink" : "text-muted"
-                                    }`}
-                                  >
-                                    {label}
-                                  </span>
-                                </span>
-                                {i < PROGRESS_STEPS.length - 1 && (
-                                  <span
-                                    aria-hidden="true"
-                                    className={`mx-3 h-px flex-1 ${
-                                      connectorDone ? "bg-primary-500" : "bg-line"
-                                    }`}
-                                  />
-                                )}
-                              </li>
-                            );
-                          })}
-                        </ol>
-                      </div>
-                    </details>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
-
-        {/* Right rail: account + documents */}
+      <div className="grid gap-8 lg:grid-cols-[1fr_1.6fr]">
+        {/* Left rail: account, quick actions, documents */}
         <aside className="flex flex-col gap-6">
           <Panel accent className="p-6">
             <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
@@ -381,6 +144,38 @@ export default async function PortalPage() {
             </dl>
           </Panel>
 
+          <Panel className="p-2">
+            <h3 className="px-4 pb-1 pt-4 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+              Quick actions
+            </h3>
+            <ul>
+              {quickActions.map((action) => (
+                <li key={action.href}>
+                  <Link
+                    href={action.href}
+                    className="group flex items-center gap-3 rounded-none px-4 py-3 transition-colors duration-200 hover:bg-surface-muted"
+                  >
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-none bg-primary-50 text-primary-600">
+                      <Icon name={action.icon} className="h-[18px] w-[18px]" />
+                    </span>
+                    <span className="min-w-0 leading-tight">
+                      <span className="block text-sm font-medium text-ink">
+                        {action.title}
+                      </span>
+                      <span className="block text-xs text-muted">
+                        {action.body}
+                      </span>
+                    </span>
+                    <Icon
+                      name="arrowUpRight"
+                      className="ml-auto h-4 w-4 shrink-0 text-muted transition-colors duration-200 group-hover:text-primary-600"
+                    />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Panel>
+
           <Panel className="p-6">
             <div className="flex items-center justify-between gap-3">
               <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
@@ -395,24 +190,66 @@ export default async function PortalPage() {
               accountant shares them.
             </p>
           </Panel>
+        </aside>
 
-          <Panel className="p-6">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-              Need a hand?
+        {/* My enquiries */}
+        <section>
+          <div className="flex items-center justify-between">
+            <h3 className="font-display text-xl font-semibold tracking-tight text-ink">
+              Your enquiries
             </h3>
-            <p className="mt-3 text-sm leading-6 text-muted">
-              Questions about tax, VAT or your accounts — the team replies the
-              same working day.
-            </p>
             <Link
               href="/contact"
-              className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 transition-colors duration-200 hover:text-primary-500"
+              className="text-sm font-semibold text-primary-600 transition-colors duration-200 hover:text-primary-500"
             >
-              Contact the team
-              <Icon name="arrowUpRight" className="h-3.5 w-3.5" />
+              New enquiry →
             </Link>
-          </Panel>
-        </aside>
+          </div>
+
+          {enquiries.length === 0 ? (
+            <div className="mt-5 rounded-none border border-dashed border-line bg-white p-10 text-center">
+              <span className="mx-auto grid h-12 w-12 place-items-center rounded-none bg-primary-50 text-primary-600">
+                <Icon name="chat" className="h-6 w-6" />
+              </span>
+              <p className="mt-4 text-[15px] font-medium text-ink">
+                No enquiries yet
+              </p>
+              <p className="mt-1 text-sm text-muted">
+                When you send us a message it&apos;ll show here with its status.
+              </p>
+              <Link
+                href="/contact"
+                className="mt-5 inline-flex h-11 items-center justify-center rounded-none bg-primary-500 px-6 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600"
+              >
+                Start an enquiry
+              </Link>
+            </div>
+          ) : (
+            <ul className="mt-5 flex flex-col gap-4">
+              {enquiries.map((enquiry) => (
+                <li
+                  key={enquiry.id}
+                  className="group rounded-none border border-line bg-white p-5 shadow-sm shadow-navy-900/5 transition-colors duration-200 hover:border-primary-400/60"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-display text-sm font-semibold text-ink">
+                      {enquiry.service ?? "General enquiry"}
+                    </span>
+                    <span className="text-xs text-muted">
+                      {fmt.format(new Date(enquiry.created_at))}
+                    </span>
+                  </div>
+                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-ink-body">
+                    {enquiry.message}
+                  </p>
+                  <div className="mt-3">
+                    <StatusChip label="Received" />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
     </div>
   );

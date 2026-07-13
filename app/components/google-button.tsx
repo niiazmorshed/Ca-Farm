@@ -4,17 +4,19 @@ import { useState } from "react";
 import { createClient } from "../lib/supabase/client";
 
 /** "Continue with Google" — starts the Supabase OAuth (PKCE) flow. */
-export function GoogleButton({ next }: { next?: string }) {
+export function GoogleButton() {
   const [loading, setLoading] = useState(false);
 
   async function handleGoogle() {
     setLoading(true);
     const supabase = createClient();
-    const params =
-      next && next.startsWith("/") ? `?next=${encodeURIComponent(next)}` : "";
+    // Keep redirectTo free of query strings so it exact-matches the Supabase
+    // redirect allow-list on every host (localhost + prod). A `?next=` param
+    // fails the match on non-wildcard entries and Supabase falls back to the
+    // Site URL (prod). The callback role-routes (/portal or /admin) anyway.
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback${params}` },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     // On success the browser is redirected to Google; only reset on failure.
     if (error) setLoading(false);
