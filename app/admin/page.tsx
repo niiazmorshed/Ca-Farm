@@ -12,6 +12,9 @@ import {
   Panel,
   SparkBars,
   StatTile,
+  StatusChip,
+  timeAgo,
+  type StatusTone,
 } from "../components/dashboard-ui";
 
 export const metadata: Metadata = {
@@ -26,24 +29,16 @@ interface EnquiryRow {
   company: string | null;
   service: string | null;
   message: string;
+  status: string;
   created_at: Date;
 }
 
-const fmtDate = new Intl.DateTimeFormat("en-GB", {
-  day: "2-digit",
-  month: "short",
-});
-const fmtTime = new Intl.DateTimeFormat("en-GB", {
-  hour: "2-digit",
-  minute: "2-digit",
-});
-const fmtLong = new Intl.DateTimeFormat("en-GB", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-});
+const STATUS_META: Record<string, { label: string; tone: StatusTone }> = {
+  new: { label: "New", tone: "green" },
+  in_progress: { label: "In progress", tone: "dark" },
+  resolved: { label: "Resolved", tone: "muted" },
+};
+
 const dateFmt = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
   month: "short",
@@ -76,16 +71,17 @@ export default async function AdminPage() {
   const [enquiriesResult, statsResult, trendResult, clientsResult, reviews] =
     await Promise.all([
       query<EnquiryRow>(
-        `select id, name, email, company, service, message, created_at
+        `select id, name, email, company, service, message, status, created_at
            from enquiries
           order by created_at desc
-          limit 9`,
+          limit 8`,
       ),
-      query<{ total: number; last7: number; prev7: number }>(
+      query<{ total: number; last7: number; prev7: number; awaiting: number }>(
         `select count(*)::int as total,
                 count(*) filter (where created_at >= now() - interval '7 days')::int as last7,
                 count(*) filter (where created_at >= now() - interval '14 days'
-                             and created_at <  now() - interval '7 days')::int as prev7
+                             and created_at <  now() - interval '7 days')::int as prev7,
+                count(*) filter (where status = 'new')::int as awaiting
            from enquiries`,
       ),
       query<{ day: Date; n: number }>(
@@ -101,14 +97,14 @@ export default async function AdminPage() {
     ]);
 
   const rows = enquiriesResult.rows;
-  const { total, last7, prev7 } = statsResult.rows[0] ?? {
+  const { total, last7, prev7, awaiting } = statsResult.rows[0] ?? {
     total: 0,
     last7: 0,
     prev7: 0,
+    awaiting: 0,
   };
   const clients = clientsResult.rows[0]?.clients ?? 0;
   const trend = dailySeries(trendResult.rows);
-  const latest = rows[0] ? new Date(rows[0].created_at) : null;
   const dueReviews = reviews.filter((r) => r.due);
   const upToDate = reviews.length - dueReviews.length;
   const firstName = (user.user_metadata?.full_name as string | undefined)
@@ -213,10 +209,10 @@ export default async function AdminPage() {
           icon={<Icon name="trendUp" className="h-[18px] w-[18px]" />}
         />
         <StatTile
-          label="Latest received"
-          value={latest ? fmtDate.format(latest) : "—"}
-          hint={latest ? `at ${fmtTime.format(latest)}` : "No enquiries yet"}
-          icon={<Icon name="clock" className="h-[18px] w-[18px]" />}
+          label="Awaiting reply"
+          value={awaiting}
+          hint={awaiting === 0 ? "Inbox clear" : "Marked new in the inbox"}
+          icon={<Icon name="chat" className="h-[18px] w-[18px]" />}
         />
         <StatTile
           label="Registered clients"
@@ -230,14 +226,23 @@ export default async function AdminPage() {
       <div className="grid items-start gap-6 xl:grid-cols-[1.65fr_1fr]">
         <Panel className="overflow-hidden">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-5 py-4">
-            <h3 className="font-display text-lg font-semibold tracking-tight text-ink">
-              Recent enquiries
-            </h3>
-            <p className="text-xs font-medium text-muted">
-              {total === 0
-                ? "New contact-form messages land here"
-                : `Showing ${rows.length} of ${total}`}
-            </p>
+            <div className="flex items-center gap-2.5">
+              <h3 className="font-display text-lg font-semibold tracking-tight text-ink">
+                Recent enquiries
+              </h3>
+              {awaiting > 0 && (
+                <span className="rounded-none bg-navy-900 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-white">
+                  {awaiting} new
+                </span>
+              )}
+            </div>
+            <Link
+              href="/admin/enquiries"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 transition-colors duration-200 hover:text-primary-500"
+            >
+              Open inbox
+              <Icon name="arrowUpRight" className="h-3.5 w-3.5" />
+            </Link>
           </div>
 
           {rows.length === 0 ? (
@@ -253,62 +258,72 @@ export default async function AdminPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[38rem] border-collapse text-left text-sm">
-                <thead>
-                  <tr className="border-b border-line bg-surface-muted text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">
-                    <th className="px-5 py-3">From</th>
-                    <th className="px-4 py-3">Service</th>
-                    <th className="px-4 py-3">Message</th>
-                    <th className="px-5 py-3 text-right">Received</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => (
-                    <tr
-                      key={row.id}
-                      className="border-b border-line align-top transition-colors duration-150 last:border-0 hover:bg-surface-muted/60"
-                    >
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-3">
-                          <Avatar
-                            initials={initialsOf(row.name, row.email)}
-                            className="h-8 w-8 text-[11px]"
-                          />
-                          <div className="min-w-0 leading-tight">
-                            <p className="font-medium text-ink">{row.name}</p>
-                            <a
-                              href={`mailto:${row.email}`}
-                              className="text-xs text-primary-600 transition-colors duration-200 hover:text-primary-500"
+            <>
+              <ul className="divide-y divide-line">
+                {rows.map((row) => {
+                  const meta = STATUS_META[row.status] ?? STATUS_META.new;
+                  return (
+                    <li key={row.id}>
+                      <Link
+                        href={`/admin/enquiries?id=${row.id}`}
+                        className="group flex items-start gap-3 px-5 py-3.5 transition-colors duration-150 hover:bg-surface-muted/70"
+                      >
+                        <Avatar
+                          initials={initialsOf(row.name, row.email)}
+                          className="h-9 w-9 text-[11px]"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-3">
+                            <p
+                              className={`truncate text-sm ${
+                                row.status === "new"
+                                  ? "font-semibold text-ink"
+                                  : "font-medium text-ink-body"
+                              }`}
                             >
-                              {row.email}
-                            </a>
-                            {row.company && (
-                              <p className="text-xs text-muted">{row.company}</p>
+                              {row.name}
+                              {row.company && (
+                                <span className="ml-2 font-normal text-muted">
+                                  · {row.company}
+                                </span>
+                              )}
+                            </p>
+                            <span className="shrink-0 text-[11px] tabular-nums text-muted">
+                              {timeAgo(new Date(row.created_at))}
+                            </span>
+                          </div>
+                          <p className="mt-0.5 line-clamp-1 text-xs leading-5 text-muted">
+                            {row.message}
+                          </p>
+                          <div className="mt-1.5 flex items-center gap-2">
+                            <StatusChip label={meta.label} tone={meta.tone} />
+                            {row.service && (
+                              <span className="truncate text-[11px] font-medium text-muted">
+                                {row.service}
+                              </span>
                             )}
                           </div>
                         </div>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        {row.service ? (
-                          <span className="inline-block whitespace-nowrap rounded-none bg-surface-muted px-2 py-0.5 text-xs font-medium text-ink-body">
-                            {row.service}
-                          </span>
-                        ) : (
-                          <span className="text-muted">—</span>
-                        )}
-                      </td>
-                      <td className="max-w-md px-4 py-3.5 text-ink-body">
-                        <p className="line-clamp-2 leading-6">{row.message}</p>
-                      </td>
-                      <td className="whitespace-nowrap px-5 py-3.5 text-right text-xs text-muted">
-                        {fmtLong.format(new Date(row.created_at))}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <Icon
+                          name="arrowUpRight"
+                          className="mt-1 h-3.5 w-3.5 shrink-0 text-line transition-colors duration-200 group-hover:text-primary-600"
+                        />
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              {total > rows.length && (
+                <div className="border-t border-line px-5 py-3 text-center">
+                  <Link
+                    href="/admin/enquiries"
+                    className="text-xs font-semibold text-primary-600 transition-colors duration-200 hover:text-primary-500"
+                  >
+                    View all {total} enquiries →
+                  </Link>
+                </div>
+              )}
+            </>
           )}
         </Panel>
 

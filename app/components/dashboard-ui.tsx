@@ -32,6 +32,21 @@ export function Avatar({
   );
 }
 
+const relDateFmt = new Intl.DateTimeFormat("en-GB", {
+  day: "2-digit",
+  month: "short",
+});
+
+/** "just now", "4m ago", "3h ago", "2d ago", then "12 Mar". */
+export function timeAgo(d: Date) {
+  const s = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (s < 60) return "just now";
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  if (s < 7 * 86400) return `${Math.floor(s / 86400)}d ago`;
+  return relDateFmt.format(d);
+}
+
 const badgeTones = {
   admin: "bg-primary-50 text-primary-600 ring-primary-500/20",
   client: "bg-secondary-50 text-secondary-600 ring-secondary-500/20",
@@ -286,11 +301,31 @@ export function SparkBars({
   );
 }
 
+const chipTones = {
+  /** Fresh / positive — brand green tint. */
+  green: { chip: "bg-secondary-50 text-secondary-500", dot: "bg-secondary-400" },
+  /** Active / needs attention — solid dark. */
+  dark: { chip: "bg-navy-900 text-white", dot: "bg-primary-400" },
+  /** Settled / archived — quiet grey. */
+  muted: { chip: "bg-surface-muted text-muted", dot: "bg-muted/60" },
+} as const;
+
+export type StatusTone = keyof typeof chipTones;
+
 /** Small status chip used on enquiry rows/cards. */
-export function StatusChip({ label }: { label: string }) {
+export function StatusChip({
+  label,
+  tone = "green",
+}: {
+  label: string;
+  tone?: StatusTone;
+}) {
+  const t = chipTones[tone];
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-none bg-secondary-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-500">
-      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-secondary-400" />
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-none px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${t.chip}`}
+    >
+      <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${t.dot}`} />
       {label}
     </span>
   );
