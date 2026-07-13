@@ -198,6 +198,41 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
 
 ---
 
+## Collaboration & merge conflicts
+
+Two contributors work in parallel on personal branches (`niaz`, `nidan`) that
+both merge into `main`. Two rules keep them from colliding:
+
+**Area ownership** — route work to the owner instead of both editing one file:
+
+| Area | Owner (branch) |
+|------|----------------|
+| `/admin/**` (dashboard, enquiries inbox, rate editors) | Niaz (`niaz`) |
+| `/portal/**` (client dashboard, settings) | Nidan (`nidan`) |
+| Shared components (`app/components/dashboard-*.tsx`), `db/schema.sql`, marketing pages | Either — pull `main` immediately before touching, keep the change additive |
+
+If a task needs a change in the other person's area, prefer a small PR against
+their branch (or a chat ping) over editing it on your own branch.
+
+**Resolving conflicts — compose, don't pick a side.** Past incident (PRs #13/#14):
+a portal conflict was resolved by taking one branch's whole file, which silently
+reverted the other side's redesign to `main` and a second, duplicate fix-PR
+followed. The rule since:
+
+- A conflict between a data-layer change and a presentation change is almost
+  never either/or — produce the file both authors would have written together
+  (e.g. new query **under** new UI).
+- Never resolve with `--ours`/`--theirs` on a file the other side rewrote for a
+  different reason; diff both sides against the merge-base first and list what
+  each adds.
+- Appended-list conflicts (icon maps, nav arrays) are always resolved as the
+  union of both sides.
+- After resolving: `npx tsc --noEmit`, `npm run lint`, `npm test`, `npm run build`
+  must pass before pushing, and say in the merge-commit body which side won where
+  and why.
+
+---
+
 ## When to update this file
 
 **You do NOT need to update `AGENTS.md` before every prompt.**
