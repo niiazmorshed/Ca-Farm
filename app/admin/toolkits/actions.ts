@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { query } from "../../lib/db";
 import { requireAdmin } from "../../lib/supabase/guards";
 import { createAdminClient } from "../../lib/supabase/admin";
-import { TOOLKIT_CATEGORIES } from "../../lib/toolkit-data";
+import { TOOLKIT_CATEGORIES } from "../../lib/toolkit-types";
 
 export interface ActionState {
   status: "idle" | "saved" | "error";

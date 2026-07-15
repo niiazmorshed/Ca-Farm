@@ -4,7 +4,7 @@
    file is uploaded in /admin/toolkits, the live card appears alongside (and
    the matching starter entry should be removed from this list). */
 
-import type { ToolkitCategory } from "./toolkit-data";
+import type { ToolkitCategory } from "./toolkit-types";
 
 export type ResourceFormat = "PDF" | "DOCX" | "XLSX";
 

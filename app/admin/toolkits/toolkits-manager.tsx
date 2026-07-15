@@ -6,7 +6,7 @@
    page immediately — no deploy. */
 
 import { useActionState } from "react";
-import { TOOLKIT_CATEGORIES, type ToolkitResource } from "../../lib/toolkit-data";
+import { TOOLKIT_CATEGORIES, type ToolkitResource } from "../../lib/toolkit-types";
 import { deleteResource, saveResource, type ActionState } from "./actions";
 
 const IDLE: ActionState = { status: "idle" };

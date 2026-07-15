@@ -1,39 +1,20 @@
-/* Server-side loader for the Entrepreneur Toolkits resources.
+/* Server-side loader for the Entrepreneur Toolkits resources — SERVER ONLY
+   (imports pg via ./db; a client component must import toolkit-types.ts
+   instead, or the browser bundle tries to resolve dns/fs/net/tls).
    Rows live in toolkit_resources (managed in /admin/toolkits); files sit in
    the public "toolkits" Supabase Storage bucket, or the row points at an
    external URL. The public page degrades to an empty list if the DB is
    unreachable — it never 500s. */
 
 import { query } from "./db";
+import type { ToolkitCategory, ToolkitResource } from "./toolkit-types";
 
-export const TOOLKIT_CATEGORIES = [
-  { value: "memo", label: "Memos" },
-  { value: "template", label: "Templates" },
-  { value: "tax-form", label: "Tax forms" },
-  { value: "vat-form", label: "VAT forms" },
-  { value: "guide", label: "Business setup guides" },
-  { value: "other", label: "Other resources" },
-] as const;
-
-export type ToolkitCategory = (typeof TOOLKIT_CATEGORIES)[number]["value"];
-
-export const TOOLKIT_CATEGORY_LABELS: Record<ToolkitCategory, string> =
-  Object.fromEntries(
-    TOOLKIT_CATEGORIES.map((c) => [c.value, c.label]),
-  ) as Record<ToolkitCategory, string>;
-
-export interface ToolkitResource {
-  id: string;
-  title: string;
-  description: string | null;
-  category: ToolkitCategory;
-  fileUrl: string;
-  /** Storage object path — null when the row points at an external URL. */
-  filePath: string | null;
-  fileName: string | null;
-  active: boolean;
-  createdAt: string;
-}
+export {
+  TOOLKIT_CATEGORIES,
+  TOOLKIT_CATEGORY_LABELS,
+  type ToolkitCategory,
+  type ToolkitResource,
+} from "./toolkit-types";
 
 interface ResourceRow {
   id: string;
