@@ -20,6 +20,7 @@ import {
 } from "../lib/ireland-cgt";
 import {
   CurrencyField,
+  NumericField,
   ProportionBar,
   ResultDisclaimer,
   SegmentedField,
@@ -370,13 +371,13 @@ export function IrelandCgtCalculator({
           <SectionToggle label="Main home (PPR) relief" checked={showPpr} onChange={setShowPpr} />
           {showPpr && (
             <div className="flex flex-col gap-4 border-l-[3px] border-line pl-4">
-              <CurrencyField
+              <NumericField
                 label="Months owned"
                 value={monthsOwned}
                 onChange={setMonthsOwned}
                 hint="Total months you owned the property."
               />
-              <CurrencyField
+              <NumericField
                 label="Months lived in as your main home"
                 value={monthsOccupied}
                 onChange={setMonthsOccupied}

@@ -170,6 +170,42 @@ export function CurrencyField({
   );
 }
 
+export function NumericField({
+  label,
+  value,
+  onChange,
+  hint,
+}: {
+  label: string;
+  value: number;
+  onChange: (n: number) => void;
+  hint?: React.ReactNode;
+}) {
+  const id = useId();
+  const { text, handleChange } = useNumericText(value, onChange);
+  return (
+    <div>
+      <label htmlFor={id} className="block text-sm font-medium text-ink">
+        {label}
+      </label>
+      <div className="relative mt-1.5">
+        <input
+          id={id}
+          type="number"
+          inputMode="numeric"
+          min={0}
+          step="1"
+          placeholder="0"
+          value={text}
+          onChange={(e) => handleChange(e.target.value)}
+          className="h-11 w-full rounded-none border border-line bg-surface px-3 text-sm text-ink tabular-nums transition-colors duration-200 focus:border-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/40"
+        />
+      </div>
+      {hint && <p className="mt-1 text-xs leading-5 text-muted">{hint}</p>}
+    </div>
+  );
+}
+
 /* ---------- proportion bar ----------
    A single hairline-bordered track split into coloured segments sized by
    value — visualises how a total divides (trading vs passive tax, net vs
