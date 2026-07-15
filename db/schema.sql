@@ -240,3 +240,39 @@ end;
 $$;
 
 grant execute on function public.custom_access_token_hook to supabase_auth_admin;
+
+-- ── Entrepreneur Toolkits ────────────────────────────────────────────────────
+-- Downloadable resources (memos, templates, tax/VAT forms, setup guides) shown
+-- on /toolkits, managed in /admin/toolkits. Files live in the public Supabase
+-- Storage bucket "toolkits"; rows can also point at an external URL instead
+-- (file_path null = nothing to delete from storage).
+
+create table if not exists toolkit_resources (
+  id          bigint generated always as identity primary key,
+  title       text not null,
+  description text,
+  category    text not null check (category in
+    ('memo','template','tax-form','vat-form','guide','other')),
+  file_url    text not null,
+  -- Storage object path inside the "toolkits" bucket; null for external links.
+  file_path   text,
+  -- Original filename shown on the download button.
+  file_name   text,
+  active      boolean not null default true,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
+create index if not exists toolkit_resources_category_idx
+  on toolkit_resources (category, created_at desc);
+
+-- Public bucket for the files. Public buckets serve objects without RLS checks
+-- and uploads only happen server-side with the service role. Wrapped so a
+-- restricted DB role can still run the rest of this file.
+do $$ begin
+  insert into storage.buckets (id, name, public)
+  values ('toolkits', 'toolkits', true)
+  on conflict (id) do nothing;
+exception when others then
+  raise notice 'skipping toolkits bucket creation: %', sqlerrm;
+end $$;

@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/tools/ireland-capital-allowances",
     "/tools/ireland-cgt",
     "/tools/ireland-cat",
+    "/toolkits",
     "/about",
     "/contact",
   ].map((path) => ({

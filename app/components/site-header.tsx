@@ -8,6 +8,7 @@ import { CALCULATOR_TOOLS } from "./calculator-tabs";
 import type { SessionUser } from "../lib/supabase/guards";
 
 const secondaryLinks = [
+  { href: "/toolkits", label: "Entrepreneur Toolkits" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
@@ -198,7 +199,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
     >
       {/* tier 1 — contact bar (navy, desktop only) */}
       <div className="hidden bg-navy-900 text-[13px] text-white/70 md:block">
-        <div className="mx-auto flex h-10 w-full max-w-6xl items-center justify-between px-5 sm:px-8">
+        <div className="mx-auto flex h-10 w-full max-w-7xl items-center justify-between px-5 sm:px-8">
           <div className="flex items-center gap-4">
             <a
               href={site.phoneHref}
@@ -238,13 +239,18 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
             : "border-line/70 bg-canvas/85"
         }`}
       >
+        {/* max-w-7xl: the nav row (logo + 6 links + sign-in + CTA) needs
+            ~1110px — it stopped fitting the 6xl container when the
+            Entrepreneur Toolkits link was added. */}
         <nav
           aria-label="Main"
-          className="mx-auto flex h-[4.5rem] w-full max-w-6xl items-center justify-between px-5 sm:px-8"
+          className="mx-auto flex h-[4.5rem] w-full max-w-7xl items-center justify-between px-5 sm:px-8"
         >
           <Logo onClick={closeMobile} />
 
-          <div className="hidden items-center gap-7 lg:flex">
+          {/* xl breakpoint: with "Entrepreneur Toolkits" the full nav no longer
+              fits at 1024px — below xl the hamburger menu takes over. */}
+          <div className="hidden items-center gap-6 xl:flex">
             {/* Services mega-menu (CSS hover + focus-within) */}
             <div
               className="group relative"
@@ -255,7 +261,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                 href="/services"
                 aria-current={servicesActive ? "page" : undefined}
                 onClick={closeServices}
-                className={`relative flex items-center gap-1 text-sm font-medium transition-colors duration-200 ${
+                className={`relative flex items-center gap-1 whitespace-nowrap text-sm font-medium transition-colors duration-200 ${
                   servicesActive
                     ? "text-primary-600"
                     : "text-ink-body hover:text-ink"
@@ -336,7 +342,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                 href="/tools/ireland-income-tax"
                 aria-current={toolsActive ? "page" : undefined}
                 onClick={closeTools}
-                className={`relative flex items-center gap-1 text-sm font-medium transition-colors duration-200 ${
+                className={`relative flex items-center gap-1 whitespace-nowrap text-sm font-medium transition-colors duration-200 ${
                   toolsActive ? "text-primary-600" : "text-ink-body hover:text-ink"
                 }`}
               >
@@ -388,7 +394,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                   key={link.href}
                   href={link.href}
                   aria-current={active ? "page" : undefined}
-                  className={`group relative text-sm font-medium transition-colors duration-200 ${
+                  className={`group relative whitespace-nowrap text-sm font-medium transition-colors duration-200 ${
                     active ? "text-primary-600" : "text-ink-body hover:text-ink"
                   }`}
                 >
@@ -440,7 +446,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
             </Link>
             <button
               type="button"
-              className="grid h-10 w-10 cursor-pointer place-items-center rounded-none border border-line text-ink transition-colors duration-200 hover:bg-secondary-50 lg:hidden"
+              className="grid h-10 w-10 cursor-pointer place-items-center rounded-none border border-line text-ink transition-colors duration-200 hover:bg-secondary-50 xl:hidden"
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -470,7 +476,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
         {menuOpen && (
           <div
             id="mobile-menu"
-            className="max-h-[calc(100vh-4.75rem)] overflow-y-auto border-t border-line bg-canvas px-5 py-4 lg:hidden"
+            className="max-h-[calc(100vh-4.75rem)] overflow-y-auto border-t border-line bg-canvas px-5 py-4 xl:hidden"
           >
             <div className="flex flex-col gap-1">
               {/* Services accordion */}
