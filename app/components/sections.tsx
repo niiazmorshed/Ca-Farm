@@ -151,13 +151,13 @@ const quickEntries: {
   },
   {
     icon: "compass",
-    title: "Advisory & CFO",
+    title: "Advisory and CFO",
     note: "A finance leader on call, without the headcount.",
     href: "/services/cfo-service",
   },
   {
     icon: "chip",
-    title: "Digital & AI",
+    title: "Digital and AI",
     note: "Modernise and automate the finance function.",
     href: "/services/digital-transformation",
   },

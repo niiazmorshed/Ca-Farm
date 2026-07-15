@@ -161,7 +161,7 @@ export interface ServiceCategory {
 export const serviceCategories: ServiceCategory[] = [
   {
     slug: "account-bookkeeping",
-    title: "Accounting & Bookkeeping",
+    title: "Accounting and Bookkeeping",
     blurb:
       "Books that are never behind, VAT and payroll that just run, accounts filed early. The compliance work, off your desk.",
     overview:
@@ -239,7 +239,7 @@ export const serviceCategories: ServiceCategory[] = [
       },
       {
         slug: "bookkeeping",
-        title: "Bookkeeping & Cloud Accounting",
+        title: "Bookkeeping and Cloud Accounting",
         blurb:
           "Clean, current books on Xero or QuickBooks, with monthly management accounts you can actually read.",
         overview:
@@ -262,7 +262,7 @@ export const serviceCategories: ServiceCategory[] = [
       },
       {
         slug: "payroll",
-        title: "Payroll & Pensions",
+        title: "Payroll and Pensions",
         blurb:
           "Accurate payslips, real-time submissions and pension auto-enrolment handled — your team paid right, every cycle.",
         overview:
@@ -285,7 +285,7 @@ export const serviceCategories: ServiceCategory[] = [
       },
       {
         slug: "audit-assurance",
-        title: "Audit & Assurance",
+        title: "Audit and Assurance",
         blurb:
           "Statutory and voluntary audits that stand up to scrutiny — and give lenders, boards and buyers confidence in your numbers.",
         overview:
@@ -319,7 +319,7 @@ export const serviceCategories: ServiceCategory[] = [
     items: [
       {
         slug: "company-setup",
-        title: "Company Setup & Secretarial",
+        title: "Company Setup and Secretarial",
         blurb:
           "Incorporation, registrations and statutory filings to get you trading fast and keep the CRO happy.",
         overview:
@@ -502,7 +502,7 @@ export const serviceCategories: ServiceCategory[] = [
     items: [
       {
         slug: "doctors",
-        title: "Doctors & Medical Professionals",
+        title: "Doctors and Medical Professionals",
         blurb:
           "Pension funding, private practice income and locum structuring for medics.",
         overview:
@@ -525,7 +525,7 @@ export const serviceCategories: ServiceCategory[] = [
       },
       {
         slug: "it-professionals",
-        title: "IT Workers & Professionals",
+        title: "IT Workers and Professionals",
         blurb:
           "Contractor structuring and share-option taxation for tech workers and contractors.",
         overview:
@@ -571,7 +571,7 @@ export const serviceCategories: ServiceCategory[] = [
       },
       {
         slug: "entrepreneurs",
-        title: "Entrepreneurs & Founders",
+        title: "Entrepreneurs and Founders",
         blurb:
           "Personal tax strategy for founders — remuneration, share schemes, reliefs and the path to exit.",
         overview:
@@ -628,7 +628,7 @@ export const serviceCategories: ServiceCategory[] = [
       },
       {
         slug: "business-automation",
-        title: "AI for Business Model & Automation",
+        title: "AI for Business Model and Automation",
         blurb:
           "Rethink and automate how the business runs — workflows, pricing and operations powered by AI.",
         overview:
@@ -726,7 +726,7 @@ export const serviceCategories: ServiceCategory[] = [
   },
   {
     slug: "crypto",
-    title: "Crypto & Digital Assets",
+    title: "Crypto and Digital Assets",
     blurb:
       "Crypto gains, staking, mining and DeFi — calculated, reported and planned. Ahead of the CARF rules landing in 2026.",
     overview:
