@@ -58,6 +58,10 @@ export interface IncomeTaxInput {
   employmentIncome: number;
   selfEmploymentOrOtherIncome: number;
   pensionContribution: number;
+  /** Spouse/civil partner income — only read when maritalStatus is "married".
+      Optional so single-person call sites don't need to pass zeros. */
+  spouseEmploymentIncome?: number;
+  spouseSelfEmploymentOrOtherIncome?: number;
 }
 
 /* ========================================================================== */
@@ -87,8 +91,11 @@ export interface YearRates {
       single: number;
       /** Single / widowed WITH the Single Person Child Carer Credit. */
       singleWithSpccc: number;
-      /** Married, one income (the form has no second-earner field — see TODO). */
+      /** Married, one income — the base married band. */
       marriedOneIncome: number;
+      /** Max band increase for a second income (lower of this and the smaller
+          spouse's income is added to the base — €35,000 for 2025/2026). */
+      marriedBandIncrease: number;
     };
     credits: {
       personalSingle: number;
@@ -177,6 +184,7 @@ export const RATES_2026: YearRates = {
       single: 44_000, // revenue.ie tax-relief-charts (unchanged 2025→2026)
       singleWithSpccc: 48_000, // €44,000 + €4,000 SPCCC band increase
       marriedOneIncome: 53_000,
+      marriedBandIncrease: 35_000, // max combined band €88,000
     },
     credits: {
       personalSingle: 2_000,
@@ -233,7 +241,12 @@ export const RATES_2025: YearRates = {
     standardRate: 0.2,
     higherRate: 0.4,
     // Income tax bands and the main credits were unchanged 2025 → 2026.
-    srcop: { single: 44_000, singleWithSpccc: 48_000, marriedOneIncome: 53_000 },
+    srcop: {
+      single: 44_000,
+      singleWithSpccc: 48_000,
+      marriedOneIncome: 53_000,
+      marriedBandIncrease: 35_000,
+    },
     credits: {
       personalSingle: 2_000,
       personalMarried: 4_000,
@@ -303,7 +316,11 @@ export interface UscBandLine {
 
 export interface IncomeTaxResult {
   year: number;
+  /** Household total: your income + spouse income when married. */
   grossIncome: number;
+  yourIncome: number;
+  /** 0 unless married with a second income. */
+  spouseIncome: number;
 
   pension: {
     entered: number;
@@ -335,12 +352,17 @@ export interface IncomeTaxResult {
     selfEmployedSurcharge: number;
     total: number;
   };
+  /** USC is an individual charge — the spouse's is computed separately on
+      their own income (zeroed when not married / no spouse income). */
+  spouseUsc: IncomeTaxResult["usc"];
 
   prsi: {
     classA: number;
     classS: number;
     total: number;
   };
+  /** PRSI is an individual charge — see spouseUsc. */
+  spousePrsi: IncomeTaxResult["prsi"];
 
   netIncomeBeforePrsi: number;
   netIncome: number;
@@ -355,6 +377,20 @@ export interface IncomeTaxResult {
 
 const clampMin0 = (n: number) => (n > 0 ? n : 0);
 const sanitize = (n: number) => (Number.isFinite(n) ? clampMin0(n) : 0);
+
+/** Spouse incomes — zeros unless married (the fields are only read then). */
+function spouseIncomes(input: IncomeTaxInput): {
+  employment: number;
+  selfEmp: number;
+  total: number;
+} {
+  if (input.maritalStatus !== "married") {
+    return { employment: 0, selfEmp: 0, total: 0 };
+  }
+  const employment = sanitize(input.spouseEmploymentIncome ?? 0);
+  const selfEmp = sanitize(input.spouseSelfEmploymentOrOtherIncome ?? 0);
+  return { employment, selfEmp, total: employment + selfEmp };
+}
 
 /* ========================================================================== */
 /* Pension relief                                                              */
@@ -408,9 +444,12 @@ export function computeIncomeTax(
   const it = rates.incomeTax;
   const employment = sanitize(input.employmentIncome);
   const selfEmp = sanitize(input.selfEmploymentOrOtherIncome);
-  const grossIncome = employment + selfEmp;
+  const yourIncome = employment + selfEmp;
+  const spouse = spouseIncomes(input);
 
-  // Pension relief reduces taxable income for INCOME TAX ONLY.
+  // Married couples are jointly assessed: one tax computation on the combined
+  // income. Pension relief reduces taxable income for INCOME TAX ONLY.
+  const grossIncome = yourIncome + spouse.total;
   const taxableIncome = clampMin0(grossIncome - qualifyingPension);
   const married = input.maritalStatus === "married";
   const spccc = spcccEligible(input);
@@ -418,10 +457,12 @@ export function computeIncomeTax(
   // Standard-rate cut-off point (SRCOP).
   let srcop: number;
   if (married) {
-    // TODO: two-income married couples get €53,000 + the lower of €35,000 or
-    // the second earner's income (capped €88,000). The Deloitte form has no
-    // second-earner field, so we use single-income married logic. Known gap.
-    srcop = it.srcop.marriedOneIncome;
+    // €53,000 base + (for two incomes) the lower of the band-increase cap
+    // (€35,000) and the smaller income — so a one-income couple stays at the
+    // base and the combined band never exceeds €88,000 (2026 values).
+    const smallerIncome = Math.min(yourIncome, spouse.total);
+    srcop =
+      it.srcop.marriedOneIncome + Math.min(it.srcop.marriedBandIncrease, smallerIncome);
   } else {
     srcop = spccc ? it.srcop.singleWithSpccc : it.srcop.single;
   }
@@ -483,6 +524,29 @@ export function computeIncomeTax(
     });
   }
 
+  // Spouse's own Employee PAYE / Earned Income credits (same combined cap).
+  if (married) {
+    const spouseRaw =
+      (spouse.employment > 0 ? it.credits.employeePaye : 0) +
+      (spouse.selfEmp > 0 ? it.credits.earnedIncome : 0);
+    const spouseCredit = Math.min(spouseRaw, it.credits.employmentCombinedCap);
+    if (spouseCredit > 0) {
+      credits.push({
+        name:
+          spouse.employment > 0 && spouse.selfEmp > 0
+            ? "Spouse Employee PAYE + Earned Income Credit"
+            : spouse.employment > 0
+              ? "Spouse Employee PAYE Credit"
+              : "Spouse Earned Income Credit",
+        amount: spouseCredit,
+        reason:
+          spouseRaw > spouseCredit
+            ? "Spouse has both income types — shared ceiling, does not stack"
+            : "Spouse has their own income",
+      });
+    }
+  }
+
   // Single Person Child Carer Credit.
   if (spccc) {
     credits.push({
@@ -522,10 +586,15 @@ export function computeIncomeTax(
 /* USC — charged on GROSS income; pension does NOT reduce it                    */
 /* ========================================================================== */
 
-export function computeUSC(input: IncomeTaxInput, rates: YearRates): IncomeTaxResult["usc"] {
+/* USC is charged per individual, so a married couple gets two independent
+   computations — each spouse has their own exemption threshold and bands. */
+function uscForPerson(
+  employment: number,
+  selfEmp: number,
+  age: number,
+  rates: YearRates,
+): IncomeTaxResult["usc"] {
   const u = rates.usc;
-  const employment = sanitize(input.employmentIncome);
-  const selfEmp = sanitize(input.selfEmploymentOrOtherIncome);
   const income = employment + selfEmp;
 
   // Cliff edge: at/below the exemption threshold, NOTHING is charged. One euro
@@ -542,7 +611,7 @@ export function computeUSC(input: IncomeTaxInput, rates: YearRates): IncomeTaxRe
   }
 
   const reducedBandsApplied =
-    input.age >= u.reduced.ageThreshold && income <= u.reduced.incomeCeiling;
+    age >= u.reduced.ageThreshold && income <= u.reduced.incomeCeiling;
   const bands = reducedBandsApplied ? u.reduced.bands : u.bands;
 
   const bandBreakdown: UscBandLine[] = [];
@@ -571,6 +640,26 @@ export function computeUSC(input: IncomeTaxInput, rates: YearRates): IncomeTaxRe
     selfEmployedSurcharge,
     total: standardUsc + selfEmployedSurcharge,
   };
+}
+
+export function computeUSC(input: IncomeTaxInput, rates: YearRates): IncomeTaxResult["usc"] {
+  return uscForPerson(
+    sanitize(input.employmentIncome),
+    sanitize(input.selfEmploymentOrOtherIncome),
+    input.age,
+    rates,
+  );
+}
+
+/** Spouse USC on the spouse's own income. The form has no spouse-age field
+    (Deloitte's doesn't either), so the main applicant's age decides whether
+    the 70+ reduced bands apply — an estimate, flagged in the UI footer. */
+export function computeSpouseUSC(
+  input: IncomeTaxInput,
+  rates: YearRates,
+): IncomeTaxResult["usc"] {
+  const spouse = spouseIncomes(input);
+  return uscForPerson(spouse.employment, spouse.selfEmp, input.age, rates);
 }
 
 /* ========================================================================== */
@@ -605,14 +694,35 @@ function computePrsiClassS(selfEmp: number, rates: YearRates): number {
   return Math.max(selfEmp * p.rate, p.selfEmployedMinimum);
 }
 
+function prsiForPerson(
+  employment: number,
+  selfEmp: number,
+  rates: YearRates,
+): IncomeTaxResult["prsi"] {
+  const classA = computePrsiClassA(employment, rates);
+  const classS = computePrsiClassS(selfEmp, rates);
+  return { classA, classS, total: classA + classS };
+}
+
 export function computePRSI(input: IncomeTaxInput, rates: YearRates): IncomeTaxResult["prsi"] {
   // TODO: PRSI generally stops once someone is 66+ AND receiving the State
   // Pension (Contributory). The form has an age field but no "receiving state
   // pension" flag, so we do NOT auto-exempt at 66 (that would misfire for
   // deferred pensions). Flagged, not hard-coded.
-  const classA = computePrsiClassA(sanitize(input.employmentIncome), rates);
-  const classS = computePrsiClassS(sanitize(input.selfEmploymentOrOtherIncome), rates);
-  return { classA, classS, total: classA + classS };
+  return prsiForPerson(
+    sanitize(input.employmentIncome),
+    sanitize(input.selfEmploymentOrOtherIncome),
+    rates,
+  );
+}
+
+/** Spouse PRSI on the spouse's own income (individual charge, like USC). */
+export function computeSpousePRSI(
+  input: IncomeTaxInput,
+  rates: YearRates,
+): IncomeTaxResult["prsi"] {
+  const spouse = spouseIncomes(input);
+  return prsiForPerson(spouse.employment, spouse.selfEmp, rates);
 }
 
 /* ========================================================================== */
@@ -631,24 +741,33 @@ export function computeIrishTax(
 
   const employment = sanitize(input.employmentIncome);
   const selfEmp = sanitize(input.selfEmploymentOrOtherIncome);
-  const grossIncome = employment + selfEmp;
+  const yourIncome = employment + selfEmp;
+  const spouseIncome = spouseIncomes(input).total;
+  // Household total — married couples are jointly assessed for income tax.
+  const grossIncome = yourIncome + spouseIncome;
 
   const pension = computeQualifyingPension(input, rates);
   const incomeTax = computeIncomeTax(input, rates, pension.qualifying);
   const usc = computeUSC(input, rates);
+  const spouseUsc = computeSpouseUSC(input, rates);
   const prsi = computePRSI(input, rates);
+  const spousePrsi = computeSpousePRSI(input, rates);
+  const uscTotal = usc.total + spouseUsc.total;
+  const prsiTotal = prsi.total + spousePrsi.total;
 
   // Take-home. The qualifying pension is money actually paid into a pension, so
   // it leaves take-home; the non-qualifying excess is NOT subtracted here.
   const netIncomeBeforePrsi =
-    grossIncome - incomeTax.netTax - usc.total - pension.qualifying;
-  const netIncome = netIncomeBeforePrsi - prsi.total;
+    grossIncome - incomeTax.netTax - uscTotal - pension.qualifying;
+  const netIncome = netIncomeBeforePrsi - prsiTotal;
 
-  const totalDeductions = incomeTax.netTax + usc.total + prsi.total;
+  const totalDeductions = incomeTax.netTax + uscTotal + prsiTotal;
 
   return {
     year,
     grossIncome,
+    yourIncome,
+    spouseIncome,
     pension: {
       entered: sanitize(input.pensionContribution),
       reliefRate: pension.reliefRate,
@@ -657,7 +776,9 @@ export function computeIrishTax(
     },
     incomeTax,
     usc,
+    spouseUsc,
     prsi,
+    spousePrsi,
     netIncomeBeforePrsi,
     netIncome,
     monthlyNetIncome: netIncome / 12,

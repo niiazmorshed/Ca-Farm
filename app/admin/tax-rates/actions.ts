@@ -67,6 +67,11 @@ function parseYearForm(formData: FormData): { year: number; rates: YearRates } {
         single: euro(formData, "srcop_single", "SRCOP (single)"),
         singleWithSpccc: euro(formData, "srcop_single_spccc", "SRCOP (single with SPCCC)"),
         marriedOneIncome: euro(formData, "srcop_married_one", "SRCOP (married, one income)"),
+        marriedBandIncrease: euro(
+          formData,
+          "srcop_married_increase",
+          "SRCOP (married second-income increase)",
+        ),
       },
       credits: {
         personalSingle: euro(formData, "credit_personal_single", "Personal credit (single)"),

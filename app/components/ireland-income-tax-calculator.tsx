@@ -203,13 +203,16 @@ interface RowDef {
   value: (r: IncomeTaxResult) => number;
   deduct?: boolean;
   variant?: RowVariant;
+  /** Row only shown when the calculation includes a spouse income. */
+  spouseOnly?: boolean;
 }
 
 const rateLabel = (rate: number) => `${+(rate * 100).toFixed(2)}%`;
 
 const buildRows = (rates: YearRates): RowDef[] => [
   { label: "Total Income", value: (r) => r.grossIncome },
-  { label: "Your Income", value: (r) => r.grossIncome },
+  { label: "Your Income", value: (r) => r.yourIncome },
+  { label: "Spouse Income", value: (r) => r.spouseIncome, spouseOnly: true },
   { label: "Qualifying Pension Deduction", value: (r) => r.pension.qualifying, deduct: true },
   {
     label: "Tax @ Lower Rate",
@@ -223,13 +226,13 @@ const buildRows = (rates: YearRates): RowDef[] => [
   },
   { label: "Tax Credits", value: (r) => r.incomeTax.totalCredits, deduct: true },
   { label: "Net Tax", value: (r) => r.incomeTax.netTax, deduct: true, variant: "emphasis" },
-  { label: "Universal Social Charge", value: (r) => r.usc.total, deduct: true },
+  { label: "Universal Social Charge", value: (r) => r.usc.total + r.spouseUsc.total, deduct: true },
   {
     label: "Annual Net Income before deduction for PRSI",
     value: (r) => r.netIncomeBeforePrsi,
     variant: "emphasis",
   },
-  { label: "PRSI", value: (r) => r.prsi.total, deduct: true },
+  { label: "PRSI", value: (r) => r.prsi.total + r.spousePrsi.total, deduct: true },
   { label: "Annual Net Income", value: (r) => r.netIncome, variant: "net" },
   { label: "Monthly Net Income", value: (r) => r.monthlyNetIncome, variant: "net" },
   { label: "Weekly Net Income", value: (r) => r.weeklyNetIncome, variant: "net" },
@@ -252,8 +255,10 @@ function ResultsTable({
   comparison: YearComparison;
   rates: YearRates;
 }) {
-  const ROWS = buildRows(rates);
   const { current, prior, delta } = comparison;
+  const ROWS = buildRows(rates).filter(
+    (row) => !row.spouseOnly || current.spouseIncome > 0,
+  );
   const rowBg = (variant: RowVariant | undefined, i: number) => {
     if (variant === "net") return "bg-primary-50 font-semibold";
     if (variant === "emphasis") return "bg-surface-muted font-medium";
@@ -328,6 +333,8 @@ const DEFAULTS: IncomeTaxInput = {
   employmentIncome: 0,
   selfEmploymentOrOtherIncome: 0,
   pensionContribution: 0,
+  spouseEmploymentIncome: 0,
+  spouseSelfEmploymentOrOtherIncome: 0,
 };
 
 export function IrelandIncomeTaxCalculator({
@@ -372,9 +379,11 @@ export function IrelandIncomeTaxCalculator({
         <p className="mt-8 text-center text-xs leading-5 text-muted">
           Estimate for the Republic of Ireland. PRSI uses the flat rate at the start of each
           year ({rateLabel(ratesByYear[CURRENT_YEAR].prsi.rate)} for {CURRENT_YEAR},{" "}
-          {rateLabel(ratesByYear[PRIOR_YEAR].prsi.rate)} for {PRIOR_YEAR}). Excludes married two-income bands, widowed
-          bereavement-year uplift, medical-card USC relief and the 66+ state-pension PRSI
-          exemption.
+          {rateLabel(ratesByYear[PRIOR_YEAR].prsi.rate)} for {PRIOR_YEAR}). Married couples are
+          jointly assessed with the second-income band increase; spouse USC and PRSI are
+          computed on the spouse&apos;s own income (spouse assumed in the same USC age band).
+          Excludes widowed bereavement-year uplift, medical-card USC relief and the 66+
+          state-pension PRSI exemption.
         </p>
       </div>
     );
@@ -429,6 +438,26 @@ export function IrelandIncomeTaxCalculator({
           value={form.selfEmploymentOrOtherIncome}
           onChange={(v) => set("selfEmploymentOrOtherIncome", v)}
         />
+
+        {form.maritalStatus === "married" && (
+          <>
+            <h3 className="mt-4 font-display text-lg font-medium text-ink">
+              Spouse / civil partner income
+            </h3>
+            <CurrencyField
+              label="Spouse employment income"
+              value={form.spouseEmploymentIncome ?? 0}
+              onChange={(v) => set("spouseEmploymentIncome", v)}
+            />
+            <CurrencyField
+              label="Spouse self-employment / other income"
+              value={form.spouseSelfEmploymentOrOtherIncome ?? 0}
+              onChange={(v) => set("spouseSelfEmploymentOrOtherIncome", v)}
+              hint="Married couples are jointly assessed — a second income raises the 20% band by up to €35,000."
+            />
+          </>
+        )}
+
         <CurrencyField
           label="Your pension contribution"
           value={form.pensionContribution}

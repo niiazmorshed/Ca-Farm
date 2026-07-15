@@ -99,6 +99,10 @@ export function parseYearRates(year: number, raw: unknown): YearRates | null {
           single: req(srcop.single),
           singleWithSpccc: req(srcop.singleWithSpccc),
           marriedOneIncome: req(srcop.marriedOneIncome),
+          // Added after launch: rows saved before it exists default to €35,000
+          // rather than throwing the whole year back to the static fallback.
+          marriedBandIncrease:
+            srcop.marriedBandIncrease === undefined ? 35_000 : req(srcop.marriedBandIncrease),
         },
         credits: {
           personalSingle: req(credits.personalSingle),

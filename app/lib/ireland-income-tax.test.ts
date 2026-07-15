@@ -68,3 +68,78 @@ test("(b) VERIFIED REFERENCE CASE — €4M employment + €1M self-emp + €2M 
   // USC surcharge slice: 3% × (1,000,000 − 100,000) = 27,000.
   assert.equal(round(r.usc.selfEmployedSurcharge), 27_000, "Self-employed USC surcharge");
 });
+
+test("(c) married, two incomes — €80,000 + €30,000 spouse, age 40, 2026", () => {
+  const input: IncomeTaxInput = {
+    maritalStatus: "married",
+    hasChildOnChildBenefit: false,
+    isPrincipalCarerOfDependentChild: false,
+    age: 40,
+    employmentIncome: 80_000,
+    selfEmploymentOrOtherIncome: 0,
+    pensionContribution: 0,
+    spouseEmploymentIncome: 30_000,
+    spouseSelfEmploymentOrOtherIncome: 0,
+  };
+  const r = computeIrishTax(input, 2026);
+
+  assert.equal(round(r.grossIncome), 110_000, "Household income");
+  assert.equal(round(r.yourIncome), 80_000, "Your income");
+  assert.equal(round(r.spouseIncome), 30_000, "Spouse income");
+
+  // SRCOP: 53,000 + min(35,000, 30,000) = 83,000.
+  assert.equal(r.incomeTax.standardRateCutOff, 83_000, "Joint SRCOP");
+  // 20% × 83,000 = 16,600; 40% × 27,000 = 10,800.
+  assert.equal(round(r.incomeTax.taxAtStandard), 16_600, "Tax @ 20%");
+  assert.equal(round(r.incomeTax.taxAtHigher), 10_800, "Tax @ 40%");
+  // Credits: married personal 4,000 + your PAYE 2,000 + spouse PAYE 2,000.
+  assert.equal(round(r.incomeTax.totalCredits), 8_000, "Tax credits");
+  assert.equal(round(r.incomeTax.netTax), 19_400, "Net tax");
+
+  // USC per person: yours on 80,000 = 2,430.62; spouse on 30,000 = 432.82.
+  assert.equal(round(r.usc.total), 2_431, "Your USC");
+  assert.equal(round(r.spouseUsc.total), 433, "Spouse USC");
+
+  // PRSI per person at 4.2%: 3,360 + 1,260.
+  assert.equal(round(r.prsi.total), 3_360, "Your PRSI");
+  assert.equal(round(r.spousePrsi.total), 1_260, "Spouse PRSI");
+
+  // Net: 110,000 − 19,400 − 2,863.44 − 4,620 = 83,116.56.
+  assert.equal(round(r.netIncome), 83_117, "Household net income");
+});
+
+test("(d) married, one income — spouse fields empty keep the €53,000 band", () => {
+  const input: IncomeTaxInput = {
+    maritalStatus: "married",
+    hasChildOnChildBenefit: false,
+    isPrincipalCarerOfDependentChild: false,
+    age: 40,
+    employmentIncome: 60_000,
+    selfEmploymentOrOtherIncome: 0,
+    pensionContribution: 0,
+  };
+  const r = computeIrishTax(input, 2026);
+
+  assert.equal(r.incomeTax.standardRateCutOff, 53_000, "One-income married SRCOP");
+  // 20% × 53,000 = 10,600; 40% × 7,000 = 2,800; credits 4,000 + 2,000.
+  assert.equal(round(r.incomeTax.netTax), 7_400, "Net tax");
+  assert.equal(round(r.spouseUsc.total), 0, "No spouse USC");
+  assert.equal(round(r.spousePrsi.total), 0, "No spouse PRSI");
+});
+
+test("(e) spouse income ignored unless married", () => {
+  const input: IncomeTaxInput = {
+    maritalStatus: "single",
+    hasChildOnChildBenefit: false,
+    isPrincipalCarerOfDependentChild: false,
+    age: 30,
+    employmentIncome: 50_000,
+    selfEmploymentOrOtherIncome: 0,
+    pensionContribution: 0,
+    spouseEmploymentIncome: 30_000,
+  };
+  const r = computeIrishTax(input, 2026);
+  assert.equal(round(r.grossIncome), 50_000, "Spouse income not counted");
+  assert.equal(round(r.spouseIncome), 0);
+  assert.equal(round(r.incomeTax.netTax), 7_200, "Same as single case (a)");
+});

@@ -96,6 +96,7 @@ function YearForm({ rates }: { rates: YearRates }) {
         <Euro name="srcop_single" value={it.srcop.single} label="SRCOP — single (€)" />
         <Euro name="srcop_single_spccc" value={it.srcop.singleWithSpccc} label="SRCOP — single + SPCCC (€)" />
         <Euro name="srcop_married_one" value={it.srcop.marriedOneIncome} label="SRCOP — married, 1 income (€)" />
+        <Euro name="srcop_married_increase" value={it.srcop.marriedBandIncrease} label="SRCOP — married 2nd-income increase, max (€)" />
       </div>
 
       <SectionTitle>Income tax — credits (€)</SectionTitle>
