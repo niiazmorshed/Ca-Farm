@@ -8,7 +8,7 @@ import { CALCULATOR_TOOLS } from "./calculator-tabs";
 import type { SessionUser } from "../lib/supabase/guards";
 
 const secondaryLinks = [
-  { href: "/toolkits", label: "Entrepreneur Toolkits" },
+  { href: "/toolkits", label: "Founders Hub" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },

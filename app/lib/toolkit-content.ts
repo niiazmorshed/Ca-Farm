@@ -1,4 +1,4 @@
-/* Static starter catalogue for the Entrepreneur Toolkits page — the resources
+/* Static starter catalogue for the Founders Hub page — the resources
    we are preparing, shown as "in preparation" cards with a request-a-copy CTA.
    FRONTEND ONLY by design: nothing here touches the database. When a real
    file is uploaded in /admin/toolkits, the live card appears alongside (and

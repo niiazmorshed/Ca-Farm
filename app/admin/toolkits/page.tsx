@@ -24,7 +24,7 @@ export default async function AdminToolkitsPage() {
     <div className="mx-auto max-w-5xl">
       <header className="mb-8">
         <h2 className="font-display text-2xl font-semibold text-ink">
-          Entrepreneur Toolkits
+          Founders Hub
         </h2>
         <p className="mt-1 text-sm text-muted">
           Memos, templates, tax forms, VAT forms and business setup guides shown
@@ -33,7 +33,7 @@ export default async function AdminToolkitsPage() {
             href="/toolkits"
             className="font-medium text-primary-600 transition-colors duration-200 hover:text-primary-500"
           >
-            public Toolkits page
+            public Founders Hub page
           </a>
           . Uploads go live immediately — no deploy needed.
           {loadError && (
