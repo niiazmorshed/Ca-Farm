@@ -174,13 +174,13 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Corporation tax, VAT, income tax and reliefs — planned ahead, filed on time, never more than you owe.",
         overview:
-          "Corporation tax in Ireland runs at 12.5% on trading income and 25% on everything else — and the gap between those two rates is where most of the planning happens. We run the full cycle: the CT1 filed through Revenue's ROS, R&D and capital-allowance claims, and the director's own Form 11 handled alongside the company. If you're a group turning over more than €750m, the 15% minimum top-up under Pillar Two comes into play — we tell you early if that's you. Whatever position we take, you get it in writing.",
+          "Corporation tax in Ireland runs at 12.5% on trading income and 25% on everything else — and the gap between those two rates is where most of the planning happens. We run the full cycle: the CT1 filed through Revenue’s ROS, R&D and capital-allowance claims, and the director’s own Form 11 handled alongside the company. If you’re a group turning over more than €750m, the 15% minimum top-up under Pillar Two comes into play — we tell you early if that’s you. Whatever position we take, you get it in writing.",
         included: [
           "Corporation tax returns — the CT1, prepared and filed through ROS",
           "Trading vs passive income — split correctly, close-company surcharge kept in check",
           "R&D tax credit — 35% back on qualifying spend, claimed and documented (Budget 2026)",
           "Capital allowances — reviewed for accelerated reliefs you might be missing",
-          "Director's income tax — the personal Form 11, filed with the company accounts",
+          "Director’s income tax — the personal Form 11, filed with the company accounts",
           "Revenue audits — interventions and correspondence handled on your behalf",
         ],
         bestFor: [
@@ -189,7 +189,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Groups large enough to face Pillar Two",
         ],
         context:
-          "The corporation tax return — the CT1 — is due nine months after your accounting year-end, on or before the 23rd of that month, and it's filed through Revenue's ROS. Miss the date and you face a surcharge on top of the tax, plus restrictions on using losses and reliefs, so we work to a timetable that has the return ready well before the deadline rather than on it.\n\nTwo things move real money here. The R&D tax credit is now worth 35% of qualifying spend, and Budget 2026 raised the first-year cash refund threshold to €87,500 — worth knowing if you're investing in genuine development work. And the gap between the 12.5% trading rate and the 25% rate on passive income means how profits are classified, and how a close company distributes them, changes the bill. We plan both rather than leaving them to the year-end scramble.",
+          "The corporation tax return — the CT1 — is due nine months after your accounting year-end, on or before the 23rd of that month, and it’s filed through Revenue’s ROS. Miss the date and you face a surcharge on top of the tax, plus restrictions on using losses and reliefs, so we work to a timetable that has the return ready well before the deadline rather than on it.\n\nTwo things move real money here. The R&D tax credit is now worth 35% of qualifying spend, and Budget 2026 raised the first-year cash refund threshold to €87,500 — worth knowing if you’re investing in genuine development work. And the gap between the 12.5% trading rate and the 25% rate on passive income means how profits are classified, and how a close company distributes them, changes the bill. We plan both rather than leaving them to the year-end scramble.",
       },
       {
         slug: "vat-returns",
@@ -212,7 +212,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Anyone near or over the registration threshold",
         ],
         context:
-          "You have to register for VAT once turnover passes €85,000 for goods or €42,500 for services in any twelve-month period — and you can register voluntarily below that where it pays to reclaim VAT on what you buy. From there most businesses file a VAT3 every two months through ROS, plus an annual Return of Trading Details that reconciles the year. Selling across the EU brings in VIES returns, and distance sellers cross into the OSS/IOSS regime once past €10,000.\n\nRates matter as much as thresholds. From 1 July 2026 the VAT rate on food, catering and hairdressing dropped to 9% from 13.5% — the sort of change that quietly affects both your pricing and your returns. We keep the treatment right and reconcile every return to your ledger before it's submitted, because VAT mistakes are the ones Revenue tends to spot fastest.",
+          "You have to register for VAT once turnover passes €85,000 for goods or €42,500 for services in any twelve-month period — and you can register voluntarily below that where it pays to reclaim VAT on what you buy. From there most businesses file a VAT3 every two months through ROS, plus an annual Return of Trading Details that reconciles the year. Selling across the EU brings in VIES returns, and distance sellers cross into the OSS/IOSS regime once past €10,000.\n\nRates matter as much as thresholds. From 1 July 2026 the VAT rate on food, catering and hairdressing dropped to 9% from 13.5% — the sort of change that quietly affects both your pricing and your returns. We keep the treatment right and reconcile every return to your ledger before it’s submitted, because VAT mistakes are the ones Revenue tends to spot fastest.",
       },
       {
         slug: "annual-accounts",
@@ -220,12 +220,12 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Year-end statutory accounts under FRS 102 / FRS 105, filed with the CRO — done early, not at the deadline.",
         overview:
-          "Year-end accounts should tell you something, not just satisfy a filing. We prepare statutory accounts under FRS 102 (or FRS 105 for micro-entities), agree them with you in plain English, and file on time — Irish accounts go to the CRO with the annual return (Form B1), tagged in iXBRL for Revenue. Many small companies (turnover up to €15m, balance sheet up to €7.5m, 50 staff) qualify for audit exemption.",
+          "Year-end accounts should tell you something, not just satisfy a filing. We prepare statutory accounts under FRS 102 (or FRS 105 for micro-entities), agree them with you in plain English, and file on time — Irish accounts go to the CRO with the annual return (Form B1), tagged in iXBRL for Revenue. Many small companies (turnover up to €15m, balance sheet up to €7.5m, up to 50 employees) qualify for audit exemption.",
         included: [
           "Statutory accounts — prepared under FRS 102 or FRS 105",
           "CRO filing — accounts and the Form B1 annual return",
           "iXBRL tagging — for Revenue and CRO requirements",
-          "Directors' report — prepared alongside the annual return",
+          "Directors’ report — prepared alongside the annual return",
           "Tax computation — corporation tax prepared with the accounts",
           "Exemption check — small-company and audit-exemption assessment",
         ],
@@ -258,7 +258,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Businesses that want monthly numbers, not annual",
         ],
         context:
-          "Revenue's shift towards real-time and digital reporting is quietly ending the shoebox-of-receipts approach. Records kept live on Xero or QuickBooks aren't just tidier — they're increasingly what ROS filing, VAT returns and any Revenue query assume you already have to hand.\n\nWe keep the bank feeds flowing, chase the receipts and reconcile as we go, then close each month with management accounts written in plain English. The point isn't neat books for their own sake — it's that you can see margin, cash and who owes you money in the month it matters, rather than finding out nine months later in a set of statutory accounts.",
+          "Revenue’s shift towards real-time and digital reporting is quietly ending the shoebox-of-receipts approach. Records kept live on Xero or QuickBooks aren’t just tidier — they’re increasingly what ROS filing, VAT returns and any Revenue query assume you already have to hand.\n\nWe keep the bank feeds flowing, chase the receipts and reconcile as we go, then close each month with management accounts written in plain English. The point isn’t neat books for their own sake — it’s that you can see margin, cash and who owes you money in the month it matters, rather than finding out nine months later in a set of statutory accounts.",
       },
       {
         slug: "payroll",
@@ -281,7 +281,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Directors balancing salary and dividends",
         ],
         context:
-          "Payroll in Ireland runs on PAYE Modernisation: every pay run is reported to Revenue in real time, before your employees are paid, through ROS. A late or wrong submission shows up immediately, which is what makes payroll unforgiving in a way annual filings aren't. We run the full cycle — payslips, PRSI, USC, PAYE and the year-end returns — so nothing slips through.\n\nTwo cost changes are live right now. Employee PRSI sits at 4.2% and rises again to 4.35% from 1 October 2026, part of a run of scheduled increases. And pension auto-enrolment — My Future Fund — started on 1 January 2026: employees aged 23 to 60 earning over €20,000, who aren't already in a scheme, are enrolled automatically, with employer and employee each contributing 1.5% of gross pay to begin with. We handle the enrolment and the contributions so it's one less thing to get wrong.",
+          "Payroll in Ireland runs on PAYE Modernisation: every pay run is reported to Revenue in real time, before your employees are paid, through ROS. A late or wrong submission shows up immediately, which is what makes payroll unforgiving in a way annual filings aren’t. We run the full cycle: payslips, PRSI, USC, PAYE and the year-end returns, so nothing slips through.\n\nTwo cost changes are live right now. Employee PRSI sits at 4.2% and rises again to 4.35% from 1 October 2026, part of a run of scheduled increases. And pension auto-enrolment (My Future Fund) started on 1 January 2026: employees aged 23 to 60 earning over €20,000, who aren’t already in a scheme, are enrolled automatically, with employer and employee each contributing 1.5% of gross pay to begin with. We handle the enrolment and the contributions as part of the regular payroll run, not as a separate project.",
       },
       {
         slug: "audit-assurance",
@@ -289,7 +289,7 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Statutory and voluntary audits that stand up to scrutiny — and give lenders, boards and buyers confidence in your numbers.",
         overview:
-          "An audit should do more than satisfy a legal requirement. The first question we answer is whether you even need one — many companies qualify for audit exemption (turnover up to €15m, balance sheet up to €7.5m, 50 employees). Since 16 July 2025, a single late annual return no longer costs a small or micro company that exemption — it is lost only on a second late filing within five years. When you do need an audit, ours are planned around your risks, run under ISA (Ireland) with minimal disruption, and end with a management letter you will actually act on.",
+          "An audit should do more than satisfy a legal requirement. The first question we answer is whether you even need one: many companies qualify for audit exemption (turnover up to €15m, balance sheet up to €7.5m, up to 50 employees). Since 16 July 2025, a single late annual return no longer costs a small or micro company that exemption — it is lost only on a second late filing within five years. When you do need an audit, ours are planned around your risks, run under ISA (Ireland) with minimal disruption, and end with a management letter you will actually act on.",
         included: [
           "Statutory audits — conducted under ISA (Ireland)",
           "Exemption check — audit-exemption and group-size assessment",
@@ -304,7 +304,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Businesses raising debt or equity",
         ],
         context:
-          "The first question about an audit is whether you need one at all. A company stays audit-exempt while it's under two of three limits — turnover €15m, balance sheet €7.5m, and 50 employees — and files on time. Since 16 July 2025 a single late annual return no longer costs a small or micro company that exemption; it's now lost only on a second late filing within five years, which gives a real second chance where there used to be none.\n\nWhen you do need an audit — because you're over the limits, you've lost the exemption, or a lender, investor or grant body asks for one — we plan it around where the risk actually sits, run it under ISA (Ireland), and finish with a management letter you can act on. A statutory audit under the Companies Act 2014 is the baseline; a voluntary one is often what gets a deal or a facility over the line.",
+          "The first question about an audit is whether you need one at all. A company stays audit-exempt provided it meets two of three limits — turnover up to €15m, balance sheet up to €7.5m, and up to 50 employees — and files on time. Since 16 July 2025, a single late annual return no longer costs a small or micro company its exemption; that is now lost only on a second late filing within five years, a real second chance where none existed before.\n\nAn audit becomes necessary once a company is over those limits, has lost the exemption, or a lender, investor or grant body requires one. We plan it around where the risk actually sits, run it under ISA (Ireland), and finish with a management letter you can act on. A statutory audit under the Companies Act 2014 is the baseline; a voluntary one is often what gets a deal or a facility over the line.",
       },
     ],
   },
@@ -338,7 +338,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Groups adding subsidiaries",
         ],
         context:
-          "A new Irish company is incorporated at the CRO, usually as a private company limited by shares (LTD), and needs at least one EEA-resident director — or a Section 137 insurance bond if every director is non-resident. Straight after incorporation come the registrations that are easy to overlook: corporation tax, and PAYE or VAT where they apply, plus the Register of Beneficial Ownership (RBO), which has to be filed within five months.\n\nThe filing that catches people out is the first annual return (Form B1), due six months after incorporation — no financial statements are needed that first time, but miss it and the clock starts on penalties and audit-exemption risk. We handle the incorporation, the registrations and the statutory registers, so you're trading quickly and both the CRO and Revenue are satisfied from day one.",
+          "A new Irish company is incorporated at the CRO, usually as a private company limited by shares (LTD), and needs at least one EEA-resident director — or a Section 137 insurance bond if every director is non-resident. Straight after incorporation come the registrations that are easy to overlook: corporation tax, and PAYE or VAT where they apply, plus the Register of Beneficial Ownership (RBO), which has to be filed within five months.\n\nThe filing that catches people out is the first annual return (Form B1), due six months after incorporation — no financial statements are needed that first time, but miss it and the clock starts on penalties and audit-exemption risk. We handle the incorporation, the registrations and the statutory registers, and get you trading quickly with both the CRO and Revenue satisfied from day one.",
       },
       {
         slug: "financial-consulting",
@@ -346,7 +346,7 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Funding strategy, financial modelling and decision support — a finance brain on call when the stakes are high.",
         overview:
-          "When the numbers behind a decision run to six or seven figures, a gut call isn't enough. We build the model, pressure-test the assumptions and sit with you while you decide — funding rounds, pricing, major hires, acquisitions.",
+          "When the numbers behind a decision run to six or seven figures, a gut call isn’t enough. We build the model, pressure-test the assumptions and sit with you while you decide — funding rounds, pricing, major hires, acquisitions.",
         included: [
           "Financial modelling — scenarios built and stress-tested",
           "Funding support — loan and grant applications put together",
@@ -361,7 +361,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Teams without an in-house finance lead",
         ],
         context:
-          "Big financial decisions tend to arrive with a deadline and imperfect information — a funding round closing, a lease to commit to, a hire you can't easily undo. The value of a model isn't precision to the last euro; it's seeing how the decision behaves when your assumptions turn out wrong, so you know where the real risk is before you sign.\n\nWe build the numbers around your actual accounts rather than a template — cash runway, pricing and margin, the funding gap and how it gets filled — and stay in the room while you weigh it up. If you're applying for finance, banks and State-backed funders want to see that the projections hold together and the assumptions are defensible; we make sure they are.",
+          "Big financial decisions tend to arrive with a deadline and imperfect information — a funding round closing, a lease to commit to, a hire you can’t easily undo. The value of a model isn’t precision to the last euro; it’s seeing how the decision behaves when your assumptions turn out wrong, so you know where the real risk is before you sign.\n\nWe build the numbers around your actual accounts rather than a template — cash runway, pricing and margin, the funding gap and how it gets filled — and stay in the room while you weigh it up. If you’re applying for finance, banks and State-backed funders want to see that the projections hold together and the assumptions are defensible; we make sure they are.",
       },
       {
         slug: "international-expansion",
@@ -369,7 +369,7 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Cross-border setup and tax structuring for businesses moving from Ireland into the EU and beyond.",
         overview:
-          "Expanding into a new country multiplies your obligations. Whether you are moving into the EU single market or further afield, there are VAT registration, permanent-establishment and transfer-pricing questions to answer first. Large groups also need to watch the 15% global minimum tax (Pillar Two). We map the landscape before you commit, then set up the structure and keep it compliant.",
+          "Expanding into a new country multiplies your obligations. Whether you are moving into the EU single market or further afield, there are VAT registration, permanent-establishment and transfer-pricing questions to answer first. Large groups also need to watch the 15% global minimum tax (Pillar Two). We work through those questions with you before you commit, then handle the structure and its ongoing compliance.",
         included: [
           "Cross-border structuring — the setup planned from Ireland out",
           "Entity setup — companies established in new jurisdictions",
@@ -384,7 +384,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Groups rationalising their structure",
         ],
         context:
-          "Trading into another country rarely means one new obligation — it usually means several at once. Selling goods or services across the EU can trigger a VAT registration abroad or bring you into the OSS/IOSS regime, and putting people or a fixed place of business on the ground can create a permanent establishment that's taxable there. Get the structure wrong early and it's slow and costly to unwind.\n\nFor larger groups there's Pillar Two on top: a 15% global minimum effective tax rate for groups with consolidated turnover above €750m, now in force across the EU. Ireland keeps its 12.5% headline rate, but big groups pay a top-up to reach 15%. We map the VAT, permanent-establishment, transfer-pricing and treaty questions before you move, then set the structure up and keep it compliant.",
+          "Trading into another country rarely means one new obligation — it usually means several at once. Selling goods or services across the EU can trigger a VAT registration abroad or bring you into the OSS/IOSS regime, and putting people or a fixed place of business on the ground can create a permanent establishment that’s taxable there. Get the structure wrong early and it’s slow and costly to unwind.\n\nFor larger groups there’s Pillar Two on top: a 15% global minimum effective tax rate for groups with consolidated turnover above €750m, now in force across the EU. Ireland keeps its 12.5% headline rate, but big groups pay a top-up to reach 15%. We map the VAT, permanent-establishment, transfer-pricing and treaty questions before you move, then set the structure up and keep it compliant.",
       },
     ],
   },
@@ -394,7 +394,7 @@ export const serviceCategories: ServiceCategory[] = [
     blurb:
       "Move off spreadsheets, onto a system that scales, with AI handling the repetitive work. The finance function, modernised.",
     overview:
-      "Technology should take work off your plate, not add to it. We modernise finance operations end to end — migrating systems, automating the manual, and embedding AI where it earns its place. With Revenue's real-time reporting and e-invoicing spreading across Europe, digital records are fast becoming the baseline, not the upgrade.",
+      "Technology should take work off your plate, not add to it. We modernise finance operations end to end — migrating systems, automating the manual, and embedding AI where it earns its place. With Revenue’s real-time reporting and e-invoicing spreading across Europe, digital records are fast becoming the baseline, not the upgrade.",
     kind: "services",
     items: [
       {
@@ -418,7 +418,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Finance leads inheriting a mess",
         ],
         context:
-          "Finance processes tend to be inherited rather than designed. They work at one size and quietly break at the next — month-end drags on, the numbers need caveats, and nobody fully trusts the report. The fix is rarely a single new tool; it's redesigning how data flows from transaction to statement so the close is fast because it's clean, not because someone worked the weekend.\n\nThere's a compliance tailwind, too. Revenue's real-time reporting and the spread of e-invoicing across Europe mean structured, digital finance data is becoming the baseline rather than a nice-to-have. We redesign the workflow, the controls and the reporting together, then bring the team along so the new way of working actually sticks.",
+          "Finance processes tend to be inherited rather than designed. They work at one size and quietly break at the next — month-end drags on, the numbers need caveats, and nobody fully trusts the report. The fix is rarely a single new tool; it’s redesigning how data flows from transaction to statement so the close is fast because it’s clean, not because someone worked the weekend.\n\nThere’s a compliance tailwind, too. Revenue’s real-time reporting and the spread of e-invoicing across Europe mean structured, digital finance data is becoming the baseline rather than a nice-to-have. We redesign the workflow, the controls and the reporting together, then bring the team along so the new way of working actually sticks.",
       },
       {
         slug: "erp-migration",
@@ -441,7 +441,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Anyone burned by a past migration",
         ],
         context:
-          "Most ERP migrations don't fail on the software — they fail on the data and the switch. Years of transactions, half of them with quirks nobody documented, have to be mapped to a new chart of accounts and moved without breaking your history or your VAT trail. Run it as a big-bang cutover with no parallel period and you find the problems in production, which is the worst place to find them.\n\nWe scope the move, clean and map the data, and run the old and new systems side by side until the numbers reconcile, then stay on through go-live. Digital, ROS-ready record-keeping is built in from the start, so the new system meets Revenue's requirements on day one instead of being something you retrofit later.",
+          "Most ERP migrations don’t fail on the software — they fail on the data and the switch. Years of transactions, half of them with quirks nobody documented, have to be mapped to a new chart of accounts and moved without breaking your history or your VAT trail. Run it as a big-bang cutover with no parallel period and you find the problems in production, which is the worst place to find them.\n\nWe scope the move, clean and map the data, and run the old and new systems side by side until the numbers reconcile, then stay on through go-live. Digital, ROS-ready record-keeping is built in from the start — a requirement the new system meets on day one, rather than something retrofitted later.",
       },
       {
         slug: "ai-automation",
@@ -464,7 +464,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Finance functions under headcount pressure",
         ],
         context:
-          "The finance work worth automating is the high-volume, rules-based kind: matching invoices, chasing receipts, coding transactions, reconciling the bank. It's repetitive, it's error-prone when people are tired, and it's exactly what OCR and modern automation handle well. Automating it isn't about cutting the team — it's about pointing them at the work that needs judgement.\n\nWe start by measuring where the hours actually go, then automate the tasks with the best return first rather than trying to boil the ocean. Everything stays inside proper controls and approvals, because the point of taking people out of data entry is to put them back where they add value — reviewing, deciding, and catching the things a rule can't.",
+          "The finance work worth automating is the high-volume, rules-based kind: matching invoices, chasing receipts, coding transactions, reconciling the bank. It’s repetitive, it’s error-prone when people are tired, and it’s exactly what OCR and modern automation handle well. Automating it isn’t about cutting the team — it’s about pointing them at the work that needs judgement.\n\nWe start by measuring where the hours actually go, then automate the tasks with the best return first rather than trying to boil the ocean. Everything stays inside proper controls and approvals, because the point of taking people out of data entry is to put them back where they add value — reviewing, deciding, and catching the things a rule can’t.",
       },
       {
         slug: "ai-integration",
@@ -483,11 +483,11 @@ export const serviceCategories: ServiceCategory[] = [
         ],
         bestFor: [
           "Businesses with data but no AI strategy",
-          "Teams piloting AI tools that don't connect",
+          "Teams piloting AI tools that don’t connect",
           "Leaders wanting AI with guardrails",
         ],
         context:
-          "Generic AI tools demo well and disappoint in practice, because they don't know your chart of accounts, your customers or your history. The value comes from connecting AI to your real data — forecasting on your actual cash patterns, flagging anomalies against your own baselines, reading your own documents — inside the systems you already use.\n\nThat only works with guardrails. Financial data needs access controls, an audit trail, and a human signing off anything that drives a decision or a filing. We build the integration and the governance together, so the output is something you can rely on and defend, not a black box you have to take on trust.",
+          "Generic AI tools demo well and disappoint in practice, because they don’t know your chart of accounts, your customers or your history. The value comes from connecting AI to your real data — forecasting on your actual cash patterns, flagging anomalies against your own baselines, reading your own documents — inside the systems you already use.\n\nThat only works with guardrails. Financial data needs access controls, an audit trail, and a human signing off anything that drives a decision or a filing. We build the integration and the governance together: the output is something you can rely on and defend, not a black box you have to take on trust.",
       },
     ],
   },
@@ -506,7 +506,7 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Pension funding, private practice income and locum structuring for medics.",
         overview:
-          "Medical careers create tax problems other professions never see — pension funding limits, mixed public (HSE) and private income, and locum work. We handle the specifics so a good year doesn't turn into a tax-bill shock.",
+          "Medical careers create tax problems other professions never see — pension funding limits, mixed public (HSE) and private income, and locum work. We handle the specifics: income structure, reliefs and pension planning, worked out well before your return is due.",
         included: [
           "Pension planning — funding limits and retirement relief",
           "Mixed income — HSE and private practice earnings reconciled",
@@ -521,7 +521,7 @@ export const serviceCategories: ServiceCategory[] = [
           "GPs running their own practice",
         ],
         context:
-          "Medicine creates tax questions most professions never face. Consultants often earn through a mix of HSE salary and private practice income, which have to be reported and structured correctly; GPs frequently run a practice as a business in its own right; and locum work adds another layer again. A strong year can turn into a preliminary-tax shock if none of it has been planned for.\n\nPensions are where the biggest reliefs sit — and where the limits bite. Contributions attract tax relief up to age-related percentage limits, and the Standard Fund Threshold — the cap on a tax-relieved pension pot — rose to €2.2 million in 2026 and is set to climb in steps to €2.8 million by 2029, so timing matters, particularly later in a career. We handle the Form 11, the practice structure and the pension planning together, so a good income doesn't quietly become a bad tax bill.",
+          "Medicine creates tax questions most professions never face. Consultants often earn through a mix of HSE salary and private practice income, which have to be reported and structured correctly; GPs frequently run a practice as a business in its own right; and locum work adds another layer again. A strong year can turn into a preliminary-tax shock if none of it has been planned for.\n\nPensions are where the biggest reliefs sit — and where the limits bite. Contributions attract tax relief up to age-related percentage limits, and the Standard Fund Threshold — the cap on a tax-relieved pension pot — rose to €2.2 million in 2026 and is set to climb in steps to €2.8 million by 2029, so timing matters, particularly later in a career. We handle the Form 11, the practice structure and the pension planning together, so retirement decisions get made on your schedule, not under year-end pressure.",
       },
       {
         slug: "it-professionals",
@@ -529,7 +529,7 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Contractor structuring and share-option taxation for tech workers and contractors.",
         overview:
-          "Tech pay comes in forms Revenue treats very differently — contract income, RSUs, share options. We structure it properly and plan around capital gains (33% CGT) so equity doesn't catch you out.",
+          "Tech pay comes in forms Revenue treats very differently — contract income, RSUs, share options. We structure it properly and plan around capital gains (33% CGT) so equity doesn’t catch you out.",
         included: [
           "Contractor structuring — limited company set up properly",
           "PSC vs umbrella — the personal service company question answered",
@@ -544,7 +544,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Consultants weighing limited vs umbrella",
         ],
         context:
-          "Tech pay arrives in forms Revenue treats very differently. Salary is taxed under PAYE; contract income depends on whether you trade as a sole trader, through your own limited company, or via an umbrella; and equity — RSUs, options, ESPP — has its own timing and its own traps. RSUs are generally taxed as pay when they vest, and a later sale can bring a separate capital gains charge on top.\n\nCapital gains run at 33%, with only the first €1,270 of gains each year exempt, so selling vested shares needs planning rather than a panic in October. We get the trading structure right, plan the equity around the tax, and keep the Form 11 and preliminary tax on track so nothing lands unexpectedly.",
+          "Tech pay arrives in forms Revenue treats very differently. Salary is taxed under PAYE; contract income depends on whether you trade as a sole trader, through your own limited company, or via an umbrella; and equity — RSUs, options, ESPP — has its own timing and its own traps. RSUs are generally taxed as pay when they vest, and a later sale can bring a separate capital gains charge on top.\n\nCapital gains run at 33%, with only the first €1,270 of gains each year exempt, so selling vested shares needs planning rather than a panic in October. We get the trading structure right, plan the equity around the tax, and keep the Form 11 and preliminary tax on track throughout the year.",
       },
       {
         slug: "independent-contractors",
@@ -552,14 +552,14 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "End-to-end tax and bookkeeping for self-employed contractors — expenses and the right trading structure.",
         overview:
-          "When you work for yourself, the admin is on you too. We take it off your plate — bookkeeping, expenses, returns — and keep you square with Revenue. Whatever your trade, we get the structure and the reliefs right, and stay on top of preliminary tax so nothing lands as a surprise.",
+          "When you work for yourself, the admin is on you too. We take it off your plate — bookkeeping, expenses, returns — and keep you square with Revenue. Whatever your trade, we get the structure and the reliefs right, and plan preliminary tax well ahead of the deadline.",
         included: [
           "Structure — sole trader vs limited company, decided early",
           "RCT — Relevant Contracts Tax handled for construction work",
           "Books — bookkeeping and expense tracking kept current",
           "Form 11 — the personal income tax return filed",
           "VAT — registration and returns once you cross the threshold",
-          "Preliminary tax — planned so it never lands as a surprise",
+          "Preliminary tax — planned ahead, due alongside the Form 11",
         ],
         bestFor: [
           "Self-employed trades and freelancers",
@@ -567,7 +567,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Anyone going limited for the first time",
         ],
         context:
-          "Going out on your own means the admin comes with it. Whether you stay a sole trader or set up a limited company changes your tax, your paperwork and your exposure, so it's worth deciding deliberately rather than by default. Once you're trading, income tax is self-assessed on the Form 11, due by 31 October each year — a little later if you pay and file through ROS — and preliminary tax for the year ahead falls due at the same time, which is the bill that surprises people in their first full year.\n\nIf you work in construction, Relevant Contracts Tax (RCT) adds another layer, with deduction rates of 0%, 20% or 35% set by your compliance record. We keep the books, handle the returns and manage preliminary tax so it's planned for, not a shock in the post.",
+          "Going out on your own means the admin comes with it. Whether you stay a sole trader or set up a limited company changes your tax, your paperwork and your exposure, so it’s worth deciding deliberately rather than by default. Once you’re trading, income tax is self-assessed on the Form 11, due by 31 October each year — a little later if you pay and file through ROS — and preliminary tax for the year ahead falls due at the same time, which is the bill that surprises people in their first full year.\n\nIf you work in construction, Relevant Contracts Tax (RCT) adds another layer, with deduction rates of 0%, 20% or 35% set by your compliance record. We keep the books, handle the returns and manage preliminary tax as a matter of course, well ahead of each deadline.",
       },
       {
         slug: "entrepreneurs",
@@ -590,7 +590,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Anyone balancing personal and business tax",
         ],
         context:
-          "For a founder the business and your own finances are one system, and the tax works best when they're planned together. How you pay yourself — salary versus dividends — affects both the company's position and your personal bill, and a share scheme like KEEP lets you bring key people in on equity in a tax-efficient way rather than with cash you'd rather keep in the business.\n\nThe number that rewards planning most sits at exit. Revised Entrepreneur Relief charges 10% CGT on qualifying gains, and Budget 2026 raised the lifetime limit to €1.5 million — up from €1 million — for disposals from January 2026, against a standard CGT rate of 33%. Getting the structure and the timing right ahead of a sale is worth real money, often more than a full year of trading profit.",
+          "For a founder the business and your own finances are one system, and the tax works best when they’re planned together. How you pay yourself (salary versus dividends) affects both the company’s position and your personal bill, and a share scheme like KEEP lets you bring key people in on equity in a tax-efficient way rather than with cash you’d rather keep in the business.\n\nThe number that rewards planning most sits at exit. Revised Entrepreneur Relief charges 10% CGT on qualifying gains, and Budget 2026 raised the lifetime limit from €1 million to €1.5 million for disposals from January 2026, against a standard CGT rate of 33%. Getting the structure and the timing right ahead of a sale is worth real money, often more than a full year of trading profit.",
       },
     ],
   },
@@ -600,7 +600,7 @@ export const serviceCategories: ServiceCategory[] = [
     blurb:
       "AI on real finance problems — forecasting, automation, tax. A chartered accountant signs off every output.",
     overview:
-      "We put AI to work on real finance problems. Where it adds genuine value — forecasting, automation, tax analysis — we deploy it; where it doesn't, we say so. Practical applications, measurable results, with a chartered accountant on every output.",
+      "We put AI to work on real finance problems. Where it adds genuine value — forecasting, automation, tax analysis — we deploy it; where it doesn’t, we say so. Practical applications, measurable results, with a chartered accountant on every output.",
     kind: "services",
     items: [
       {
@@ -609,7 +609,7 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "AI-driven forecasting, reporting and analysis that turns your finance data into decisions.",
         overview:
-          "There are answers in your finance data you don't have time to dig for. We apply AI to surface them — cash-flow forecasting, anomaly detection, real-time reporting — so you see what's coming, not just what already happened.",
+          "There are answers in your finance data you don’t have time to dig for. We apply AI to surface them — cash-flow forecasting, anomaly detection, real-time reporting — turning last month’s numbers into an early view of next month’s.",
         included: [
           "Forecasting — AI cash-flow and revenue projections",
           "Anomaly detection — fraud and errors flagged early",
@@ -624,7 +624,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Leaders making data-led decisions",
         ],
         context:
-          "Most finance teams are rich in data and poor in time to interrogate it. The monthly numbers tell you what already happened; the questions that matter — will cash hold up, which customers are slipping, where margin is leaking — need someone to dig, and the digging rarely gets done. That's the gap AI is genuinely good at closing.\n\nWe apply it to your own figures: cash-flow and revenue forecasting built on your real patterns, anomaly detection that flags the odd transaction early, and reporting that stays current instead of being rebuilt every month. A chartered accountant reviews what it produces, because a forecast you're going to act on needs judgement behind it, not just output.",
+          "Most finance teams are rich in data and poor in time to interrogate it. The monthly numbers tell you what already happened; the questions that matter — will cash hold up, which customers are slipping, where margin is leaking — need someone to dig, and the digging rarely gets done. That’s the gap AI is genuinely good at closing.\n\nWe apply it to your own figures: cash-flow and revenue forecasting built on your real patterns, anomaly detection that flags the odd transaction early, and reporting that stays current instead of being rebuilt every month. A chartered accountant reviews what it produces, because a forecast you’re going to act on needs judgement behind it, not just output.",
       },
       {
         slug: "business-automation",
@@ -632,7 +632,7 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "Rethink and automate how the business runs — workflows, pricing and operations powered by AI.",
         overview:
-          "AI can reshape how the business earns, not just how the back office runs. We help you find those opportunities — automated operations, AI-driven pricing, new service lines — and build them in.",
+          "AI can reshape how the business earns, beyond simply running the back office more efficiently. We help you find those opportunities — automated operations, AI-driven pricing, new service lines — and build them in.",
         included: [
           "Opportunity assessment — where AI actually moves the model",
           "Operations — workflows automated end to end",
@@ -647,7 +647,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Leaders rethinking their model",
         ],
         context:
-          "AI often gets bolted onto the back office when the bigger opportunity is in the business model itself — how you price, how you serve customers, what you can offer that wasn't economic before. Automating operations frees up capacity; rethinking pricing or productising a service can change what the business is actually worth.\n\nWe look at both: the workflows worth automating now, and the model-level moves AI makes possible — dynamic pricing, demand analytics, new service lines. Then we build the ones with a real return, grounded in your numbers rather than in hype, so the change shows up in margin and not just in a slide deck.",
+          "AI often gets bolted onto the back office when the bigger opportunity is in the business model itself — how you price, how you serve customers, what you can offer that wasn’t economic before. Automating operations frees up capacity; rethinking pricing or productising a service can change what the business is actually worth.\n\nWe look at both: the workflows worth automating now, and the model-level moves AI makes possible — dynamic pricing, demand analytics, new service lines. Then we build the ones with a real return, grounded in your numbers rather than in hype, so the change shows up in margin and not just in a slide deck.",
       },
       {
         slug: "taxation",
@@ -655,7 +655,7 @@ export const serviceCategories: ServiceCategory[] = [
         blurb:
           "AI-assisted tax analysis and optimisation — spot reliefs, model scenarios and cut compliance time.",
         overview:
-          "Tax work is full of repetition and pattern-matching — the kind of thing AI genuinely helps with. We use it to scan for reliefs you're missing, model the tax impact of decisions, and speed up compliance across the Irish tax regime — always with a chartered accountant signing off the output.",
+          "Tax work is full of repetition and pattern-matching — the kind of thing AI genuinely helps with. We use it to scan for reliefs you’re missing, model the tax impact of decisions, and speed up compliance across the Irish tax regime — always with a chartered accountant signing off the output.",
         included: [
           "Relief discovery — allowances and reliefs surfaced by AI",
           "Scenario modelling — the tax impact of decisions, mapped",
@@ -670,7 +670,7 @@ export const serviceCategories: ServiceCategory[] = [
           "Anyone leaving reliefs unclaimed",
         ],
         context:
-          "Irish tax is detailed, changes every Budget, and is full of reliefs that go unclaimed simply because nobody had time to check — R&D, capital allowances, various sector-specific measures. Much of the work of finding them is pattern-matching across documents and prior returns, which is exactly where AI earns its place.\n\nWe use it to scan for reliefs and allowances you may be missing, model the tax impact of a decision before you make it, and speed up routine compliance across the Irish regime. Nothing goes out on AI's say-so, though: a chartered accountant reviews and signs off every position, because with Revenue the responsibility is yours and the answer has to be right.",
+          "Irish tax is detailed, changes every Budget, and is full of reliefs that go unclaimed simply because nobody had time to check — R&D, capital allowances, various sector-specific measures. Much of the work of finding them is pattern-matching across documents and prior returns, which is exactly where AI earns its place.\n\nWe use it to scan for reliefs and allowances you may be missing, model the tax impact of a decision before you make it, and speed up routine compliance across the Irish regime. Nothing goes out on AI’s say-so, though: a chartered accountant reviews and signs off every position, because with Revenue the responsibility is yours and the answer has to be right.",
       },
     ],
   },
@@ -680,7 +680,7 @@ export const serviceCategories: ServiceCategory[] = [
     blurb:
       "A finance director for a few days a month. Forecasts, board packs and funding support, without the salary.",
     overview:
-      "Most businesses don't need a full-time finance director — they need a few hours of a great one, armed with current numbers. We build the forecast, sit in the board meeting, and tell you what the numbers mean for the decision in front of you.",
+      "Most businesses don’t need a full-time finance director — they need a few hours of a great one, armed with current numbers. We build the forecast, sit in the board meeting, and tell you what the numbers mean for the decision in front of you.",
     kind: "single",
     items: [],
     included: [
@@ -697,7 +697,7 @@ export const serviceCategories: ServiceCategory[] = [
       "Founders who need strategy, not just compliance",
     ],
     context:
-      "There's a stage where a business is too big to run the finances on instinct but too small to justify a full-time finance director on a six-figure salary. What you actually need is a few days a month of someone senior, working from current numbers — building the forecast, sitting in the board meeting, and translating the figures into the decision in front of you.\n\nThat's the role we fill: cash-flow and P&L forecasting, budgets, KPIs and board packs, and hands-on support when you're raising or refinancing. You get the judgement of an experienced finance director and the continuity of the same person each month, without the cost or the commitment of the hire.",
+      "There’s a stage where a business is too big to run the finances on instinct but too small to justify a full-time finance director on a six-figure salary. What you actually need is a few days a month of someone senior, working from current numbers — building the forecast, sitting in the board meeting, and translating the figures into the decision in front of you.\n\nThat’s the role we fill: cash-flow and P&L forecasting, budgets, KPIs and board packs, and hands-on support when you’re raising or refinancing. You get the judgement of an experienced finance director and the continuity of the same person each month, without the cost or the commitment of the hire.",
   },
   {
     slug: "outsourcing",
@@ -722,7 +722,7 @@ export const serviceCategories: ServiceCategory[] = [
       "Irish firms scaling fast",
     ],
     context:
-      "Building an in-house finance team is slow and expensive: you're recruiting for several roles, covering holidays and sick leave, and carrying the cost whether the work is there that month or not. Outsourcing the function — or just the parts you don't want to own — gives you the same output as an extension of your business, scaled to what you actually need.\n\nWe run bookkeeping, payroll, supplier payments, management accounts and credit control, keeping everything ROS-ready and reconciled, with a named contact who knows your business rather than a faceless queue. As you grow, the service grows with you, which is usually cheaper and far less disruptive than hiring, training and replacing a team of your own.",
+      "Building an in-house finance team is slow and expensive: you’re recruiting for several roles, covering holidays and sick leave, and carrying the cost whether the work is there that month or not. Outsourcing the function — or just the parts you don’t want to own — gives you the same output as an extension of your business, scaled to what you actually need.\n\nWe run bookkeeping, payroll, supplier payments, management accounts and credit control, keeping everything ROS-ready and reconciled, with a named contact who knows your business rather than a faceless queue. As you grow, the service grows with you, which is usually cheaper and far less disruptive than hiring, training and replacing a team of your own.",
   },
   {
     slug: "crypto",
@@ -747,7 +747,7 @@ export const serviceCategories: ServiceCategory[] = [
       "Anyone facing CARF reporting or a Revenue query",
     ],
     context:
-      "Crypto is taxed in Ireland under the existing rules, not a special regime, which is what trips people up. Disposing of a crypto-asset — selling it, swapping one token for another, or spending it — is a capital gains event, taxed at 33% on the gain above the €1,270 annual exemption. Income from staking, mining or airdrops is treated differently again, and can be taxable at your marginal rate when it's received. Every wallet and exchange has to be pulled together to get it right.\n\nThe bigger shift is visibility. Under the OECD Crypto-Asset Reporting Framework (CARF), and the EU's DAC8, exchanges begin collecting user data in 2026 and reporting it to Revenue from 2027 — so positions that once went unnoticed no longer will. We reconstruct the records, calculate the gains, classify the income correctly and file through ROS, so you're straight with Revenue before the data arrives ahead of you.",
+      "Crypto is taxed in Ireland under the existing rules, not a special regime, which is what trips people up. Disposing of a crypto-asset — selling it, swapping one token for another, or spending it — is a capital gains event, taxed at 33% on the gain above the €1,270 annual exemption. Income from staking, mining or airdrops is treated differently again, and can be taxable at your marginal rate when it’s received. Every wallet and exchange has to be pulled together to get it right.\n\nThe bigger shift is visibility. Under the OECD Crypto-Asset Reporting Framework (CARF), and the EU’s DAC8, exchanges begin collecting user data in 2026 and reporting it to Revenue from 2027 — so positions that once went unnoticed no longer will. We reconstruct the records, calculate the gains, classify the income correctly and file through ROS, putting you straight with Revenue before that data reaches them.",
   },
 ];
 
