@@ -258,10 +258,15 @@ create table if not exists toolkit_resources (
   file_path   text,
   -- Original filename shown on the download button.
   file_name   text,
+  -- Accounting framework badge (FRS 102 / FRS 101 / IFRS …); null when N/A.
+  framework   text,
   active      boolean not null default true,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
+
+-- Upgrade path for databases created before the framework badge existed.
+alter table toolkit_resources add column if not exists framework text;
 
 create index if not exists toolkit_resources_category_idx
   on toolkit_resources (category, created_at desc);

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { query } from "../../lib/db";
 import { requireAdmin } from "../../lib/supabase/guards";
 import { createAdminClient } from "../../lib/supabase/admin";
-import { TOOLKIT_CATEGORIES } from "../../lib/toolkit-types";
+import { TOOLKIT_CATEGORIES, TOOLKIT_FRAMEWORKS } from "../../lib/toolkit-types";
 
 export interface ActionState {
   status: "idle" | "saved" | "error";
@@ -12,6 +12,7 @@ export interface ActionState {
 }
 
 const CATEGORY_VALUES = TOOLKIT_CATEGORIES.map((c) => c.value) as string[];
+const FRAMEWORK_VALUES = TOOLKIT_FRAMEWORKS as readonly string[];
 
 /* Uploads go into the public "toolkits" bucket. Extension allowlist keeps the
    bucket to documents (no scripts/executables); 20 MB matches the server-action
@@ -33,6 +34,7 @@ interface ParsedResource {
   title: string;
   description: string | null;
   category: string;
+  framework: string | null;
   externalUrl: string | null;
   active: boolean;
 }
@@ -41,10 +43,13 @@ function parseFields(formData: FormData): ParsedResource | string {
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const category = String(formData.get("category") ?? "");
+  const framework = String(formData.get("framework") ?? "").trim();
   const externalUrl = String(formData.get("external_url") ?? "").trim();
 
   if (!title) return "Title is required.";
   if (!CATEGORY_VALUES.includes(category)) return "Pick a category.";
+  if (framework && !FRAMEWORK_VALUES.includes(framework))
+    return "Unknown framework.";
   if (externalUrl && !/^https?:\/\//i.test(externalUrl))
     return "External link must start with http(s)://";
 
@@ -52,6 +57,7 @@ function parseFields(formData: FormData): ParsedResource | string {
     title,
     description: description || null,
     category,
+    framework: framework || null,
     externalUrl: externalUrl || null,
     active: formData.get("active") === "on",
   };
@@ -97,16 +103,23 @@ export async function saveResource(
   await requireAdmin();
 
   const parsed = parseFields(formData);
-  if (typeof parsed === "string") return { status: "error", message: parsed };
+  if (typeof parsed === "string") {
+    console.warn("[toolkits] save rejected (fields):", parsed);
+    return { status: "error", message: parsed };
+  }
 
   const id = String(formData.get("id") ?? "").trim();
   const file = formData.get("file");
   const hasFile = file instanceof File && file.size > 0;
 
-  if (!id && !hasFile && !parsed.externalUrl)
+  if (!id && !hasFile && !parsed.externalUrl) {
+    console.warn("[toolkits] save rejected: no file and no link");
     return { status: "error", message: "Attach a file or paste an external link." };
-  if (hasFile && parsed.externalUrl)
+  }
+  if (hasFile && parsed.externalUrl) {
+    console.warn("[toolkits] save rejected: both file and link supplied");
     return { status: "error", message: "Attach a file OR a link — not both." };
+  }
 
   // Resolve the file the row should point at.
   let fileUrl: string | null = null;
@@ -133,27 +146,30 @@ export async function saveResource(
         await removeStoredFile(rows[0]?.file_path ?? null);
         await query(
           `update toolkit_resources
-              set title = $1, description = $2, category = $3, active = $4,
-                  file_url = $5, file_path = $6, file_name = $7, updated_at = now()
-            where id = $8`,
-          [parsed.title, parsed.description, parsed.category, parsed.active,
-           fileUrl, filePath, fileName, id],
+              set title = $1, description = $2, category = $3, framework = $4,
+                  active = $5, file_url = $6, file_path = $7, file_name = $8,
+                  updated_at = now()
+            where id = $9`,
+          [parsed.title, parsed.description, parsed.category, parsed.framework,
+           parsed.active, fileUrl, filePath, fileName, id],
         );
       } else {
         await query(
           `update toolkit_resources
-              set title = $1, description = $2, category = $3, active = $4,
-                  updated_at = now()
-            where id = $5`,
-          [parsed.title, parsed.description, parsed.category, parsed.active, id],
+              set title = $1, description = $2, category = $3, framework = $4,
+                  active = $5, updated_at = now()
+            where id = $6`,
+          [parsed.title, parsed.description, parsed.category, parsed.framework,
+           parsed.active, id],
         );
       }
     } else {
       await query(
         `insert into toolkit_resources
-           (title, description, category, file_url, file_path, file_name, active)
-         values ($1, $2, $3, $4, $5, $6, $7)`,
-        [parsed.title, parsed.description, parsed.category,
+           (title, description, category, framework, file_url, file_path,
+            file_name, active)
+         values ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [parsed.title, parsed.description, parsed.category, parsed.framework,
          fileUrl, filePath, fileName, parsed.active],
       );
     }
@@ -163,6 +179,7 @@ export async function saveResource(
   }
 
   revalidate();
+  console.log("[toolkits] saved:", id ? `updated ${id}` : "inserted new row");
   return { status: "saved", message: id ? "Saved." : "Resource added." };
 }
 

@@ -3,7 +3,13 @@
 /* Founders Hub resource browser. The tab strip is a 1:1 visual copy of the
    Ireland-calculators switcher (calculator-tabs.tsx TabInner) so both hubs
    share one design language — the only difference is these tabs switch a
-   category client-side instead of navigating between routes. */
+   category client-side instead of navigating between routes.
+
+   Two clearly-separated groups per tab so real downloads never read as
+   "coming soon":
+     • Available now  — real uploads from /admin/toolkits, shown as cards.
+     • In preparation — the curated catalogue (toolkit-content.ts), shown as a
+       lighter list with a request-a-copy link. */
 
 import { useState } from "react";
 import Link from "next/link";
@@ -14,7 +20,7 @@ import {
 } from "../lib/toolkit-types";
 import { STARTER_RESOURCES, type StarterResource } from "../lib/toolkit-content";
 
-/* Tab labels kept short so the strip scans like the calculators one. */
+/* Short tab labels so the strip scans like the calculators one. */
 const TAB_LABELS: Record<ToolkitCategory, string> = {
   memo: "Memos",
   template: "Templates",
@@ -26,10 +32,10 @@ const TAB_LABELS: Record<ToolkitCategory, string> = {
 
 const CATEGORY_INTROS: Record<ToolkitCategory, string> = {
   memo: "Short technical notes on the tax questions founders ask us most.",
-  template: "Ready-to-use documents and spreadsheets for the day-to-day running of the business.",
-  "tax-form": "Walkthroughs and checklists for the Revenue forms you will actually file.",
-  "vat-form": "VAT registration and the returns cycle, explained for Ireland and the UK.",
-  guide: "Step-by-step playbooks for starting and structuring a business.",
+  template: "Ready-to-use statements, workings and checklists for day-to-day reporting.",
+  "tax-form": "Walkthroughs and checklists for the Revenue forms you actually file.",
+  "vat-form": "VAT registration and the returns cycle, for Ireland and the UK.",
+  guide: "Step-by-step playbooks for setting up, running and closing a company.",
   other: "Everything else worth having to hand.",
 };
 
@@ -67,7 +73,7 @@ function TabInner({ label, active }: { label: string; active: boolean }) {
   );
 }
 
-/* ---------- cards ---------- */
+/* ---------- shared bits ---------- */
 
 const addedOn = (iso: string) =>
   new Intl.DateTimeFormat("en-IE", { dateStyle: "medium" }).format(new Date(iso));
@@ -75,21 +81,40 @@ const addedOn = (iso: string) =>
 const ctaLink =
   "whitespace-nowrap text-sm font-semibold text-primary-500 transition-colors duration-200 hover:text-primary-600";
 
-function FormatTag({ format }: { format: string }) {
+function Badge({ tone, children }: { tone: "framework" | "format"; children: React.ReactNode }) {
+  const cls =
+    tone === "framework"
+      ? "bg-secondary-50 text-secondary-600"
+      : "bg-surface-muted text-muted";
   return (
-    <span className="shrink-0 rounded-none bg-secondary-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-600">
-      {format}
+    <span className={`shrink-0 rounded-none px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${cls}`}>
+      {children}
     </span>
   );
 }
 
-/* Live card — a real uploaded file (or external link) from the admin. */
+function GroupHeading({ label }: { label: string }) {
+  return (
+    <div className="mb-4 flex items-center gap-3">
+      <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">
+        {label}
+      </h3>
+      <span className="h-px flex-1 bg-line" aria-hidden="true" />
+    </div>
+  );
+}
+
+/* ---------- Available now: real uploaded file, shown as a card ---------- */
+
 function UploadedCard({ resource }: { resource: ToolkitResource }) {
   return (
     <div className="flex flex-col rounded-none border border-line bg-surface p-6">
-      <h3 className="font-display text-base font-medium tracking-tight text-ink">
-        {resource.title}
-      </h3>
+      <div className="flex items-start justify-between gap-3">
+        <h4 className="font-display text-base font-medium tracking-tight text-ink">
+          {resource.title}
+        </h4>
+        {resource.framework && <Badge tone="framework">{resource.framework}</Badge>}
+      </div>
       {resource.description && (
         <p className="mt-2 flex-1 text-sm leading-6 text-muted">{resource.description}</p>
       )}
@@ -103,33 +128,40 @@ function UploadedCard({ resource }: { resource: ToolkitResource }) {
   );
 }
 
-/* Starter card — a resource our team is finalising (no file yet). */
-function StarterCard({ resource }: { resource: StarterResource }) {
+/* ---------- In preparation: curated catalogue, shown as a light list ---------- */
+
+function StarterRow({ resource }: { resource: StarterResource }) {
   return (
-    <div className="flex flex-col rounded-none border border-line bg-surface p-6">
-      <div className="flex items-start justify-between gap-3">
-        <h3 className="font-display text-base font-medium tracking-tight text-ink">
-          {resource.title}
-        </h3>
-        <FormatTag format={resource.format} />
+    <li className="flex items-center justify-between gap-4 px-4 py-3.5">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <p className="text-sm font-medium text-ink">{resource.title}</p>
+          {resource.framework && <Badge tone="framework">{resource.framework}</Badge>}
+          <Badge tone="format">{resource.format}</Badge>
+        </div>
+        <p className="mt-1 text-xs leading-5 text-muted">{resource.description}</p>
       </div>
-      <p className="mt-2 flex-1 text-sm leading-6 text-muted">{resource.description}</p>
-      <div className="mt-5 flex items-baseline justify-between gap-3 border-t border-line pt-4">
-        <span className="text-xs font-medium uppercase tracking-wide text-muted">
-          In preparation
-        </span>
-        <Link href="/contact" className={ctaLink}>
-          Request a copy <span aria-hidden="true">→</span>
-        </Link>
-      </div>
-    </div>
+      <Link href="/contact" className={`${ctaLink} shrink-0`}>
+        Request a copy <span aria-hidden="true">→</span>
+      </Link>
+    </li>
+  );
+}
+
+function StarterList({ items }: { items: StarterResource[] }) {
+  return (
+    <ul className="divide-y divide-line rounded-none border border-line bg-surface-muted/40">
+      {items.map((resource) => (
+        <StarterRow key={resource.title} resource={resource} />
+      ))}
+    </ul>
   );
 }
 
 /* ---------- browser ---------- */
 
 export function ToolkitBrowser({ uploaded }: { uploaded: ToolkitResource[] }) {
-  /* Only show tabs that have something behind them. */
+  /* Show any category that has real uploads or curated cards behind it. */
   const categories = TOOLKIT_CATEGORIES.filter(
     (c) =>
       uploaded.some((r) => r.category === c.value) ||
@@ -169,13 +201,28 @@ export function ToolkitBrowser({ uploaded }: { uploaded: ToolkitResource[] }) {
 
       <p className="text-sm leading-6 text-muted">{CATEGORY_INTROS[active]}</p>
 
-      <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {uploadedItems.map((resource) => (
-          <UploadedCard key={resource.id} resource={resource} />
-        ))}
-        {starterItems.map((resource) => (
-          <StarterCard key={resource.title} resource={resource} />
-        ))}
+      <div className="mt-8 flex flex-col gap-10">
+        {uploadedItems.length > 0 && (
+          <section>
+            <GroupHeading label="Available now" />
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {uploadedItems.map((resource) => (
+                <UploadedCard key={resource.id} resource={resource} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {starterItems.length > 0 && (
+          <section>
+            <GroupHeading label="In preparation" />
+            <p className="mb-4 -mt-1 text-sm leading-6 text-muted">
+              Being finalised by our team — request a copy and we&apos;ll email it
+              to you the moment it&apos;s ready.
+            </p>
+            <StarterList items={starterItems} />
+          </section>
+        )}
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ const notes = [
   },
   {
     title: "Growing every month",
-    body: "Items marked “in preparation” are being finalised — request a copy and we'll email it to you the moment it's ready.",
+    body: "New memos, templates and guides are added regularly — if you need something that isn't here yet, just ask and we'll send it over.",
   },
 ];
 

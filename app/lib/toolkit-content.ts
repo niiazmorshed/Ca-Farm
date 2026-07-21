@@ -1,10 +1,11 @@
-/* Static starter catalogue for the Founders Hub page — the resources
-   we are preparing, shown as "in preparation" cards with a request-a-copy CTA.
-   FRONTEND ONLY by design: nothing here touches the database. When a real
-   file is uploaded in /admin/toolkits, the live card appears alongside (and
-   the matching starter entry should be removed from this list). */
+/* Curated "coming soon" catalogue for the Founders Hub. These render as
+   in-preparation cards (with a Request-a-copy CTA) ALONGSIDE the real files
+   uploaded in /admin/toolkits — so every category reads as a full, professional
+   library even before a file is attached. FRONTEND ONLY: nothing here touches
+   the database. As a real file is uploaded for one of these, remove its entry
+   here so it isn't duplicated. */
 
-import type { ToolkitCategory } from "./toolkit-types";
+import type { ToolkitCategory, ToolkitFramework } from "./toolkit-types";
 
 export type ResourceFormat = "PDF" | "DOCX" | "XLSX";
 
@@ -13,6 +14,8 @@ export interface StarterResource {
   description: string;
   format: ResourceFormat;
   category: ToolkitCategory;
+  /** Accounting-framework badge, matching the uploaded-card badge. */
+  framework?: ToolkitFramework;
 }
 
 export const STARTER_RESOURCES: StarterResource[] = [
@@ -49,31 +52,91 @@ export const STARTER_RESOURCES: StarterResource[] = [
   // ── Templates ──────────────────────────────────────────────────────────
   {
     category: "template",
-    format: "DOCX",
-    title: "VAT-ready sales invoice template",
+    format: "XLSX",
+    framework: "FRS 102",
+    title: "Balance sheet template",
     description:
-      "Invoice layout with every field an Irish VAT invoice must carry — VAT number, rate breakdown and reverse-charge wording.",
+      "Statement of financial position laid out to FRS 102, ready to drop your trial-balance figures into.",
   },
   {
     category: "template",
     format: "XLSX",
-    title: "12-month cash-flow forecast template",
+    framework: "FRS 102",
+    title: "Profit & loss statement template",
     description:
-      "A working spreadsheet for monthly cash planning: receipts, payments, VAT set-aside and a running bank balance.",
-  },
-  {
-    category: "template",
-    format: "DOCX",
-    title: "Board minutes & company resolutions pack",
-    description:
-      "First board meeting minutes, dividend declaration and standard resolutions, ready to adapt for an Irish limited company.",
+      "Income statement structured to FRS 102, with the standard expense analysis and prior-year column.",
   },
   {
     category: "template",
     format: "XLSX",
-    title: "Expense claim form",
+    framework: "FRS 102",
+    title: "Cashflow statement template",
     description:
-      "Staff and director expense claims with mileage and subsistence at civil-service rates, ready for payroll.",
+      "Cashflow statement under FRS 102 — operating, investing and financing sections with the reconciliation built in.",
+  },
+  {
+    category: "template",
+    format: "XLSX",
+    framework: "FRS 102",
+    title: "Management accounts template",
+    description:
+      "Monthly management pack — P&L, balance sheet and KPIs — for board and lender reporting.",
+  },
+  {
+    category: "template",
+    format: "DOCX",
+    framework: "FRS 101",
+    title: "Financial statements template (Word)",
+    description:
+      "Full statutory financial statements shell under FRS 101, formatted and ready for the year's numbers.",
+  },
+  {
+    category: "template",
+    format: "XLSX",
+    framework: "FRS 101",
+    title: "Financial statements workings (Excel)",
+    description:
+      "The supporting workbook for the FRS 101 statements — all calculations live here and feed the Word document.",
+  },
+  {
+    category: "template",
+    format: "XLSX",
+    framework: "FRS 102",
+    title: "Trial balance template",
+    description:
+      "Clean trial-balance workbook to build the year-end file from, formatted for FRS 102 mapping.",
+  },
+  {
+    category: "template",
+    format: "XLSX",
+    framework: "FRS 102",
+    title: "Trial balance with GL mapping — primary",
+    description:
+      "Trial balance mapped to the primary general-ledger structure, ready to roll into the financial statements.",
+  },
+  {
+    category: "template",
+    format: "XLSX",
+    framework: "FRS 102",
+    title: "Trial balance with GL mapping — secondary",
+    description:
+      "Secondary GL mapping layer for sub-analysis and consolidation on top of the primary mapping.",
+  },
+  {
+    category: "template",
+    format: "PDF",
+    framework: "IFRS",
+    title: "IFRS disclosure checklist",
+    description:
+      "Disclosure checklist for IFRS financial statements — work through it to make sure nothing's missed.",
+  },
+  {
+    category: "template",
+    format: "PDF",
+    framework: "FRS 102",
+    title: "FRS 102 disclosure checklist",
+    description:
+      "Disclosure checklist for FRS 102 accounts, including the reduced-disclosure options for qualifying entities.",
   },
 
   // ── Tax forms ──────────────────────────────────────────────────────────
@@ -82,7 +145,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
     format: "PDF",
     title: "TR1 — registering as a sole trader or partnership",
     description:
-      "Walkthrough of Revenue's TR1 registration: which taxes to tick, common errors and what to have ready before you start.",
+      "Walkthrough of Revenue's TR1 registration: which taxes to tick, common errors and what to have ready.",
   },
   {
     category: "tax-form",
@@ -96,14 +159,14 @@ export const STARTER_RESOURCES: StarterResource[] = [
     format: "PDF",
     title: "Form 11 preparation checklist",
     description:
-      "Everything to gather before the income tax return: income sources, reliefs, health expenses and pension certificates.",
+      "Everything to gather before the income tax return: income sources, reliefs, health expenses and pension certs.",
   },
   {
     category: "tax-form",
     format: "PDF",
     title: "CT1 preparation checklist",
     description:
-      "The corporation tax return, demystified — accounts adjustments, losses, close-company surcharge and iXBRL requirements.",
+      "The corporation tax return demystified — accounts adjustments, losses, close-company surcharge and iXBRL.",
   },
 
   // ── VAT forms ──────────────────────────────────────────────────────────
@@ -112,7 +175,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
     format: "PDF",
     title: "VAT3 return — completion walkthrough",
     description:
-      "Box-by-box guide to the bi-monthly VAT3: T1, T2, postponed accounting and intra-EU boxes explained with examples.",
+      "Box-by-box guide to the bi-monthly VAT3: T1, T2, postponed accounting and intra-EU boxes with examples.",
   },
   {
     category: "vat-form",
@@ -126,10 +189,10 @@ export const STARTER_RESOURCES: StarterResource[] = [
     format: "PDF",
     title: "VAT registration checklist — Ireland & UK",
     description:
-      "Current registration thresholds, voluntary registration trade-offs and the evidence Revenue and HMRC ask for.",
+      "Current registration thresholds, voluntary-registration trade-offs and the evidence Revenue and HMRC ask for.",
   },
 
-  // ── Business setup guides ──────────────────────────────────────────────
+  // ── Setup guides ───────────────────────────────────────────────────────
   {
     category: "guide",
     format: "PDF",
@@ -146,16 +209,23 @@ export const STARTER_RESOURCES: StarterResource[] = [
   },
   {
     category: "guide",
-    format: "PDF",
-    title: "Setting up a UK limited company from Ireland",
+    format: "DOCX",
+    title: "Articles & Memorandum of Association — company setup",
     description:
-      "Companies House incorporation, UK corporation tax and VAT registration, and the cross-border points Irish founders miss.",
+      "The constitutional documents for a new Irish company, with the standard clauses and where to tailor them.",
   },
   {
     category: "guide",
     format: "PDF",
-    title: "New business bank account & startup checklist",
+    title: "Company dissolution — closing a company",
     description:
-      "Documents banks ask for, plus the first-90-days checklist: insurance, payroll, bookkeeping software and Revenue access.",
+      "Winding a company down cleanly: voluntary strike-off vs liquidation, final returns and the Revenue steps.",
+  },
+  {
+    category: "guide",
+    format: "PDF",
+    title: "Accountant's year-end closing checklist",
+    description:
+      "The year-end close, step by step — accruals, reconciliations and the file every set of accounts should carry.",
   },
 ];

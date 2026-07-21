@@ -5,8 +5,12 @@
    take them on/off the public /toolkits page. Saving revalidates the public
    page immediately — no deploy. */
 
-import { useActionState } from "react";
-import { TOOLKIT_CATEGORIES, type ToolkitResource } from "../../lib/toolkit-types";
+import { useActionState, useState } from "react";
+import {
+  TOOLKIT_CATEGORIES,
+  TOOLKIT_FRAMEWORKS,
+  type ToolkitResource,
+} from "../../lib/toolkit-types";
 import { deleteResource, saveResource, type ActionState } from "./actions";
 
 const IDLE: ActionState = { status: "idle" };
@@ -55,6 +59,12 @@ function ResourceForm({ resource }: { resource?: ToolkitResource }) {
   );
   const isNew = !resource;
 
+  // A resource points at ONE source — an uploaded file OR an external link.
+  // Track which the admin is using so we can disable the other and never
+  // submit both (the server rejects "both", which is what silently blocked
+  // early uploads). null = neither chosen yet.
+  const [source, setSource] = useState<"file" | "link" | null>(null);
+
   return (
     <div className="rounded-none border border-line bg-white p-4">
       <form action={action}>
@@ -73,6 +83,16 @@ function ResourceForm({ resource }: { resource?: ToolkitResource }) {
               ))}
             </select>
           </Field>
+          <Field label="Framework (optional)">
+            <select name="framework" defaultValue={resource?.framework ?? ""} className={inputClass}>
+              <option value="">None</option>
+              {TOOLKIT_FRAMEWORKS.map((f) => (
+                <option key={f} value={f}>
+                  {f}
+                </option>
+              ))}
+            </select>
+          </Field>
           <div className="flex items-end gap-4 pb-1">
             <label className="flex items-center gap-1.5 text-sm text-ink">
               <input type="checkbox" name="active" defaultChecked={resource?.active ?? true} className="h-4 w-4 accent-primary-500" />
@@ -87,13 +107,28 @@ function ResourceForm({ resource }: { resource?: ToolkitResource }) {
               name="file"
               type="file"
               accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt,.md,.png,.jpg,.jpeg,.zip"
-              className="w-full cursor-pointer text-sm text-ink file:mr-3 file:h-9 file:cursor-pointer file:rounded-none file:border file:border-line file:bg-surface-muted file:px-3 file:text-xs file:font-semibold file:text-ink"
+              disabled={source === "link"}
+              onChange={(e) => setSource(e.target.files?.length ? "file" : null)}
+              className="w-full cursor-pointer text-sm text-ink file:mr-3 file:h-9 file:cursor-pointer file:rounded-none file:border file:border-line file:bg-surface-muted file:px-3 file:text-xs file:font-semibold file:text-ink disabled:cursor-not-allowed disabled:opacity-40"
             />
           </Field>
           <Field label="…or external link" className="lg:col-span-2">
-            <input name="external_url" type="url" placeholder="https://…" className={inputClass} />
+            <input
+              name="external_url"
+              type="url"
+              placeholder="https://…"
+              disabled={source === "file"}
+              onChange={(e) => setSource(e.target.value.trim() ? "link" : null)}
+              className={`${inputClass} disabled:cursor-not-allowed disabled:opacity-40`}
+            />
           </Field>
         </div>
+
+        <p className="mt-2 text-xs text-muted">
+          Add <strong>either</strong> a file <strong>or</strong> a link — choosing
+          one disables the other. Files up to 20 MB (PDF, Word, Excel, PowerPoint,
+          images, zip).
+        </p>
 
         {resource && (
           <p className="mt-2 text-xs text-muted">

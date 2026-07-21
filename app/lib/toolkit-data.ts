@@ -21,6 +21,7 @@ interface ResourceRow {
   title: string;
   description: string | null;
   category: ToolkitCategory;
+  framework: string | null;
   file_url: string;
   file_path: string | null;
   file_name: string | null;
@@ -33,6 +34,7 @@ const fromRow = (r: ResourceRow): ToolkitResource => ({
   title: r.title,
   description: r.description,
   category: r.category,
+  framework: r.framework,
   fileUrl: r.file_url,
   filePath: r.file_path,
   fileName: r.file_name,
@@ -40,12 +42,14 @@ const fromRow = (r: ResourceRow): ToolkitResource => ({
   createdAt: r.created_at,
 });
 
+const SELECT_COLS = `id, title, description, category, framework, file_url,
+                     file_path, file_name, active, created_at`;
+
 /** Active resources for the public page (empty list on DB failure). */
 export async function getToolkitResources(): Promise<ToolkitResource[]> {
   try {
     const { rows } = await query<ResourceRow>(
-      `select id, title, description, category, file_url, file_path,
-              file_name, active, created_at
+      `select ${SELECT_COLS}
          from toolkit_resources
         where active
         order by category asc, created_at desc`,
@@ -60,8 +64,7 @@ export async function getToolkitResources(): Promise<ToolkitResource[]> {
 /** Everything, including inactive rows — for the admin manager. */
 export async function getAllToolkitResources(): Promise<ToolkitResource[]> {
   const { rows } = await query<ResourceRow>(
-    `select id, title, description, category, file_url, file_path,
-            file_name, active, created_at
+    `select ${SELECT_COLS}
        from toolkit_resources
       order by category asc, created_at desc`,
   );
