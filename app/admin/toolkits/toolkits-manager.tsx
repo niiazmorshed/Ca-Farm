@@ -125,7 +125,7 @@ function ResourceForm({ resource }: { resource?: ToolkitResource }) {
         </div>
 
         <p className="mt-2 text-xs text-muted">
-          Add <strong>either</strong> a file <strong>or</strong> a link — choosing
+          Add <strong>either</strong> a file <strong>or</strong> a link: choosing
           one disables the other. Files up to 20 MB (PDF, Word, Excel, PowerPoint,
           images, zip).
         </p>
@@ -198,7 +198,7 @@ export function ToolkitsManager({ resources }: { resources: ToolkitResource[] })
         <div className="flex flex-col gap-4">
           {resources.length === 0 && (
             <p className="text-sm text-muted">
-              Nothing uploaded yet — add the first memo, template or form above.
+              Nothing uploaded yet. Add the first memo, template or form above.
             </p>
           )}
           {resources.map((r) => (

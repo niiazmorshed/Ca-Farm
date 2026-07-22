@@ -26,7 +26,7 @@ const quickActions = [
     href: "/contact",
     icon: "chat",
     title: "Start an enquiry",
-    body: "Message the team — same-day reply.",
+    body: "Message the team: same-day reply.",
   },
   {
     href: "/tools/ireland",
@@ -231,8 +231,8 @@ export default async function PortalPage() {
                 <p className="mt-0.5 text-xs text-muted">
                   {totalEnquiries} total
                   {unreadCount > 0 &&
-                    ` · ${unreadCount} new ${unreadCount === 1 ? "reply" : "replies"}`}
-                  {" "}— tap one to read the conversation and reply.
+                    ` · ${unreadCount} new ${unreadCount === 1 ? "reply" : "replies"}`}. Tap
+                  one to read the conversation and reply.
                   {totalEnquiries > enquiries.length &&
                     ` Showing the latest ${enquiries.length}.`}
                 </p>
@@ -347,7 +347,7 @@ export default async function PortalPage() {
               Need a hand?
             </h3>
             <p className="mt-3 text-sm leading-6 text-muted">
-              Questions about tax, VAT or your accounts — the team replies the
+              Questions about tax, VAT or your accounts: the team replies the
               same working day.
             </p>
             <Link

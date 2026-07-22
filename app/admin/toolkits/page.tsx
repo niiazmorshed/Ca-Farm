@@ -35,11 +35,11 @@ export default async function AdminToolkitsPage() {
           >
             public Founders Hub page
           </a>
-          . Uploads go live immediately — no deploy needed.
+          . Uploads go live immediately, no deploy needed.
           {loadError && (
             <>
               {" "}
-              Could not read the toolkit_resources table — run{" "}
+              Could not read the toolkit_resources table. Run{" "}
               <code className="rounded-none bg-surface-muted px-1.5 py-0.5 text-xs">
                 node scripts/db-migrate.mjs
               </code>{" "}
