@@ -7,7 +7,7 @@ import { RD_LAST_REVIEWED } from "../../lib/ireland-rd-tax-credit";
 import { getRdData } from "../../lib/rd-data";
 
 export const metadata: Metadata = {
-  title: "Ireland R&D Tax Credit Calculator — 35% Credit & 3-Year Instalments",
+  title: "Ireland R&D Tax Credit Calculator: 35% Credit & 3-Year Instalments",
   description:
     "Estimate the Irish R&D Corporation Tax Credit at 35% of qualifying expenditure, with the three-year instalment schedule and the ~47.5% combined benefit. Republic of Ireland.",
 };
@@ -15,15 +15,15 @@ export const metadata: Metadata = {
 const notes = [
   {
     title: "35% of qualifying spend",
-    body: "The credit is 35% of qualifying R&D expenditure, on top of the 12.5% trading deduction the same spend attracts — a combined benefit of about 47.5%. Rate applies for accounting periods commencing on or after 1 January 2026.",
+    body: "The credit is 35% of qualifying R&D expenditure, on top of the 12.5% trading deduction the same spend attracts, a combined benefit of about 47.5%. Rate applies for accounting periods commencing on or after 1 January 2026.",
   },
   {
     title: "Paid over three years",
-    body: "The first €87,500 (or 50% of the credit, whichever is greater) is payable in year one; the balance follows across years two and three. You elect cash refund or offset against tax due — it isn't netted against Corporation Tax first.",
+    body: "The first €87,500 (or 50% of the credit, whichever is greater) is payable in year one; the balance follows across years two and three. You elect cash refund or offset against tax due, it isn't netted against Corporation Tax first.",
   },
   {
     title: "Qualifying is the hard part",
-    body: "The science test, eligible cost categories, subcontractor and grant limits and the capital/revenue split shape a real claim — and Revenue can audit it. Use this to size the benefit, then let us build the claim.",
+    body: "The science test, eligible cost categories, subcontractor and grant limits and the capital/revenue split shape a real claim, and Revenue can audit it. Use this to size the benefit, then let us build the claim.",
   },
 ];
 
@@ -44,7 +44,7 @@ export default async function IrelandRdTaxCreditPage() {
           />
         }
         title="Ireland R&D tax credit calculator"
-        lede={`Estimate the ${config.ratePercent}% R&D Corporation Tax Credit and how it's paid out over three years — figures current as of ${RD_LAST_REVIEWED}.`}
+        lede={`Estimate the ${config.ratePercent}% R&D Corporation Tax Credit and how it's paid out over three years, figures current as of ${RD_LAST_REVIEWED}.`}
       />
 
       <Container className="py-16 sm:py-20">

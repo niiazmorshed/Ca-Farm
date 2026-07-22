@@ -23,7 +23,7 @@ export default function Home() {
       <PromoBanner
         eyebrow="Beyond compliance"
         title="We help you read the numbers, not just file them."
-        body="A partner who knows your business, a forecast on the table, and plain-English advice before the big decisions — not after."
+        body="A partner who knows your business, a forecast on the table, and plain-English advice before the big decisions, not after."
         ctaHref="/services/cfo-service"
         ctaLabel="Explore advisory"
         image="forecast"

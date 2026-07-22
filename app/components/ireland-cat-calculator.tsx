@@ -39,7 +39,7 @@ const MONTHS = [
 
 const GROUP_NOTE: Record<Relationship, string> = {
   child: "A child of the disponer.",
-  parent: "Parent — Group A on an absolute inheritance, Group B on a gift.",
+  parent: "Parent: Group A on an absolute inheritance, Group B on a gift.",
   sibling: "A brother or sister of the disponer.",
   "niece-nephew": "A niece or nephew of the disponer.",
   grandchild: "A grandchild (lineal descendant).",
@@ -97,7 +97,7 @@ export function IrelandCatCalculator({ config }: { config: CatConfig }) {
       <div className="flex flex-col gap-5">
         <div className="border-l-[3px] border-primary-500 bg-surface-muted px-4 py-3 text-xs leading-5 text-ink-body">
           <span className="font-semibold text-ink">Gift or inheritance.</span> Enter one
-          benefit — who received it, its value and any relief — and see the CAT due after
+          benefit, who received it, its value and any relief, and see the CAT due after
           the group threshold and, for gifts, the €{config.smallGiftExemptionEur.toLocaleString("en-IE")} small-gift exemption.
         </div>
 
@@ -118,7 +118,7 @@ export function IrelandCatCalculator({ config }: { config: CatConfig }) {
           hint={
             <>
               {GROUP_NOTE[relationship]} Group{" "}
-              <span className="font-semibold text-ink">{r.group}</span> — threshold{" "}
+              <span className="font-semibold text-ink">{r.group}</span>: threshold{" "}
               <span className="font-semibold text-ink">{money(r.groupThreshold)}</span>.
             </>
           }
@@ -139,7 +139,7 @@ export function IrelandCatCalculator({ config }: { config: CatConfig }) {
           label="Deductible liabilities & costs"
           value={deductibleLiabilities}
           onChange={setDeductibleLiabilities}
-          hint="Debts, costs or consideration paid by the beneficiary — reduce the taxable value."
+          hint="Debts, costs or consideration paid by the beneficiary: reduce the taxable value."
         />
 
         <SegmentedField<ReliefKind>
@@ -170,7 +170,7 @@ export function IrelandCatCalculator({ config }: { config: CatConfig }) {
           label="Prior benefits in this group (since 5 Dec 1991)"
           value={priorBenefits}
           onChange={setPriorBenefits}
-          hint="Taxable value of earlier gifts/inheritances in the SAME group — they use up the threshold."
+          hint="Taxable value of earlier gifts/inheritances in the SAME group: they use up the threshold."
         />
 
         <SelectField
@@ -203,7 +203,7 @@ export function IrelandCatCalculator({ config }: { config: CatConfig }) {
             <p className="mt-2.5 text-sm text-muted">
               {r.taxableExcess > 0
                 ? `on ${money(r.taxableExcess)} above the ${money(r.groupThreshold)} Group ${r.group} threshold.`
-                : `nothing to pay — within the ${money(r.groupThreshold)} Group ${r.group} threshold.`}
+                : `nothing to pay: within the ${money(r.groupThreshold)} Group ${r.group} threshold.`}
             </p>
           </div>
           <dl className="divide-y divide-line">

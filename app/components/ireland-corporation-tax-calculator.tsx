@@ -79,20 +79,20 @@ export function IrelandCorporationTaxCalculator({ config }: { config: CtConfig }
           <span className="font-semibold text-ink">You decide the split.</span>{" "}
           Trading income is active business profit (12.5%); passive income is
           rent, interest and most foreign dividends (25%). Enter each figure
-          where it belongs — the tool never classifies for you.
+          where it belongs: the tool never classifies for you.
         </div>
 
         <CurrencyField
           label="Trading profit"
           value={tradingProfit}
           onChange={setTradingProfit}
-          hint="Active business trading profits — taxed at 12.5%."
+          hint="Active business trading profits: taxed at 12.5%."
         />
         <CurrencyField
           label="Passive / non-trading income"
           value={passiveIncome}
           onChange={setPassiveIncome}
-          hint="Rental income, interest and most foreign dividends — taxed at 25%."
+          hint="Rental income, interest and most foreign dividends: taxed at 25%."
         />
 
         <div className="mt-auto border border-line bg-surface p-4">
@@ -102,7 +102,7 @@ export function IrelandCorporationTaxCalculator({ config }: { config: CtConfig }
           <p className="mt-2 text-xs leading-5 text-muted">
             Trading and passive income only. Chargeable gains on disposals, the
             Knowledge Development Box (10% effective), the close-company surcharge
-            and start-up relief can each change the final bill — that&rsquo;s a
+            and start-up relief can each change the final bill: that&rsquo;s a
             conversation, not a slider. For the R&amp;D credit (35%), use the{" "}
             <a
               href="/tools/ireland-rd-tax-credit"

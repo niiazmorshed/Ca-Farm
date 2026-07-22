@@ -7,7 +7,7 @@ import { getCgtData } from "../../lib/cgt-data";
 import { CGT_LAST_REVIEWED } from "../../lib/ireland-cgt";
 
 export const metadata: Metadata = {
-  title: "Ireland Capital Gains Tax Calculator — 33% CGT with Indexation Relief",
+  title: "Ireland Capital Gains Tax Calculator: 33% CGT with Indexation Relief",
   description:
     "Estimate Irish Capital Gains Tax: proceeds less the indexed acquisition cost, PPR and Entrepreneur reliefs, allowable losses and the €1,270 exemption at 33%. Includes Revenue's indexation multipliers 1974–2002 for older assets. Republic of Ireland.",
 };
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 const notes = [
   {
     title: "Indexation for older assets",
-    body: "The cost of an asset acquired before 2003 is uplifted by Revenue's official multiplier for the year of purchase, so inflation isn't taxed as gain. Indexation is frozen — costs from 2003 onward get no uplift.",
+    body: "The cost of an asset acquired before 2003 is uplifted by Revenue's official multiplier for the year of purchase, so inflation isn't taxed as gain. Indexation is frozen, costs from 2003 onward get no uplift.",
   },
   {
     title: "Reliefs and rates",
@@ -23,7 +23,7 @@ const notes = [
   },
   {
     title: "Editable, verified rates",
-    body: "The rates and the full multiplier table are sourced from revenue.ie and stored so they can be updated after each Budget without a redeploy. Estimates only — reliefs like retirement relief and share-matching rules aren't modelled.",
+    body: "The rates and the full multiplier table are sourced from revenue.ie and stored so they can be updated after each Budget without a redeploy. Estimates only, reliefs like retirement relief and share-matching rules aren't modelled.",
   },
 ];
 
@@ -44,7 +44,7 @@ export default async function IrelandCgtPage() {
           />
         }
         title="Ireland capital gains tax calculator"
-        lede={`Work out CGT on a disposal — with indexation relief for older assets, the main reliefs and the €1,270 exemption at ${config.standardRatePercent}%. Figures current as of ${CGT_LAST_REVIEWED}.`}
+        lede={`Work out CGT on a disposal, with indexation relief for older assets, the main reliefs and the €1,270 exemption at ${config.standardRatePercent}%. Figures current as of ${CGT_LAST_REVIEWED}.`}
       />
 
       <Container className="py-16 sm:py-20">

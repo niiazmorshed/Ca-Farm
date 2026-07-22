@@ -453,7 +453,7 @@ export function IrelandIncomeTaxCalculator({
               label="Spouse self-employment / other income"
               value={form.spouseSelfEmploymentOrOtherIncome ?? 0}
               onChange={(v) => set("spouseSelfEmploymentOrOtherIncome", v)}
-              hint="Married couples are jointly assessed — a second income raises the 20% band by up to €35,000."
+              hint="Married couples are jointly assessed: a second income raises the 20% band by up to €35,000."
             />
           </>
         )}
@@ -462,7 +462,7 @@ export function IrelandIncomeTaxCalculator({
           label="Your pension contribution"
           value={form.pensionContribution}
           onChange={(v) => set("pensionContribution", v)}
-          hint="Relief is capped by your age band and €115,000 of earnings — any excess gets no relief."
+          hint="Relief is capped by your age band and €115,000 of earnings: any excess gets no relief."
         />
       </div>
 

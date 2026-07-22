@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 const NOTICES: Record<string, string> = {
   confirm: "We couldn't confirm that link. Try signing in, or request a new one.",
-  confirmed: "Email confirmed — you can sign in now.",
+  confirmed: "Email confirmed. You can sign in now.",
   oauth: "Couldn't complete Google sign-in. Please try again.",
 };
 
@@ -25,7 +25,7 @@ export default async function LoginPage({
       <PageHero
         eyebrow="Client area"
         title="Sign in."
-        lede="Access your CA Farm client area. A partner-led practice — your books, in one place."
+        lede="Access your CA Farm client area. A partner-led practice: your books, in one place."
         image="tower"
       />
       <Container className="py-16 sm:py-20">

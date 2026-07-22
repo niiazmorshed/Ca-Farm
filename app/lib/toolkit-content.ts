@@ -23,7 +23,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
   {
     category: "memo",
     format: "PDF",
-    title: "Salary vs dividends — director remuneration memo",
+    title: "Salary vs dividends: director remuneration memo",
     description:
       "How to structure director pay between salary, pension and dividends tax-efficiently, for Irish and UK owner-managed companies.",
   },
@@ -32,7 +32,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
     format: "PDF",
     title: "Preliminary tax & filing deadlines memo",
     description:
-      "The key Revenue dates for the year — Form 11 preliminary tax, CT1 filing windows and what happens if you miss them.",
+      "The key Revenue dates for the year: Form 11 preliminary tax, CT1 filing windows and what happens if you miss them.",
   },
   {
     category: "memo",
@@ -46,7 +46,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
     format: "PDF",
     title: "Small benefit exemption memo",
     description:
-      "Tax-free vouchers and non-cash benefits for staff — current limits, what qualifies and the payroll treatment.",
+      "Tax-free vouchers and non-cash benefits for staff: current limits, what qualifies and the payroll treatment.",
   },
 
   // ── Templates ──────────────────────────────────────────────────────────
@@ -72,7 +72,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
     framework: "FRS 102",
     title: "Cashflow statement template",
     description:
-      "Cashflow statement under FRS 102 — operating, investing and financing sections with the reconciliation built in.",
+      "Cashflow statement under FRS 102: operating, investing and financing sections with the reconciliation built in.",
   },
   {
     category: "template",
@@ -80,7 +80,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
     framework: "FRS 102",
     title: "Management accounts template",
     description:
-      "Monthly management pack — P&L, balance sheet and KPIs — for board and lender reporting.",
+      "Monthly management pack (P&L, balance sheet and KPIs) for board and lender reporting.",
   },
   {
     category: "template",
@@ -96,7 +96,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
     framework: "FRS 101",
     title: "Financial statements workings (Excel)",
     description:
-      "The supporting workbook for the FRS 101 statements — all calculations live here and feed the Word document.",
+      "The supporting workbook for the FRS 101 statements: all calculations live here and feed the Word document.",
   },
   {
     category: "template",
@@ -110,7 +110,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
     category: "template",
     format: "XLSX",
     framework: "FRS 102",
-    title: "Trial balance with GL mapping — primary",
+    title: "Trial balance with GL mapping: primary",
     description:
       "Trial balance mapped to the primary general-ledger structure, ready to roll into the financial statements.",
   },
@@ -118,7 +118,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
     category: "template",
     format: "XLSX",
     framework: "FRS 102",
-    title: "Trial balance with GL mapping — secondary",
+    title: "Trial balance with GL mapping: secondary",
     description:
       "Secondary GL mapping layer for sub-analysis and consolidation on top of the primary mapping.",
   },
@@ -128,7 +128,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
     framework: "IFRS",
     title: "IFRS disclosure checklist",
     description:
-      "Disclosure checklist for IFRS financial statements — work through it to make sure nothing's missed.",
+      "Disclosure checklist for IFRS financial statements: work through it to make sure nothing's missed.",
   },
   {
     category: "template",
@@ -143,16 +143,16 @@ export const STARTER_RESOURCES: StarterResource[] = [
   {
     category: "tax-form",
     format: "PDF",
-    title: "TR1 — registering as a sole trader or partnership",
+    title: "TR1: registering as a sole trader or partnership",
     description:
       "Walkthrough of Revenue's TR1 registration: which taxes to tick, common errors and what to have ready.",
   },
   {
     category: "tax-form",
     format: "PDF",
-    title: "TR2 — company tax registration walkthrough",
+    title: "TR2: company tax registration walkthrough",
     description:
-      "Registering a new company for corporation tax, VAT and PAYE with the TR2 — section by section.",
+      "Registering a new company for corporation tax, VAT and PAYE with the TR2: section by section.",
   },
   {
     category: "tax-form",
@@ -166,14 +166,14 @@ export const STARTER_RESOURCES: StarterResource[] = [
     format: "PDF",
     title: "CT1 preparation checklist",
     description:
-      "The corporation tax return demystified — accounts adjustments, losses, close-company surcharge and iXBRL.",
+      "The corporation tax return demystified: accounts adjustments, losses, close-company surcharge and iXBRL.",
   },
 
   // ── VAT forms ──────────────────────────────────────────────────────────
   {
     category: "vat-form",
     format: "PDF",
-    title: "VAT3 return — completion walkthrough",
+    title: "VAT3 return: completion walkthrough",
     description:
       "Box-by-box guide to the bi-monthly VAT3: T1, T2, postponed accounting and intra-EU boxes with examples.",
   },
@@ -187,7 +187,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
   {
     category: "vat-form",
     format: "PDF",
-    title: "VAT registration checklist — Ireland & UK",
+    title: "VAT registration checklist: Ireland & UK",
     description:
       "Current registration thresholds, voluntary-registration trade-offs and the evidence Revenue and HMRC ask for.",
   },
@@ -196,28 +196,28 @@ export const STARTER_RESOURCES: StarterResource[] = [
   {
     category: "guide",
     format: "PDF",
-    title: "Setting up a limited company in Ireland — step by step",
+    title: "Setting up a limited company in Ireland: step by step",
     description:
       "CRO incorporation, constitution, beneficial ownership (RBO) filing, tax registration and your first compliance calendar.",
   },
   {
     category: "guide",
     format: "PDF",
-    title: "Sole trader vs limited company — decision guide",
+    title: "Sole trader vs limited company: decision guide",
     description:
       "Tax, liability, pension and admin compared side by side, with worked examples at different profit levels.",
   },
   {
     category: "guide",
     format: "DOCX",
-    title: "Articles & Memorandum of Association — company setup",
+    title: "Articles & Memorandum of Association: company setup",
     description:
       "The constitutional documents for a new Irish company, with the standard clauses and where to tailor them.",
   },
   {
     category: "guide",
     format: "PDF",
-    title: "Company dissolution — closing a company",
+    title: "Company dissolution: closing a company",
     description:
       "Winding a company down cleanly: voluntary strike-off vs liquidation, final returns and the Revenue steps.",
   },
@@ -226,6 +226,6 @@ export const STARTER_RESOURCES: StarterResource[] = [
     format: "PDF",
     title: "Accountant's year-end closing checklist",
     description:
-      "The year-end close, step by step — accruals, reconciliations and the file every set of accounts should carry.",
+      "The year-end close, step by step: accruals, reconciliations and the file every set of accounts should carry.",
   },
 ];

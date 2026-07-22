@@ -79,8 +79,8 @@ export default async function SubServicePage({
           </div>
           <ul className="mt-2 divide-y divide-line border-b border-line">
             {item.included.map((entry) => {
-              const [label, ...rest] = entry.split(" — ");
-              const detail = rest.join(" — ");
+              const [label, ...rest] = entry.split(": ");
+              const detail = rest.join(": ");
               return (
                 <li
                   key={entry}
@@ -93,7 +93,7 @@ export default async function SubServicePage({
                     <span className="font-display font-semibold text-ink">
                       {label}
                     </span>
-                    {detail && <> — {detail}</>}
+                    {detail && <>: {detail}</>}
                   </p>
                 </li>
               );

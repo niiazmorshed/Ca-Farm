@@ -6,7 +6,7 @@ import { IrelandIncomeTaxCalculator } from "../../components/ireland-income-tax-
 import { getTaxRates } from "../../lib/tax-data";
 
 export const metadata: Metadata = {
-  title: "Ireland Income Tax Calculator (Income Tax + USC + PRSI) — 2026",
+  title: "Ireland Income Tax Calculator (Income Tax + USC + PRSI): 2026",
   description:
     "Estimate your Irish personal tax for 2026: income tax, USC and PRSI, with pension relief, tax credits and a 2025 comparison. Republic of Ireland.",
 };
@@ -18,7 +18,7 @@ const notes = [
   },
   {
     title: "Pension relief, done right",
-    body: "Applies the age-banded relief cap on €115,000 of earnings — pension reduces income tax only, not USC or PRSI, and any excess above the cap gets no relief.",
+    body: "Applies the age-banded relief cap on €115,000 of earnings, pension reduces income tax only, not USC or PRSI, and any excess above the cap gets no relief.",
   },
   {
     title: "2026 vs 2025",
@@ -42,7 +42,7 @@ export default async function IrelandIncomeTaxPage() {
           />
         }
         title="Ireland income tax calculator"
-        lede="Estimate your Irish income tax, USC and PRSI for 2026 — including pension relief and tax credits — with a 2025 comparison alongside."
+        lede="Estimate your Irish income tax, USC and PRSI for 2026, including pension relief and tax credits, with a 2025 comparison alongside."
       />
 
       <Container className="py-16 sm:py-20">

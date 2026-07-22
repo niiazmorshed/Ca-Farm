@@ -24,7 +24,7 @@ const STEP_META = [
   {
     title: "Topic",
     prompt: "What can we help you with?",
-    sub: "Pick the closest area — you can explain in detail next.",
+    sub: "Pick the closest area: you can explain in detail next.",
   },
   {
     title: "Your enquiry",
@@ -131,10 +131,10 @@ function SuccessCard() {
         </svg>
       </span>
       <h2 className="font-display text-2xl font-medium tracking-tight text-ink">
-        Thank you — we’ve got it.
+        Thank you, we’ve got it.
       </h2>
       <p className="text-[15px] leading-7 text-muted">
-        Your enquiry is in. A partner — not an autoresponder — will reply within
+        Your enquiry is in. A partner, not an autoresponder, will reply within
         one business day.
       </p>
     </div>
@@ -175,7 +175,7 @@ export function ContactForm() {
 
   const validateStep = (s: number): string | null => {
     if (s === 2 && message.trim().length < 10)
-      return "Tell us a little more — a sentence or two is plenty.";
+      return "Tell us a little more: a sentence or two is plenty.";
     if (s === 3) {
       if (name.trim().length < 2) return "Please tell us your name.";
       if (!EMAIL_RE.test(email.trim())) return "Please enter a valid email address.";
@@ -276,7 +276,7 @@ export function ContactForm() {
         {related.length > 0 && (
           <div className="rounded-none border-l-[3px] border-primary-400 bg-surface-muted p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">
-              While you’re here — this might help
+              While you’re here, this might help
             </p>
             <ul className="mt-2 flex flex-col gap-2">
               {related.map((faq) => (

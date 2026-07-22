@@ -17,7 +17,7 @@ export default function ServicesPage() {
       <PageHero
         eyebrow="Services"
         title="Everything your finance function needs."
-        lede="From day-to-day bookkeeping to AI and international expansion — built for businesses across Ireland. Take one service or the whole stack, scoped upfront."
+        lede="From day-to-day bookkeeping to AI and international expansion, built for businesses across Ireland. Take one service or the whole stack, scoped upfront."
         image="tower"
       />
 

@@ -104,7 +104,7 @@ export function parseRdConfig(raw: unknown): RdConfig | null {
 
 /** Shown beside the qualifying-spend input. */
 export const RD_QUALIFYING_NOTE =
-  "Qualifying cost for one accounting period, net of any grant funding: science-tested staff, materials, overheads and plant apportioned to the work, plus outsourced R&D within limits. Grant-aided spend doesn't qualify. Eligibility is assessed case by case — enter only spend you're confident is eligible.";
+  "Qualifying cost for one accounting period, net of any grant funding: science-tested staff, materials, overheads and plant apportioned to the work, plus outsourced R&D within limits. Grant-aided spend doesn't qualify. Eligibility is assessed case by case: enter only spend you're confident is eligible.";
 
 /* ---------- maths ---------- */
 

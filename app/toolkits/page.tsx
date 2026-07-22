@@ -5,15 +5,15 @@ import { ToolkitBrowser } from "../components/toolkit-browser";
 import { getToolkitResources } from "../lib/toolkit-data";
 
 export const metadata: Metadata = {
-  title: "Founders Hub — memos, templates, tax & VAT forms",
+  title: "Founders Hub: memos, templates, tax & VAT forms",
   description:
-    "Practical resources for founders and business owners: memos, templates, tax forms, VAT forms and business setup guides for Ireland and the UK — prepared by chartered accountants.",
+    "Practical resources for founders and business owners: memos, templates, tax forms, VAT forms and business setup guides for Ireland and the UK, prepared by chartered accountants.",
 };
 
 const notes = [
   {
     title: "Prepared by accountants",
-    body: "Every memo, template and walkthrough is drafted and reviewed by our chartered accountants — the same standards we apply to client work.",
+    body: "Every memo, template and walkthrough is drafted and reviewed by our chartered accountants, to the same standards we apply to client work.",
   },
   {
     title: "Ireland & UK focused",
@@ -21,7 +21,7 @@ const notes = [
   },
   {
     title: "Growing every month",
-    body: "New memos, templates and guides are added regularly — if you need something that isn't here yet, just ask and we'll send it over.",
+    body: "New memos, templates and guides are added regularly. If you need something that isn't here yet, just ask and we'll send it over.",
   },
 ];
 
@@ -38,7 +38,7 @@ export default async function FoundersHubPage() {
           />
         }
         title="Founders Hub"
-        lede="Memos, templates, tax and VAT forms, and step-by-step business setup guides — practical resources prepared by our accountants for founders in Ireland and the UK."
+        lede="Memos, templates, tax and VAT forms, and step-by-step business setup guides, prepared by our accountants for founders in Ireland and the UK."
       />
 
       <Container className="py-16 sm:py-20">

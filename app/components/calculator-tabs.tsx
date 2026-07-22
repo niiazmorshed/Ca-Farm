@@ -6,17 +6,17 @@ export const CALCULATOR_TOOLS = [
   {
     href: "/tools/ireland-income-tax",
     label: "Income tax",
-    desc: "Income tax, USC & PRSI — 2026 vs 2025",
+    desc: "Income tax, USC & PRSI: 2026 vs 2025",
   },
   {
     href: "/tools/ireland-vat",
     label: "VAT",
-    desc: "Net VAT position — payable or receivable",
+    desc: "Net VAT position: payable or receivable",
   },
   {
     href: "/tools/ireland-corporation-tax",
     label: "Corporation tax",
-    desc: "12.5% trading, 25% passive — total tax due",
+    desc: "12.5% trading, 25% passive: total tax due",
   },
   {
     href: "/tools/ireland-rd-tax-credit",
@@ -36,7 +36,7 @@ export const CALCULATOR_TOOLS = [
   {
     href: "/tools/ireland-cat",
     label: "CAT",
-    desc: "Gift & inheritance tax — thresholds & reliefs",
+    desc: "Gift & inheritance tax: thresholds & reliefs",
   },
   {
     href: "/tools/ireland",

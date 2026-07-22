@@ -6,15 +6,15 @@ import { IrelandMortgageCalculator } from "../../components/ireland-mortgage-cal
 import { getMortgageData } from "../../lib/mortgage-data";
 
 export const metadata: Metadata = {
-  title: "Ireland Mortgage Calculator — Compare Repayments by Lender",
+  title: "Ireland Mortgage Calculator: Compare Repayments by Lender",
   description:
-    "Compare monthly mortgage repayments across Irish lenders — first-time buyer, trading up, switcher and investment rates with APRC, green mortgage and cashback offers.",
+    "Compare monthly mortgage repayments across Irish lenders, first-time buyer, trading up, switcher and investment rates with APRC, green mortgage and cashback offers.",
 };
 
 const notes = [
   {
     title: "Compare Irish lenders",
-    body: "Monthly repayments across AIB, Haven, Bank of Ireland, Avant Money, PTSB and ICS — with each product's interest rate, APRC and incentives side by side.",
+    body: "Monthly repayments across AIB, Haven, Bank of Ireland, Avant Money, PTSB and ICS, with each product's interest rate, APRC and incentives side by side.",
   },
   {
     title: "Every rate type",
@@ -43,7 +43,7 @@ export default async function IrelandMortgagePage() {
           />
         }
         title="Ireland mortgage calculator"
-        lede={`Compare monthly repayments across Irish lenders — variable, fixed and green rates as of ${ratesAsOf}.`}
+        lede={`Compare monthly repayments across Irish lenders: variable, fixed and green rates as of ${ratesAsOf}.`}
       />
 
       <Container className="py-16 sm:py-20">

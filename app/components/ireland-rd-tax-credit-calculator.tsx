@@ -86,8 +86,9 @@ export function IrelandRdTaxCreditCalculator({ config }: { config: RdConfig }) {
         <div className="border-l-[3px] border-primary-500 bg-surface-muted px-4 py-3 text-xs leading-5 text-ink-body">
           <span className="font-semibold text-ink">A credit, not a deduction.</span>{" "}
           The R&amp;D credit is {config.ratePercent}% of qualifying spend and comes
-          on top of the normal {config.tradingDeductionPercent}% trading deduction
-          — a combined benefit of about {RD_CREDIT.effectiveBenefitPercent}%. It&rsquo;s
+          on top of the normal {config.tradingDeductionPercent}% trading
+          deduction: a combined benefit of about{" "}
+          {RD_CREDIT.effectiveBenefitPercent}%. It&rsquo;s
           paid to you over three years, or set against tax you owe.
         </div>
 
@@ -122,7 +123,7 @@ export function IrelandRdTaxCreditCalculator({ config }: { config: RdConfig }) {
           <p className="mt-2 text-xs leading-5 text-muted">
             Whether an activity passes the science test, which costs are eligible,
             subcontractor and grant limits, and the capital/revenue split all shape a
-            real claim — and Revenue can audit it. Treat this as a sizing estimate,
+            real claim, and Revenue can audit it. Treat this as a sizing estimate,
             then let us build the claim. Applies to {RD_CREDIT.effectiveFrom}.
             {/* effectiveFrom is prose-only, not editable — stays in code. */}
           </p>
@@ -168,7 +169,7 @@ export function IrelandRdTaxCreditCalculator({ config }: { config: RdConfig }) {
             <InstalmentRow
               dotClass="bg-primary-500"
               year="Year 1 instalment"
-              when="On filing — cash or offset"
+              when="On filing: cash or offset"
               value={money(year1)}
             />
             <InstalmentRow
@@ -202,7 +203,7 @@ export function IrelandRdTaxCreditCalculator({ config }: { config: RdConfig }) {
             Paid in three instalments
           </h3>
           <p className="mt-2 text-xs leading-5 text-muted">
-            The credit isn&rsquo;t netted against your Corporation Tax first — you
+            The credit isn&rsquo;t netted against your Corporation Tax first: you
             elect, for each instalment, to offset it against tax due or take it as a
             cash refund. A claim of {eur0(config.firstYearThresholdEur)} or less is
             paid in full in year one.

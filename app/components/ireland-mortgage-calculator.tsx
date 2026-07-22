@@ -598,8 +598,8 @@ export function IrelandMortgageCalculator({
         </div>
 
         <p className="mt-8 text-center text-xs leading-5 text-muted">
-          Indicative lender rates as of {ratesAsOf} for the Republic of Ireland —
-          lenders reprice regularly and eligibility conditions apply (LTV bands,
+          Indicative lender rates as of {ratesAsOf} for the Republic of Ireland.
+          Lenders reprice regularly and eligibility conditions apply (LTV bands,
           green BER criteria, minimum loan sizes). Repayments use the standard
           amortising formula; APRC figures are the lenders&apos; own.
         </p>
