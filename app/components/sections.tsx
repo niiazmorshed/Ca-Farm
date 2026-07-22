@@ -52,7 +52,7 @@ export function Hero() {
             <em className="text-primary-300 not-italic">rebuilt around AI.</em>
           </h1>
           <p className="animate-fade-up mt-7 max-w-xl text-lg leading-8 text-white/80 [animation-delay:150ms] sm:text-xl">
-            Partner-led tax, audit and advisory across Ireland — with AI doing
+            Partner-led tax, audit and advisory across Ireland, with AI doing
             the heavy lifting.
           </p>
           <div className="animate-fade-up mt-10 flex flex-col gap-3 [animation-delay:220ms] sm:flex-row">
@@ -253,7 +253,7 @@ export function Services() {
           <SectionHeading
             eyebrow="What we do"
             title="One firm for the whole journey."
-            lede="Year-end accounts, payroll, tax, a part-time CFO — take one or the lot. Across Ireland."
+            lede="Year-end accounts, payroll, tax, a part-time CFO: take one or the lot. Across Ireland."
           />
           <Link
             href="/services"
@@ -410,7 +410,7 @@ const aiCapabilities: { icon: AiIcon; title: string; note: string }[] = [
   {
     icon: "forecast",
     title: "Forecasting & insight",
-    note: "See what’s coming — cash-flow forecasts, anomaly detection, live reporting.",
+    note: "See what’s coming: cash-flow forecasts, anomaly detection, live reporting.",
   },
   {
     icon: "automate",
@@ -420,7 +420,7 @@ const aiCapabilities: { icon: AiIcon; title: string; note: string }[] = [
   {
     icon: "tax",
     title: "Tax intelligence",
-    note: "Spot reliefs you’re missing — checked by a chartered accountant.",
+    note: "Spot reliefs you’re missing, checked by a chartered accountant.",
   },
 ];
 
@@ -440,7 +440,7 @@ export function AiBand() {
           <div className="max-w-2xl border-l-2 border-primary-400 pl-6 sm:pl-8">
             <Eyebrow tone="dark">AI, applied</Eyebrow>
             <h2 className="mt-6 font-display text-4xl font-bold leading-[1.03] tracking-[-0.02em] text-balance sm:text-5xl">
-              AI in the work —{" "}
+              AI in the work,{" "}
               <em className="text-primary-300 not-italic">not bolted on after.</em>
             </h2>
             <p className="mt-6 text-lg leading-8 text-white/80">
@@ -535,7 +535,7 @@ const steps = [
   },
   {
     title: "Year-round care",
-    description: "Monthly numbers and proactive planning — not a January scramble.",
+    description: "Monthly numbers and proactive planning, not a January scramble.",
   },
 ];
 
@@ -615,7 +615,7 @@ export function Stats() {
 const testimonials = [
   {
     quote:
-      "CA Farm took our year-end from a three-week scramble to a non-event. The books are just — done.",
+      "CA Farm took our year-end from a three-week scramble to a non-event. The books are just… done.",
     name: "Priya Shah",
     role: "Founder, Bloom Studio",
   },
@@ -627,7 +627,7 @@ const testimonials = [
   },
   {
     quote:
-      "Proper partner-led service. I message our accountant and get an answer the same day — not a ticket number.",
+      "Proper partner-led service. I message our accountant and get an answer the same day, not a ticket number.",
     name: "Hannah Okafor",
     role: "COO, Marrow Kitchen",
   },
@@ -677,12 +677,12 @@ const faqs = [
   {
     question: "How hard is it to switch accountants?",
     answer:
-      "Not hard at all — for you. You sign one letter of engagement; we contact your previous accountant, collect handover records and pick up mid-year without missing a deadline.",
+      "Not hard at all, for you. You sign one letter of engagement; we contact your previous accountant, collect handover records and pick up mid-year without missing a deadline.",
   },
   {
     question: "How does your pricing work?",
     answer:
-      "A fixed monthly fee, scoped upfront based on your size and what you need. No hourly billing, and the scope is reviewed together once a year — not whenever we feel like it.",
+      "A fixed monthly fee, scoped upfront based on your size and what you need. No hourly billing, and the scope is reviewed together once a year, not whenever we feel like it.",
   },
   {
     question: "Which accounting software do you support?",
@@ -692,7 +692,7 @@ const faqs = [
   {
     question: "Do you work with businesses like mine?",
     answer:
-      "Our clients range from sole traders to €20m-turnover companies — startups and SaaS, hospitality, retail, healthcare and professional services are our deepest benches.",
+      "Our clients range from sole traders to €20m-turnover companies. Startups and SaaS, hospitality, retail, healthcare and professional services are our deepest benches.",
   },
   {
     question: "I’ve already missed deadlines. Can you help?",
@@ -796,7 +796,7 @@ export function ContactCta({ children }: { children?: ReactNode }) {
               {children ?? "Ready to put your books on solid ground?"}
             </h2>
             <p className="mx-auto mt-4 max-w-xl leading-7 text-white/75">
-              Tell us where things stand — we’ll tell you exactly what we’d do,
+              Tell us where things stand and we’ll tell you exactly what we’d do,
               what it costs and what you’d get back. No obligation, no jargon.
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">

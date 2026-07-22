@@ -16,7 +16,7 @@ const pricingFaqs = [
   {
     question: "Can I change plan later?",
     answer:
-      "Yes — plans flex with your business. Most clients start on Limited Company and move up when monthly numbers start driving decisions.",
+      "Yes, plans flex with your business. Most clients start on Limited Company and move up when monthly numbers start driving decisions.",
   },
   {
     question: "Are there setup or onboarding fees?",
@@ -26,7 +26,7 @@ const pricingFaqs = [
   {
     question: "What does “from” mean in the price?",
     answer:
-      "The listed price covers a typical business at that stage. High transaction volumes, multiple entities or complex VAT push the quote up — but it is fixed before you sign and reviewed once a year.",
+      "The listed price covers a typical business at that stage. High transaction volumes, multiple entities or complex VAT push the quote up, but it is fixed before you sign and reviewed once a year.",
   },
 ];
 
@@ -36,7 +36,7 @@ export default function PricingPage() {
       <PageHero
         eyebrow="Pricing"
         title="Fixed fees. No surprises."
-        lede="One monthly price agreed upfront, reviewed once a year. The meter never runs — call us as often as you like."
+        lede="One monthly price agreed upfront, reviewed once a year. The meter never runs, so call us as often as you like."
         image="architecture"
       />
 
@@ -98,7 +98,7 @@ export default function PricingPage() {
               </h2>
               <p className="mt-2 text-sm leading-6 text-white/70">
                 Book a free call. We’ll look at your size and needs and recommend
-                the plan that fits — or scope a custom one.
+                the plan that fits, or scope a custom one.
               </p>
               <Button href="/contact" className="mt-5 w-full">
                 Book a free call

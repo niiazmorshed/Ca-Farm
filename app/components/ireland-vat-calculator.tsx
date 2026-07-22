@@ -97,19 +97,19 @@ function VerdictCard({ pos }: { pos: VatPosition }) {
     payable: {
       tag: { text: "Payable", cls: "bg-navy-900 text-white" },
       eyebrow: "VAT payable",
-      sub: "payable to Revenue for the period — you received more VAT on sales than you paid on purchases.",
+      sub: "payable to Revenue for the period: you received more VAT on sales than you paid on purchases.",
       netLabel: "Net VAT payable (T3)",
     },
     receivable: {
       tag: { text: "Receivable", cls: "bg-primary-500 text-white" },
       eyebrow: "VAT receivable",
-      sub: "receivable from Revenue for the period — you paid more VAT on purchases than you received on sales.",
+      sub: "receivable from Revenue for the period: you paid more VAT on purchases than you received on sales.",
       netLabel: "Net VAT repayable (T4)",
     },
     balanced: {
       tag: { text: "Balanced", cls: "border border-line bg-surface-muted text-muted" },
       eyebrow: "VAT position",
-      sub: "VAT received and VAT paid are equal — nothing due either way.",
+      sub: "VAT received and VAT paid are equal: nothing due either way.",
       netLabel: "Net VAT position",
     },
   }[direction];
@@ -153,7 +153,7 @@ function VerdictCard({ pos }: { pos: VatPosition }) {
           <div className="flex items-baseline gap-2.5">
             <LegendDot className="bg-navy-900" />
             <span className="text-sm text-ink-body">
-              VAT received on sales (output — T1)
+              VAT received on sales (output: T1)
             </span>
           </div>
           <span className="text-sm font-medium text-ink tabular-nums">
@@ -164,7 +164,7 @@ function VerdictCard({ pos }: { pos: VatPosition }) {
           <div className="flex items-baseline gap-2.5">
             <LegendDot className="bg-primary-500" />
             <span className="text-sm text-ink-body">
-              VAT paid on purchases (input — T2)
+              VAT paid on purchases (input: T2)
             </span>
           </div>
           <span className="text-sm font-medium text-ink tabular-nums">{money(paid)}</span>
@@ -177,7 +177,7 @@ function VerdictCard({ pos }: { pos: VatPosition }) {
         </div>
       </dl>
       <p className="border-t border-line px-5 py-3 text-xs leading-5 text-muted sm:px-6">
-        Mirrors the VAT3 return — T1 VAT on sales, T2 VAT on purchases; only the
+        Mirrors the VAT3 return: T1 VAT on sales, T2 VAT on purchases; only the
         difference changes hands with Revenue.
       </p>
     </div>
@@ -204,7 +204,7 @@ function ThresholdsCard({ thresholds }: { thresholds: VatThresholds }) {
       </div>
       <p className="mt-2 text-xs leading-5 text-muted">
         Turnover limits in any 12-month period, in force since {thresholds.since}.
-        You must register once turnover exceeds — or is likely to exceed — the limit
+        You must register once turnover exceeds, or is likely to exceed, the limit
         for your activity.
       </p>
     </div>
@@ -246,7 +246,7 @@ export function IrelandVatCalculator({ config }: { config: VatConfig }) {
       <div className="flex flex-col gap-5">
         <div className="border-l-[3px] border-primary-500 bg-surface-muted px-4 py-3 text-xs leading-5 text-ink-body">
           <span className="font-semibold text-ink">How VAT settles.</span> Fill both
-          tabs — the VAT you <span className="font-medium text-ink">receive</span> on
+          tabs: the VAT you <span className="font-medium text-ink">receive</span> on
           sales and the VAT you <span className="font-medium text-ink">pay</span> on
           purchases. The result on the right nets them into what&rsquo;s payable to,
           or receivable from, Revenue.
@@ -300,8 +300,8 @@ export function IrelandVatCalculator({ config }: { config: VatConfig }) {
             </div>
             <p className="mt-1 text-xs leading-5 text-muted">
               {received
-                ? "VAT you charge customers — owed to Revenue (output VAT)."
-                : "VAT you pay suppliers — reclaimable from Revenue (input VAT)."}
+                ? "VAT you charge customers: owed to Revenue (output VAT)."
+                : "VAT you pay suppliers: reclaimable from Revenue (input VAT)."}
             </p>
 
             <div className="mt-4 flex flex-col gap-4">
@@ -313,7 +313,7 @@ export function IrelandVatCalculator({ config }: { config: VatConfig }) {
                   rates={rates}
                   hint={
                     <>
-                      {salesRate.label.split(" — ")[0]} rate — {salesRate.applies}.
+                      {salesRate.label.split(": ")[0]} rate: {salesRate.applies}.
                       {salesRate.note && <span className="block">{salesRate.note}</span>}
                     </>
                   }
@@ -326,13 +326,13 @@ export function IrelandVatCalculator({ config }: { config: VatConfig }) {
                   rates={rates}
                   hint={
                     <>
-                      {purchaseRate.label.split(" — ")[0]} rate — {purchaseRate.applies}.
+                      {purchaseRate.label.split(": ")[0]} rate: {purchaseRate.applies}.
                       {purchaseRate.note && (
                         <span className="block">{purchaseRate.note}</span>
                       )}
                       <span className="mt-0.5 block text-muted">
                         {purchaseMirrored
-                          ? "Mirrors what you sell — change if you buy at a different rate."
+                          ? "Mirrors what you sell: change if you buy at a different rate."
                           : "Set independently. "}
                         {!purchaseMirrored && (
                           <button
@@ -354,7 +354,7 @@ export function IrelandVatCalculator({ config }: { config: VatConfig }) {
                   label="Sales for the period (excluding VAT)"
                   value={salesAmount}
                   onChange={setSalesAmount}
-                  hint="Everything you invoiced before VAT — a year, a quarter or one VAT period."
+                  hint="Everything you invoiced before VAT: a year, a quarter or one VAT period."
                 />
               ) : (
                 <CurrencyField
@@ -371,7 +371,7 @@ export function IrelandVatCalculator({ config }: { config: VatConfig }) {
                 sales.gross > 0 ? (
                   <>
                     VAT received:{" "}
-                    <span className="font-medium text-ink">{money(sales.vat)}</span> —
+                    <span className="font-medium text-ink">{money(sales.vat)}</span>, and
                     customers pay {money(sales.gross)} gross.
                   </>
                 ) : (
@@ -380,7 +380,7 @@ export function IrelandVatCalculator({ config }: { config: VatConfig }) {
               ) : purchases.gross > 0 ? (
                 <>
                   VAT paid:{" "}
-                  <span className="font-medium text-ink">{money(purchases.vat)}</span> —
+                  <span className="font-medium text-ink">{money(purchases.vat)}</span>,
                   on a net cost of {money(purchases.net)}.
                 </>
               ) : (

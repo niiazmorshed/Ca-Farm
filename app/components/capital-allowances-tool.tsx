@@ -20,17 +20,17 @@ const NOTES: Record<Mode, { title: string; body: string }[]> = {
     },
     {
       title: "Cars are capped",
-      body: "Car allowances are limited to €24,000 and restricted by CO2 — full relief up to 155 g/km, 50% from 156–190 g/km, and none above 190 g/km. The emissions bands change again on 1 January 2027.",
+      body: "Car allowances are limited to €24,000 and restricted by CO2: full relief up to 155 g/km, 50% from 156–190 g/km, and none above 190 g/km. The emissions bands change again on 1 January 2027.",
     },
     {
       title: "The cash value",
-      body: "Allowances reduce taxable profit, so the cash saving is the allowance times your tax rate — shown here at the 12.5% trading rate. Disposals can trigger a balancing allowance or charge later.",
+      body: "Allowances reduce taxable profit, so the cash saving is the allowance times your tax rate, shown here at the 12.5% trading rate. Disposals can trigger a balancing allowance or charge later.",
     },
   ],
   finance: [
     {
       title: "Working capital",
-      body: "Current assets minus current liabilities — the buffer that funds day-to-day trading. A surplus covers your short-term obligations; a deficit signals a short-term funding gap.",
+      body: "Current assets minus current liabilities: the buffer that funds day-to-day trading. A surplus covers your short-term obligations; a deficit signals a short-term funding gap.",
     },
     {
       title: "The two ratios",
@@ -38,7 +38,7 @@ const NOTES: Record<Mode, { title: string; body: string }[]> = {
     },
     {
       title: "Read it in context",
-      body: "It's a point-in-time snapshot. Seasonality, the cash-conversion cycle and your sector all shape what's comfortable — pair it with cash-flow forecasting.",
+      body: "It's a point-in-time snapshot. Seasonality, the cash-conversion cycle and your sector all shape what's comfortable, so pair it with cash-flow forecasting.",
     },
   ],
 };

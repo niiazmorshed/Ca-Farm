@@ -7,7 +7,7 @@ import { CT_LAST_REVIEWED } from "../../lib/ireland-corporation-tax";
 import { getCorporationTaxData } from "../../lib/corporation-tax-data";
 
 export const metadata: Metadata = {
-  title: "Ireland Corporation Tax Calculator — 12.5% Trading, 25% Passive",
+  title: "Ireland Corporation Tax Calculator: 12.5% Trading, 25% Passive",
   description:
     "Estimate Irish corporation tax on trading profit (12.5%) and passive/non-trading income (25%), with the total tax due and blended effective rate. Republic of Ireland.",
 };
@@ -23,7 +23,7 @@ const notes = [
   },
   {
     title: "Reliefs come next",
-    body: "Chargeable gains, the R&D credit, Knowledge Development Box, close-company surcharge and start-up relief change the final bill — that's a conversation, not a slider.",
+    body: "Chargeable gains, the R&D credit, Knowledge Development Box, close-company surcharge and start-up relief change the final bill. That's a conversation, not a slider.",
   },
 ];
 
@@ -44,7 +44,7 @@ export default async function IrelandCorporationTaxPage() {
           />
         }
         title="Ireland corporation tax calculator"
-        lede={`Estimate the total corporation tax on trading income and passive income, with the blended effective rate — figures current as of ${CT_LAST_REVIEWED}.`}
+        lede={`Estimate the total corporation tax on trading income and passive income, with the blended effective rate, figures current as of ${CT_LAST_REVIEWED}.`}
       />
 
       <Container className="py-16 sm:py-20">

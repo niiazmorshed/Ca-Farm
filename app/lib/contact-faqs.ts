@@ -21,7 +21,7 @@ export interface ContactFaq {
 export const CONTACT_FAQS: ContactFaq[] = [
   {
     q: "Do I need an audit?",
-    a: "Many companies are audit-exempt — under two of turnover €15m, balance sheet €7.5m and 50 employees, filed on time.",
+    a: "Many companies are audit-exempt: under two of turnover €15m, balance sheet €7.5m and 50 employees, filed on time.",
     href: "/services/account-bookkeeping/audit-assurance",
     keywords: ["audit", "exemption", "assurance", "statutory"],
   },
@@ -39,13 +39,13 @@ export const CONTACT_FAQS: ContactFaq[] = [
   },
   {
     q: "Is a gift or inheritance taxable?",
-    a: "Capital Acquisitions Tax at 33% above your group threshold — with agricultural and business relief. Try the CAT calculator.",
+    a: "Capital Acquisitions Tax at 33% above your group threshold, with agricultural and business relief. Try the CAT calculator.",
     href: "/tools/ireland-cat",
     keywords: ["gift", "inheritance", "inherit", "cat", "estate", "family farm", "bequest"],
   },
   {
     q: "Can you run our payroll?",
-    a: "Full cycle — payslips, PAYE Modernisation, pensions and year-end — and we keep you ahead of auto-enrolment (My Future Fund).",
+    a: "Full cycle, payslips, PAYE Modernisation, pensions and year-end, and we keep you ahead of auto-enrolment (My Future Fund).",
     href: "/services/account-bookkeeping/payroll",
     keywords: ["payroll", "paye", "pension", "auto-enrolment", "auto enrolment", "wages", "employees"],
   },

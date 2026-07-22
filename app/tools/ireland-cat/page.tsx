@@ -7,19 +7,19 @@ import { CAT_LAST_REVIEWED } from "../../lib/ireland-cat";
 import { getCatData } from "../../lib/cat-data";
 
 export const metadata: Metadata = {
-  title: "Ireland CAT Calculator — Gift & Inheritance Tax (Group A/B/C)",
+  title: "Ireland CAT Calculator: Gift & Inheritance Tax (Group A/B/C)",
   description:
-    "Estimate Irish Capital Acquisitions Tax on a gift or inheritance. Group A/B/C thresholds (€400,000 / €40,000 / €20,000), the €3,000 small-gift exemption, agricultural and business relief at 90%, prior-benefit aggregation and 33% — with the pay & file date. Republic of Ireland.",
+    "Estimate Irish Capital Acquisitions Tax on a gift or inheritance. Group A/B/C thresholds (€400,000 / €40,000 / €20,000), the €3,000 small-gift exemption, agricultural and business relief at 90%, prior-benefit aggregation and 33%, with the pay & file date. Republic of Ireland.",
 };
 
 const notes = [
   {
     title: "Group thresholds",
-    body: "Your relationship to the disponer sets the tax-free threshold — Group A €400,000 (children), B €40,000 (close relatives), C €20,000 (everyone else). The tool derives it for you.",
+    body: "Your relationship to the disponer sets the tax-free threshold, Group A €400,000 (children), B €40,000 (close relatives), C €20,000 (everyone else). The tool derives it for you.",
   },
   {
     title: "Farm & business relief",
-    body: "Agricultural relief and business relief each cut the taxable value of qualifying property by 90% — subject to conditions (active-farmer test, six-year retention) not modelled here.",
+    body: "Agricultural relief and business relief each cut the taxable value of qualifying property by 90%, subject to conditions (active-farmer test, six-year retention) not modelled here.",
   },
   {
     title: "Aggregation since 1991",
@@ -44,7 +44,7 @@ export default async function IrelandCatPage() {
           />
         }
         title="Ireland CAT calculator"
-        lede={`Estimate gift and inheritance tax — group thresholds, small-gift exemption, agricultural and business relief, aggregation and the pay & file date. Figures current as of ${CAT_LAST_REVIEWED}.`}
+        lede={`Estimate gift and inheritance tax, group thresholds, small-gift exemption, agricultural and business relief, aggregation and the pay & file date. Figures current as of ${CAT_LAST_REVIEWED}.`}
       />
 
       <Container className="py-16 sm:py-20">

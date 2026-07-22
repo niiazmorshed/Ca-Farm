@@ -159,8 +159,8 @@ export default async function CategoryPage({
             </div>
             <ul className="mt-2 divide-y divide-line border-b border-line">
               {(cat.included ?? []).map((entry) => {
-                const [label, ...rest] = entry.split(" — ");
-                const detail = rest.join(" — ");
+                const [label, ...rest] = entry.split(": ");
+                const detail = rest.join(": ");
                 return (
                   <li
                     key={entry}
@@ -173,7 +173,7 @@ export default async function CategoryPage({
                       <span className="font-display font-semibold text-ink">
                         {label}
                       </span>
-                      {detail && <> — {detail}</>}
+                      {detail && <>: {detail}</>}
                     </p>
                   </li>
                 );
@@ -239,7 +239,7 @@ export default async function CategoryPage({
               We’re building this service
             </h2>
             <p className="text-[15px] leading-7 text-muted">
-              Tell us what you need and we’ll be in touch the moment it launches —
+              Tell us what you need and we’ll be in touch the moment it launches,
               or sooner, if we can already help.
             </p>
             <Button href="/contact" className="mt-3">

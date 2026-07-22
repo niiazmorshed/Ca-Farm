@@ -165,7 +165,7 @@ export function IrelandCapitalAllowancesCalculator({ config }: { config: CaConfi
           <p className="mt-2 text-xs leading-5 text-muted">
             One asset, the standard write-off. Balancing allowances or charges on
             disposal, private-use restrictions, leasing rules and scheme-specific
-            building reliefs can each change the position — that&rsquo;s a
+            building reliefs can each change the position: that&rsquo;s a
             conversation, not a slider.
           </p>
         </div>

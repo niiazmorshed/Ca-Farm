@@ -74,7 +74,7 @@ export const ASSET_CLASSES: AssetClass[] = [
     ratePercent: 12.5,
     years: 8,
     firstYearFull: false,
-    note: "Machinery, equipment, fixtures and fittings, plus commercial vehicles (vans, trucks, tractors) — written off at 12.5% a year over 8 years.",
+    note: "Machinery, equipment, fixtures and fittings, plus commercial vehicles (vans, trucks, tractors), written off at 12.5% a year over 8 years.",
   },
   {
     key: "motor-vehicle",
@@ -83,7 +83,7 @@ export const ASSET_CLASSES: AssetClass[] = [
     years: 8,
     firstYearFull: false,
     co2Restricted: true,
-    note: "12.5% over 8 years, but the cost is capped at €24,000 and restricted by CO2 emissions. Commercial vehicles (vans, trucks) aren't restricted — use Plant & machinery for those.",
+    note: "12.5% over 8 years, but the cost is capped at €24,000 and restricted by CO2 emissions. Commercial vehicles (vans, trucks) aren't restricted; use Plant & machinery for those.",
   },
   {
     key: "industrial-building",
@@ -91,7 +91,7 @@ export const ASSET_CLASSES: AssetClass[] = [
     ratePercent: 4,
     years: 25,
     firstYearFull: false,
-    note: "Factories, mills and similar buildings in use for a trade — 4% a year over 25 years. Many scheme-specific building reliefs have ended; check the building qualifies.",
+    note: "Factories, mills and similar buildings in use for a trade: 4% a year over 25 years. Many scheme-specific building reliefs have ended; check the building qualifies.",
   },
   {
     key: "energy-efficient",
@@ -99,7 +99,7 @@ export const ASSET_CLASSES: AssetClass[] = [
     ratePercent: 100,
     years: 1,
     firstYearFull: true,
-    note: "Accelerated Capital Allowance — 100% written off in year one for approved energy-efficient equipment on the SEAI Triple-E register. Extended to 31 December 2030. Excludes equipment run on fossil fuels.",
+    note: "Accelerated Capital Allowance, 100% written off in year one for approved energy-efficient equipment on the SEAI Triple-E register. Extended to 31 December 2030. Excludes equipment run on fossil fuels.",
   },
 ];
 
@@ -126,13 +126,13 @@ export const CAR_CO2_GROUPS: Co2Group[] = [
     key: "group1",
     label: "0–155 g/km (Category A–C)",
     factor: 1,
-    note: "Full relief — allowances on the cost up to €24,000.",
+    note: "Full relief: allowances on the cost up to €24,000.",
   },
   {
     key: "group2",
     label: "156–190 g/km (Category D–E)",
     factor: 0.5,
-    note: "Half relief — allowances on 50% of the cost (capped at €24,000).",
+    note: "Half relief: allowances on 50% of the cost (capped at €24,000).",
   },
   {
     key: "group3",

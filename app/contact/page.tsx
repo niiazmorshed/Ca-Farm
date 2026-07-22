@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const nextSteps = [
   "We reply within one business day to arrange a call.",
   "A free 30-minute conversation about where things stand.",
-  "A fixed-fee proposal in writing — take it or leave it.",
+  "A fixed-fee proposal in writing: take it or leave it.",
 ];
 
 export default function ContactPage() {
@@ -21,7 +21,7 @@ export default function ContactPage() {
       <PageHero
         eyebrow="Contact"
         title="Start the conversation."
-        lede="Tell us where your books stand. A partner reads every enquiry — you will not be handed to a sales team."
+        lede="Tell us where your books stand. A partner reads every enquiry: you will not be handed to a sales team."
         image="teamMeeting"
       />
 

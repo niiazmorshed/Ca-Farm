@@ -25,16 +25,16 @@ const ratio = (n: number) => `${n.toFixed(2)}×`;
 /* Rule-of-thumb reading of a ratio — deliberately hedged. */
 function currentRatioBand(r: number | null): string {
   if (r === null) return "No current liabilities to cover.";
-  if (r < 1) return "Under 1 — current liabilities exceed current assets.";
-  if (r < 1.5) return "1–1.5 — adequate, but tight.";
-  if (r <= 3) return "1.5–3 — generally considered healthy.";
-  return "Over 3 — comfortable, but may signal idle cash or stock.";
+  if (r < 1) return "Under 1: current liabilities exceed current assets.";
+  if (r < 1.5) return "1–1.5: adequate, but tight.";
+  if (r <= 3) return "1.5–3: generally considered healthy.";
+  return "Over 3: comfortable, but may signal idle cash or stock.";
 }
 
 function quickRatioBand(r: number | null): string {
   if (r === null) return "No current liabilities to cover.";
-  if (r < 1) return "Under 1 — can't cover liabilities without selling stock.";
-  return "1 or above — liabilities covered from liquid assets alone.";
+  if (r < 1) return "Under 1: can't cover liabilities without selling stock.";
+  return "1 or above: liabilities covered from liquid assets alone.";
 }
 
 function RatioCard({
@@ -68,11 +68,11 @@ function ResultCard({ r }: { r: WorkingCapitalResult }) {
   const view = {
     surplus: {
       tag: { text: "Surplus", cls: "bg-primary-500 text-white" },
-      sub: "current assets exceed current liabilities — short-term obligations are covered.",
+      sub: "current assets exceed current liabilities: short-term obligations are covered.",
     },
     deficit: {
       tag: { text: "Deficit", cls: "bg-navy-900 text-white" },
-      sub: "current liabilities exceed current assets — a short-term funding gap.",
+      sub: "current liabilities exceed current assets: a short-term funding gap.",
     },
     balanced: {
       tag: { text: "Balanced", cls: "border border-line bg-surface-muted text-muted" },
@@ -163,7 +163,7 @@ export function WorkingCapitalCalculator() {
         <div className="border-l-[3px] border-primary-500 bg-surface-muted px-4 py-3 text-xs leading-5 text-ink-body">
           <span className="font-semibold text-ink">Liquidity, not tax.</span> Working
           capital is what&rsquo;s left of your short-term assets after short-term
-          debts — the buffer that funds day-to-day trading. Enter the balance-sheet
+          debts: the buffer that funds day-to-day trading. Enter the balance-sheet
           figures and the ratios are worked out for you.
         </div>
 
@@ -192,7 +192,7 @@ export function WorkingCapitalCalculator() {
           </p>
           <p className="mt-2 text-xs leading-5 text-muted">
             Working capital is a point-in-time figure. Read it alongside cash flow,
-            seasonality and the cash-conversion cycle — what&rsquo;s &ldquo;healthy&rdquo;
+            seasonality and the cash-conversion cycle: what&rsquo;s &ldquo;healthy&rdquo;
             varies a lot by industry.
           </p>
         </div>
@@ -217,7 +217,7 @@ export function WorkingCapitalCalculator() {
         </div>
         <p className="border-t border-line pt-6 text-xs leading-5 text-muted">
           Indicative only, not financial advice. Ratio &ldquo;health&rdquo; is a rule
-          of thumb that varies by industry and season — read these figures alongside
+          of thumb that varies by industry and season: read these figures alongside
           cash flow and your specific circumstances.
         </p>
       </div>

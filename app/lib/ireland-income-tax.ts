@@ -493,7 +493,7 @@ export function computeIncomeTax(
       amount: it.credits.personalSingle,
       reason:
         input.maritalStatus === "widowed"
-          ? "Widowed — standard credit (excludes bereavement-year uplift, see TODO)"
+          ? "Widowed: standard credit (excludes bereavement-year uplift, see TODO)"
           : "Single",
     });
   }
@@ -517,7 +517,7 @@ export function computeIncomeTax(
       name: label,
       amount: employmentCredit,
       reason: capped
-        ? "Both employment and self-employment income — shared €2,000 ceiling, does not stack"
+        ? "Both employment and self-employment income: shared €2,000 ceiling, does not stack"
         : hasEmployment
           ? "Has employment income"
           : "Has self-employment income",
@@ -541,7 +541,7 @@ export function computeIncomeTax(
         amount: spouseCredit,
         reason:
           spouseRaw > spouseCredit
-            ? "Spouse has both income types — shared ceiling, does not stack"
+            ? "Spouse has both income types: shared ceiling, does not stack"
             : "Spouse has their own income",
       });
     }

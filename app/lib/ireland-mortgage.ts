@@ -512,7 +512,7 @@ export function compareProducts(
       `Your loan is ${new Intl.NumberFormat("en-IE", {
         style: "percent",
         maximumFractionDigits: 1,
-      }).format(ltv)} of the property value — above the ${Math.round(
+      }).format(ltv)} of the property value: above the ${Math.round(
         maxLtv * 100,
       )}% Central Bank loan-to-value limit. You would need a deposit of at least ${fmtEur(
         value * (1 - maxLtv),
@@ -540,7 +540,7 @@ export function compareProducts(
 
   if (input.age > 0 && input.age + input.termYears > policy.maxAgeAtEnd) {
     warnings.push(
-      `A ${input.termYears}-year term would run past age ${policy.maxAgeAtEnd}. Most lenders cap the term so the mortgage ends by ${policy.maxAgeAtEnd} — around ${Math.max(
+      `A ${input.termYears}-year term would run past age ${policy.maxAgeAtEnd}. Most lenders cap the term so the mortgage ends by ${policy.maxAgeAtEnd}, around ${Math.max(
         5,
         policy.maxAgeAtEnd - input.age,
       )} years in your case.`,

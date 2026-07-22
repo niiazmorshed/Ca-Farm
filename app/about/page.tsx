@@ -25,7 +25,7 @@ export default function AboutPage() {
       <PageHero
         eyebrow="The firm"
         title="Accountants who act like partners."
-        lede="CA Farm was founded on a simple complaint: most firms only call when the invoice is due. We built the practice we wished existed — close to the numbers, ahead of the deadlines, honest about the fees."
+        lede="CA Farm was founded on a simple complaint: most firms only call when the invoice is due. We built the practice we wished existed: close to the numbers, ahead of the deadlines, honest about the fees."
         image="office"
       />
 
@@ -37,7 +37,7 @@ export default function AboutPage() {
           />
           <div className="mt-6 flex flex-col gap-5 text-[15px] leading-7 text-ink-body">
             <p>
-              We started in a single room above a farm shop — which is where
+              We started in a single room above a farm shop, which is where
               the name comes from. The first clients were rural businesses
               that needed more than a year-end filing: they needed someone who
               understood seasonality, capital spend and what a bad harvest
@@ -48,7 +48,7 @@ export default function AboutPage() {
               clients, but the operating principle is unchanged: every client
               gets a partner who knows their business, books that are never
               out of date, and advice in plain English before decisions are
-              made — not after.
+              made, not after.
             </p>
             <p>
               We cap each partner’s client list on purpose. Growth that costs

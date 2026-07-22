@@ -102,7 +102,7 @@ function Row({
 
 function ResultCard({ r }: { r: CgtResult }) {
   const view = r.isLoss
-    ? { tag: { text: "Allowable loss", cls: "bg-navy-900 text-white" }, hero: r.disposalLoss, sub: "No CGT — this disposal is a loss you can carry forward or set against other gains." }
+    ? { tag: { text: "Allowable loss", cls: "bg-navy-900 text-white" }, hero: r.disposalLoss, sub: "No CGT: this disposal is a loss you can carry forward or set against other gains." }
     : r.totalTax > 0
       ? { tag: { text: "CGT due", cls: "bg-primary-500 text-white" }, hero: r.totalTax, sub: `Effective rate ${r.effectiveRatePercent}% of the taxable gain.` }
       : { tag: { text: "No CGT", cls: "border border-line bg-surface-muted text-muted" }, hero: 0, sub: "The gain is covered by reliefs, losses and the annual exemption." };
@@ -280,7 +280,7 @@ export function IrelandCgtCalculator({
           label="Selling costs"
           value={disposalCosts}
           onChange={setDisposalCosts}
-          hint="Incidental costs of disposal — solicitor, auctioneer, agent fees. Not indexed."
+          hint="Incidental costs of disposal: solicitor, auctioneer, agent fees. Not indexed."
         />
         <CurrencyField
           label="Acquisition cost"
@@ -308,7 +308,7 @@ export function IrelandCgtCalculator({
           label="Month of sale (optional)"
           value={disposalMonth}
           onChange={setDisposalMonth}
-          hint="Sets the CGT payment date — Jan–Nov is due 15 December, December is due 31 January."
+          hint="Sets the CGT payment date: Jan–Nov is due 15 December, December is due 31 January."
         >
           <option value="">Select a month…</option>
           {MONTHS.map((m, i) => (
@@ -327,7 +327,7 @@ export function IrelandCgtCalculator({
                 label="Enhancement expenditure"
                 value={enhancementCost}
                 onChange={setEnhancementCost}
-                hint="Money spent adding value (extensions, improvements) — not repairs."
+                hint="Money spent adding value (extensions, improvements): not repairs."
               />
               <SelectField label="Year of the enhancement" value={enhYearKey} onChange={setEnhYearKey}>
                 {yearOptions}

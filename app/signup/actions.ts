@@ -46,7 +46,7 @@ export async function signup(
     );
     return {
       error: exists
-        ? "An account with this email already exists — try signing in."
+        ? "An account with this email already exists. Try signing in."
         : createError.message,
       values,
     };

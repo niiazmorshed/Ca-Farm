@@ -94,7 +94,7 @@ export async function submitEnquiry(
   if (!EMAIL_RE.test(values.email))
     errors.email = "Please enter a valid email address.";
   if (values.message.length < 10)
-    errors.message = "Tell us a little more — a sentence or two is plenty.";
+    errors.message = "Tell us a little more: a sentence or two is plenty.";
 
   if (Object.keys(errors).length > 0) {
     return { status: "error", errors, values };

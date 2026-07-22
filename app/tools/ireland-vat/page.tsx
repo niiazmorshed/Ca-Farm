@@ -7,19 +7,19 @@ import { VAT_LAST_REVIEWED } from "../../lib/ireland-vat";
 import { getVatData } from "../../lib/vat-data";
 
 export const metadata: Metadata = {
-  title: "Ireland VAT Calculator — Net VAT Payable or Receivable (VAT3)",
+  title: "Ireland VAT Calculator: Net VAT Payable or Receivable (VAT3)",
   description:
-    "Enter your sales and purchases and see your net VAT position — payable to Revenue or receivable back — the way the VAT3 return nets output VAT against input VAT. Every Irish rate: 23%, 13.5%, 9%, 4.8% and 0%. Republic of Ireland.",
+    "Enter your sales and purchases and see your net VAT position, payable to Revenue or receivable back, the way the VAT3 return nets output VAT against input VAT. Every Irish rate: 23%, 13.5%, 9%, 4.8% and 0%. Republic of Ireland.",
 };
 
 const notes = [
   {
     title: "Payable or receivable",
-    body: "VAT charged on sales is owed to Revenue; VAT paid on purchases is reclaimable. The calculator nets the two — charge more than you paid and the balance is payable; pay more than you charged and it's receivable.",
+    body: "VAT charged on sales is owed to Revenue; VAT paid on purchases is reclaimable. The calculator nets the two: charge more than you paid and the balance is payable; pay more than you charged and it's receivable.",
   },
   {
     title: "Every Irish rate",
-    body: "Standard 23%, reduced 13.5%, second reduced 9% (food, catering and hairdressing since 1 July 2026), 4.8% livestock and 0% zero — pick what you sell and what you buy and each rate is applied for you.",
+    body: "Standard 23%, reduced 13.5%, second reduced 9% (food, catering and hairdressing since 1 July 2026), 4.8% livestock and 0% zero: pick what you sell and what you buy and each rate is applied for you.",
   },
   {
     title: "Registration thresholds",
@@ -44,7 +44,7 @@ export default async function IrelandVatPage() {
           />
         }
         title="Ireland VAT calculator"
-        lede={`Enter your sales and purchases and see whether VAT is payable to Revenue or receivable back — netted the way the VAT3 return works. Figures current as of ${VAT_LAST_REVIEWED}.`}
+        lede={`Enter your sales and purchases and see whether VAT is payable to Revenue or receivable back, netted the way the VAT3 return works. Figures current as of ${VAT_LAST_REVIEWED}.`}
       />
 
       <Container className="py-16 sm:py-20">
