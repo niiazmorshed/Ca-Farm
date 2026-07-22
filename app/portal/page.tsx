@@ -1,38 +1,19 @@
 import Link from "next/link";
 import { query } from "../lib/db";
 import { requireClient } from "../lib/supabase/guards";
+import { getThreadsFor, markClientRead } from "../lib/enquiry-messages";
+import { PortalConversation } from "../components/portal-conversation";
+import { sendClientMessageAction } from "./actions";
 import { Icon } from "../components/dashboard-icons";
-import {
-  Avatar,
-  initialsOf,
-  Panel,
-  StatusChip,
-  timeAgo,
-  type StatusTone,
-} from "../components/dashboard-ui";
+import { Avatar, initialsOf, Panel, timeAgo } from "../components/dashboard-ui";
 
 interface EnquiryRow {
   id: string;
   service: string | null;
   message: string;
-  status: string;
   created_at: Date;
+  client_last_read_at: Date | null;
 }
-
-/**
- * Client-facing view of the admin triage state: "new" reads as "Received"
- * (we have it), in_progress as "In review", resolved as "Resolved".
- */
-const STATUS_META: Record<
-  string,
-  { label: string; tone: StatusTone; step: 1 | 2 | 3 }
-> = {
-  new: { label: "Received", tone: "green", step: 1 },
-  in_progress: { label: "In review", tone: "dark", step: 2 },
-  resolved: { label: "Resolved", tone: "muted", step: 3 },
-};
-
-const PROGRESS_STEPS = ["Received", "In review", "Resolved"] as const;
 
 const fmt = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
@@ -71,24 +52,23 @@ export default async function PortalPage() {
   const user = await requireClient();
 
   // Profile, the client's own enquiries (owned by user_id, with an email
-  // fallback for pre-signup submissions) and accurate status counts across
-  // the full history — all from the pg pool and fetched in parallel.
+  // fallback for pre-signup submissions) and a total count — all from the pg
+  // pool and fetched in parallel.
   const [profileResult, enquiriesResult, countsResult] = await Promise.all([
     query<{ full_name: string | null; role: string; created_at: Date }>(
       "select full_name, role, created_at from public.profiles where id = $1",
       [user.id],
     ),
     query<EnquiryRow>(
-      `select id, service, message, status, created_at
+      `select id, service, message, created_at, client_last_read_at
          from enquiries
         where user_id = $1 or lower(email) = lower($2)
         order by created_at desc
         limit 50`,
       [user.id, user.email ?? ""],
     ),
-    query<{ total: number; open: number }>(
-      `select count(*)::int as total,
-              count(*) filter (where status <> 'resolved')::int as open
+    query<{ total: number }>(
+      `select count(*)::int as total
          from enquiries
         where user_id = $1 or lower(email) = lower($2)`,
       [user.id, user.email ?? ""],
@@ -97,11 +77,31 @@ export default async function PortalPage() {
 
   const profile = profileResult.rows[0] ?? null;
   const enquiries = enquiriesResult.rows;
-  const { total: totalEnquiries, open } = countsResult.rows[0] ?? {
-    total: 0,
-    open: 0,
-  };
-  const resolved = totalEnquiries - open;
+  // Reply threads for the listed enquiries (one round-trip, grouped by id).
+  const threads = await getThreadsFor(enquiries.map((e) => e.id));
+  const { total: totalEnquiries } = countsResult.rows[0] ?? { total: 0 };
+
+  // A thread is unread when the team has replied since the client last read it.
+  // Compute BEFORE marking read so the "new reply" cues show on this visit.
+  const unreadIds = new Set<string>();
+  for (const e of enquiries) {
+    const lastAdmin = (threads.get(e.id) ?? [])
+      .filter((m) => m.sender === "admin")
+      .at(-1);
+    if (
+      lastAdmin &&
+      (!e.client_last_read_at ||
+        lastAdmin.createdAt > new Date(e.client_last_read_at))
+    ) {
+      unreadIds.add(e.id);
+    }
+  }
+  const unreadCount = unreadIds.size;
+
+  // The client is viewing the portal now — mark their threads read so the cues
+  // clear on the next visit.
+  await markClientRead(user.id, user.email ?? "");
+
   const firstName = profile?.full_name?.split(" ")[0];
   const initials = initialsOf(profile?.full_name, user.email ?? "");
   const latest = enquiries[0] ? new Date(enquiries[0].created_at) : null;
@@ -113,14 +113,9 @@ export default async function PortalPage() {
       hint: totalEnquiries === 0 ? "None yet" : "All time",
     },
     {
-      label: "Open requests",
-      value: String(open),
-      hint: open === 0 ? "Nothing waiting" : "With the team",
-    },
-    {
-      label: "Resolved",
-      value: String(resolved),
-      hint: resolved === 0 ? "None yet" : "Completed",
+      label: "New replies",
+      value: String(unreadCount),
+      hint: unreadCount === 0 ? "You're all caught up" : "Unread from the team",
     },
     {
       label: "Last activity",
@@ -174,7 +169,7 @@ export default async function PortalPage() {
             </div>
           </div>
 
-          <dl className="mt-8 grid grid-cols-2 gap-y-1 border-t border-white/10 lg:grid-cols-4 lg:divide-x lg:divide-white/10">
+          <dl className="mt-8 grid grid-cols-1 gap-y-1 border-t border-white/10 sm:grid-cols-3 sm:divide-x sm:divide-white/10">
             {heroStats.map((stat) => (
               <div
                 key={stat.label}
@@ -235,8 +230,9 @@ export default async function PortalPage() {
               {totalEnquiries > 0 && (
                 <p className="mt-0.5 text-xs text-muted">
                   {totalEnquiries} total
-                  {open > 0 && ` · ${open} open with the team`} — tap one to see
-                  its full message and progress.
+                  {unreadCount > 0 &&
+                    ` · ${unreadCount} new ${unreadCount === 1 ? "reply" : "replies"}`}
+                  {" "}— tap one to read the conversation and reply.
                   {totalEnquiries > enquiries.length &&
                     ` Showing the latest ${enquiries.length}.`}
                 </p>
@@ -259,7 +255,8 @@ export default async function PortalPage() {
                 No enquiries yet
               </p>
               <p className="mt-1 text-sm text-muted">
-                When you send us a message it&apos;ll show here with its status.
+                When you send us a message it&apos;ll show here, and the team&apos;s
+                replies land in the same thread.
               </p>
               <Link
                 href="/contact"
@@ -270,101 +267,22 @@ export default async function PortalPage() {
             </div>
           ) : (
             <ul className="mt-5 flex flex-col gap-4">
-              {enquiries.map((enquiry) => {
-                const meta = STATUS_META[enquiry.status] ?? STATUS_META.new;
-                return (
-                  <li key={enquiry.id}>
-                    <details className="group relative rounded-none border border-line bg-white transition-colors duration-200 open:border-primary-400/60 hover:border-primary-400/60">
-                      <span
-                        aria-hidden="true"
-                        className="absolute inset-y-0 left-0 w-0.5 bg-primary-400 opacity-0 transition-opacity duration-200 group-open:opacity-100 group-hover:opacity-100"
-                      />
-                      <summary className="flex cursor-pointer list-none items-start gap-4 p-5 [&::-webkit-details-marker]:hidden">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <span className="font-display text-sm font-semibold text-ink">
-                              {enquiry.service ?? "General enquiry"}
-                            </span>
-                            <span className="flex items-center gap-3 text-xs text-muted">
-                              <span className="tabular-nums">
-                                Ref #{enquiry.id.padStart(4, "0")}
-                              </span>
-                              {fmt.format(new Date(enquiry.created_at))}
-                            </span>
-                          </div>
-                          <p className="mt-2 line-clamp-2 text-sm leading-6 text-ink-body group-open:hidden">
-                            {enquiry.message}
-                          </p>
-                          <div className="mt-3">
-                            <StatusChip label={meta.label} tone={meta.tone} />
-                          </div>
-                        </div>
-                        <Icon
-                          name="chevronDown"
-                          className="mt-1 h-4 w-4 shrink-0 text-muted transition-transform duration-200 group-open:rotate-180"
-                        />
-                      </summary>
-                      <div className="border-t border-line px-5 pb-5 pt-4">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
-                          Your message
-                        </p>
-                        <p className="mt-2 whitespace-pre-line text-sm leading-6 text-ink-body">
-                          {enquiry.message}
-                        </p>
-
-                        {/* Progress: Received → In review → Resolved */}
-                        <ol className="mt-5 flex items-center border-t border-line pt-4">
-                          {PROGRESS_STEPS.map((label, i) => {
-                            const done = i + 1 <= meta.step;
-                            const connectorDone = i + 1 < meta.step;
-                            return (
-                              <li
-                                key={label}
-                                className="flex flex-1 items-center last:flex-none"
-                              >
-                                <span className="flex items-center gap-2">
-                                  <span
-                                    className={`grid h-5 w-5 shrink-0 place-items-center rounded-full ${
-                                      done
-                                        ? "bg-primary-500 text-white"
-                                        : "border border-line bg-white"
-                                    }`}
-                                  >
-                                    {done ? (
-                                      <Icon
-                                        name="check"
-                                        className="h-3 w-3"
-                                        strokeWidth={2.5}
-                                      />
-                                    ) : (
-                                      <span className="h-1.5 w-1.5 rounded-full bg-line" />
-                                    )}
-                                  </span>
-                                  <span
-                                    className={`text-xs font-medium ${
-                                      done ? "text-ink" : "text-muted"
-                                    }`}
-                                  >
-                                    {label}
-                                  </span>
-                                </span>
-                                {i < PROGRESS_STEPS.length - 1 && (
-                                  <span
-                                    aria-hidden="true"
-                                    className={`mx-3 h-px flex-1 ${
-                                      connectorDone ? "bg-primary-500" : "bg-line"
-                                    }`}
-                                  />
-                                )}
-                              </li>
-                            );
-                          })}
-                        </ol>
-                      </div>
-                    </details>
-                  </li>
-                );
-              })}
+              {enquiries.map((enquiry) => (
+                <li key={enquiry.id}>
+                  <PortalConversation
+                    enquiryId={enquiry.id}
+                    service={enquiry.service ?? "General enquiry"}
+                    refLabel={`Ref #${enquiry.id.padStart(4, "0")}`}
+                    dateLabel={fmt.format(new Date(enquiry.created_at))}
+                    openingMessage={enquiry.message}
+                    openingAt={new Date(enquiry.created_at)}
+                    messages={threads.get(enquiry.id) ?? []}
+                    unread={unreadIds.has(enquiry.id)}
+                    action={sendClientMessageAction}
+                    defaultOpen={unreadIds.has(enquiry.id)}
+                  />
+                </li>
+              ))}
             </ul>
           )}
         </section>

@@ -19,6 +19,36 @@ create index if not exists enquiries_created_at_idx on enquiries (created_at des
 alter table enquiries add column if not exists status text not null default 'new'
   check (status in ('new', 'in_progress', 'resolved'));
 
+-- Links an enquiry to the client account that owns it (null for guest/
+-- pre-signup submissions; the portal also matches on email as a fallback).
+alter table enquiries add column if not exists user_id uuid;
+
+-- Chat read tracking: when each side last opened the thread. A thread is
+-- "unread" for a side when the other side has posted since this timestamp
+-- (null = never opened → unread). Replaces the old new/in_progress/resolved
+-- triage as the inbox signal.
+alter table enquiries add column if not exists admin_last_read_at  timestamptz;
+alter table enquiries add column if not exists client_last_read_at timestamptz;
+
+-- ── Enquiry chat ────────────────────────────────────────────────────────────
+-- Two-way conversation on an enquiry: the client (portal) and admin (inbox)
+-- exchange messages, all stored here. The enquiry's original `message` column
+-- is the first line of the thread; every reply after that is a row below.
+create table if not exists enquiry_messages (
+  id             bigint generated always as identity primary key,
+  enquiry_id     bigint not null references enquiries (id) on delete cascade,
+  -- Which side wrote it. 'client' shows left in the portal / right in admin.
+  sender         text not null check (sender in ('admin', 'client')),
+  -- The auth user who sent it (null tolerated for older/guest rows).
+  sender_user_id uuid,
+  body           text not null,
+  created_at     timestamptz not null default now()
+);
+
+-- Thread read in chronological order, scoped to one enquiry.
+create index if not exists enquiry_messages_thread_idx
+  on enquiry_messages (enquiry_id, created_at asc);
+
 -- ── Ireland mortgage comparison ─────────────────────────────────────────────
 -- Lender rate products shown on /tools/ireland, editable in /admin/mortgage-rates
 -- so a repricing never needs a code deploy. Seeded below only when empty.

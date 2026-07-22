@@ -2,16 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { query } from "../../lib/db";
 import { requireAdmin } from "../../lib/supabase/guards";
-import { updateEnquiryStatusAction } from "./actions";
+import { sendAdminMessageAction } from "./actions";
 import { Icon } from "../../components/dashboard-icons";
+import { ChatPanel } from "../../components/chat-panel";
+import {
+  ADMIN_UNREAD_SQL,
+  getThreadMessages,
+  markAdminRead,
+} from "../../lib/enquiry-messages";
 import {
   Avatar,
   initialsOf,
   PageHeader,
   Panel,
-  StatusChip,
   timeAgo,
-  type StatusTone,
 } from "../../components/dashboard-ui";
 
 export const metadata: Metadata = {
@@ -26,20 +30,9 @@ interface EnquiryRow {
   company: string | null;
   service: string | null;
   message: string;
-  status: string;
   created_at: Date;
+  unread: boolean;
 }
-
-type StatusKey = "new" | "in_progress" | "resolved";
-
-const STATUS_META: Record<StatusKey, { label: string; tone: StatusTone }> = {
-  new: { label: "New", tone: "green" },
-  in_progress: { label: "In progress", tone: "dark" },
-  resolved: { label: "Resolved", tone: "muted" },
-};
-
-const statusMeta = (s: string) =>
-  STATUS_META[s as StatusKey] ?? STATUS_META.new;
 
 const fmtLong = new Intl.DateTimeFormat("en-GB", {
   weekday: "short",
@@ -51,9 +44,9 @@ const fmtLong = new Intl.DateTimeFormat("en-GB", {
 });
 
 /** Inbox URL preserving the active filter + search. */
-function hrefWith(p: { status?: string; q?: string; id?: string }) {
+function hrefWith(p: { filter?: string; q?: string; id?: string }) {
   const sp = new URLSearchParams();
-  if (p.status && p.status !== "all") sp.set("status", p.status);
+  if (p.filter && p.filter !== "all") sp.set("filter", p.filter);
   if (p.q) sp.set("q", p.q);
   if (p.id) sp.set("id", p.id);
   const s = sp.toString();
@@ -63,87 +56,83 @@ function hrefWith(p: { status?: string; q?: string; id?: string }) {
 export default async function EnquiriesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ id?: string; q?: string; status?: string }>;
+  searchParams: Promise<{ id?: string; q?: string; filter?: string }>;
 }) {
   await requireAdmin();
   const params = await searchParams;
   const q = params.q?.trim() ?? "";
-  const statusFilter =
-    params.status && params.status in STATUS_META ? params.status : "all";
+  const filter = params.filter === "unread" ? "unread" : "all";
   const idParam = params.id && /^\d+$/.test(params.id) ? params.id : null;
 
-  // List query with optional status + free-text filters.
+  // Opening a thread marks it read for the admin — do this first so the list
+  // and counts below reflect it immediately (no one-render lag on the badge).
+  if (idParam) await markAdminRead(idParam);
+
+  // List query with optional unread + free-text filters. (`e` alias is required
+  // by ADMIN_UNREAD_SQL.)
   const conds: string[] = [];
   const values: unknown[] = [];
-  if (statusFilter !== "all") {
-    values.push(statusFilter);
-    conds.push(`status = $${values.length}`);
-  }
+  if (filter === "unread") conds.push(ADMIN_UNREAD_SQL);
   if (q) {
     values.push(`%${q}%`);
     const n = values.length;
     conds.push(
-      `(name ilike $${n} or email ilike $${n} or coalesce(company, '') ilike $${n}
-        or coalesce(service, '') ilike $${n} or message ilike $${n})`,
+      `(e.name ilike $${n} or e.email ilike $${n} or coalesce(e.company, '') ilike $${n}
+        or coalesce(e.service, '') ilike $${n} or e.message ilike $${n})`,
     );
   }
   const where = conds.length ? `where ${conds.join(" and ")}` : "";
 
   const [listResult, countsResult, selectedResult] = await Promise.all([
     query<EnquiryRow>(
-      `select id, name, email, company, service, message, status, created_at
-         from enquiries ${where}
-        order by created_at desc
+      `select e.id, e.name, e.email, e.company, e.service, e.message, e.created_at,
+              ${ADMIN_UNREAD_SQL} as unread
+         from enquiries e ${where}
+        order by e.created_at desc
         limit 100`,
       values,
     ),
-    query<{ total: number; new: number; in_progress: number; resolved: number }>(
+    query<{ total: number; unread: number }>(
       `select count(*)::int as total,
-              count(*) filter (where status = 'new')::int as new,
-              count(*) filter (where status = 'in_progress')::int as in_progress,
-              count(*) filter (where status = 'resolved')::int as resolved
-         from enquiries`,
+              count(*) filter (where ${ADMIN_UNREAD_SQL})::int as unread
+         from enquiries e`,
     ),
     idParam
       ? query<EnquiryRow>(
-          `select id, name, email, company, service, message, status, created_at
-             from enquiries where id = $1`,
+          `select e.id, e.name, e.email, e.company, e.service, e.message, e.created_at,
+                  ${ADMIN_UNREAD_SQL} as unread
+             from enquiries e where e.id = $1`,
           [idParam],
         )
       : Promise.resolve(null),
   ]);
 
   const rows = listResult.rows;
-  const counts = countsResult.rows[0] ?? {
-    total: 0,
-    new: 0,
-    in_progress: 0,
-    resolved: 0,
-  };
+  const counts = countsResult.rows[0] ?? { total: 0, unread: 0 };
   const selected = selectedResult?.rows[0] ?? rows[0] ?? null;
   const explicitSelection = Boolean(selectedResult?.rows[0]);
 
+  const thread = selected ? await getThreadMessages(selected.id) : [];
+
   const tabs = [
     { key: "all", label: "All", count: counts.total },
-    { key: "new", label: "New", count: counts.new },
-    { key: "in_progress", label: "In progress", count: counts.in_progress },
-    { key: "resolved", label: "Resolved", count: counts.resolved },
+    { key: "unread", label: "Unread", count: counts.unread },
   ];
 
   return (
     <div className="mx-auto max-w-6xl">
       <PageHeader
-        eyebrow="Inbox"
+        eyebrow="Messages"
         title="Enquiries"
-        lede="Every contact-form message, triaged in one place — reply, track and resolve."
+        lede="Every client conversation in one place — read, reply and keep the thread going."
         actions={
-          counts.new > 0 ? (
+          counts.unread > 0 ? (
             <span className="inline-flex items-center gap-2 rounded-none bg-navy-900 px-3.5 py-2 text-xs font-semibold text-white">
               <span
                 aria-hidden="true"
                 className="h-1.5 w-1.5 rounded-full bg-primary-400"
               />
-              {counts.new} awaiting reply
+              {counts.unread} unread
             </span>
           ) : undefined
         }
@@ -160,8 +149,8 @@ export default async function EnquiriesPage({
             {/* Filters */}
             <div className="border-b border-line p-4">
               <form action="/admin/enquiries" method="get" role="search">
-                {statusFilter !== "all" && (
-                  <input type="hidden" name="status" value={statusFilter} />
+                {filter !== "all" && (
+                  <input type="hidden" name="filter" value={filter} />
                 )}
                 <label className="flex h-10 items-center gap-2.5 rounded-none border border-line bg-surface-muted/60 px-3 transition-colors duration-200 focus-within:border-primary-500 focus-within:bg-white">
                   <Icon name="search" className="h-4 w-4 shrink-0 text-muted" />
@@ -176,11 +165,11 @@ export default async function EnquiriesPage({
               </form>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {tabs.map((tab) => {
-                  const active = statusFilter === tab.key;
+                  const active = filter === tab.key;
                   return (
                     <Link
                       key={tab.key}
-                      href={hrefWith({ status: tab.key, q })}
+                      href={hrefWith({ filter: tab.key, q })}
                       className={`inline-flex items-center gap-1.5 rounded-none px-2.5 py-1.5 text-xs font-semibold transition-colors duration-200 ${
                         active
                           ? "bg-navy-900 text-white"
@@ -207,12 +196,12 @@ export default async function EnquiriesPage({
                     <Icon name="inbox" className="h-5 w-5" />
                   </span>
                   <p className="mt-3 text-sm font-medium text-ink">
-                    {q || statusFilter !== "all"
-                      ? "No enquiries match"
+                    {q || filter !== "all"
+                      ? "No conversations match"
                       : "No enquiries yet"}
                   </p>
                   <p className="mt-1 text-xs text-muted">
-                    {q || statusFilter !== "all"
+                    {q || filter !== "all"
                       ? "Try a different search or filter."
                       : "New contact-form messages land here."}
                   </p>
@@ -220,12 +209,11 @@ export default async function EnquiriesPage({
               ) : (
                 <ul className="divide-y divide-line">
                   {rows.map((row) => {
-                    const meta = statusMeta(row.status);
                     const active = selected?.id === row.id;
                     return (
                       <li key={row.id}>
                         <Link
-                          href={hrefWith({ status: statusFilter, q, id: row.id })}
+                          href={hrefWith({ filter, q, id: row.id })}
                           aria-current={active ? "true" : undefined}
                           className={`relative block px-4 py-3.5 transition-colors duration-150 ${
                             active
@@ -247,7 +235,7 @@ export default async function EnquiriesPage({
                               />
                               <span
                                 className={`truncate text-sm ${
-                                  row.status === "new"
+                                  row.unread
                                     ? "font-semibold text-ink"
                                     : "font-medium text-ink-body"
                                 }`}
@@ -255,21 +243,33 @@ export default async function EnquiriesPage({
                                 {row.name}
                               </span>
                             </span>
-                            <span className="shrink-0 text-[11px] tabular-nums text-muted">
-                              {timeAgo(new Date(row.created_at))}
+                            <span className="flex shrink-0 items-center gap-1.5">
+                              {row.unread && (
+                                <span
+                                  aria-label="Unread"
+                                  title="Unread"
+                                  className="h-2 w-2 rounded-full bg-primary-500"
+                                />
+                              )}
+                              <span className="text-[11px] tabular-nums text-muted">
+                                {timeAgo(new Date(row.created_at))}
+                              </span>
                             </span>
                           </div>
-                          <p className="mt-1.5 line-clamp-2 pl-[38px] text-xs leading-5 text-muted">
+                          <p
+                            className={`mt-1.5 line-clamp-2 pl-[38px] text-xs leading-5 ${
+                              row.unread ? "font-medium text-ink-body" : "text-muted"
+                            }`}
+                          >
                             {row.message}
                           </p>
-                          <div className="mt-2 flex items-center gap-2 pl-[38px]">
-                            <StatusChip label={meta.label} tone={meta.tone} />
-                            {row.service && (
+                          {row.service && (
+                            <div className="mt-2 pl-[38px]">
                               <span className="truncate text-[11px] font-medium text-muted">
                                 {row.service}
                               </span>
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </Link>
                       </li>
                     );
@@ -300,7 +300,7 @@ export default async function EnquiriesPage({
                     Nothing selected
                   </p>
                   <p className="mt-1 text-sm text-muted">
-                    Pick an enquiry from the list to read it here.
+                    Pick a conversation from the list to read it here.
                   </p>
                 </div>
               </div>
@@ -309,41 +309,33 @@ export default async function EnquiriesPage({
                 {/* Detail header */}
                 <div className="border-b border-line px-5 py-4 sm:px-6">
                   <Link
-                    href={hrefWith({ status: statusFilter, q })}
+                    href={hrefWith({ filter, q })}
                     className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold text-muted transition-colors duration-200 hover:text-ink lg:hidden"
                   >
                     <Icon name="arrowLeft" className="h-3.5 w-3.5" />
                     Back to inbox
                   </Link>
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div className="flex min-w-0 items-center gap-3.5">
-                      <Avatar
-                        initials={initialsOf(selected.name, selected.email)}
-                        className="h-11 w-11 text-sm"
-                      />
-                      <div className="min-w-0 leading-tight">
-                        <h3 className="truncate font-display text-lg font-semibold tracking-tight text-ink">
-                          {selected.name}
-                        </h3>
-                        <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-sm">
-                          <a
-                            href={`mailto:${selected.email}`}
-                            className="text-primary-600 transition-colors duration-200 hover:text-primary-500"
-                          >
-                            {selected.email}
-                          </a>
-                          {selected.company && (
-                            <span className="text-muted">
-                              · {selected.company}
-                            </span>
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                    <StatusChip
-                      label={statusMeta(selected.status).label}
-                      tone={statusMeta(selected.status).tone}
+                  <div className="flex min-w-0 items-center gap-3.5">
+                    <Avatar
+                      initials={initialsOf(selected.name, selected.email)}
+                      className="h-11 w-11 text-sm"
                     />
+                    <div className="min-w-0 leading-tight">
+                      <h3 className="truncate font-display text-lg font-semibold tracking-tight text-ink">
+                        {selected.name}
+                      </h3>
+                      <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-sm">
+                        <a
+                          href={`mailto:${selected.email}`}
+                          className="text-primary-600 transition-colors duration-200 hover:text-primary-500"
+                        >
+                          {selected.email}
+                        </a>
+                        {selected.company && (
+                          <span className="text-muted">· {selected.company}</span>
+                        )}
+                      </p>
+                    </div>
                   </div>
 
                   {/* Meta strip */}
@@ -375,57 +367,30 @@ export default async function EnquiriesPage({
                   </dl>
                 </div>
 
-                {/* Message body */}
-                <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
-                    Message
-                  </p>
-                  <div className="mt-3 max-w-2xl whitespace-pre-line text-[15px] leading-7 text-ink-body">
-                    {selected.message}
-                  </div>
-                </div>
-
-                {/* Action bar */}
-                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-surface-muted/50 px-5 py-3.5 sm:px-6">
-                  <a
-                    href={`mailto:${selected.email}?subject=${encodeURIComponent(
-                      `Re: ${selected.service ?? "your enquiry"} — CA Farm`,
-                    )}`}
-                    className="inline-flex h-10 items-center gap-2 rounded-none bg-primary-500 px-4 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-600"
-                  >
-                    <Icon name="chat" className="h-4 w-4" />
-                    Reply by email
-                  </a>
-                  <div
-                    className="inline-flex rounded-none border border-line bg-white"
-                    role="group"
-                    aria-label="Set status"
-                  >
-                    {(Object.keys(STATUS_META) as StatusKey[]).map((key) => {
-                      const active = selected.status === key;
-                      return (
-                        <form key={key} action={updateEnquiryStatusAction}>
-                          <input type="hidden" name="id" value={selected.id} />
-                          <input type="hidden" name="status" value={key} />
-                          <button
-                            type="submit"
-                            disabled={active}
-                            className={`inline-flex h-10 cursor-pointer items-center gap-1.5 px-3.5 text-xs font-semibold transition-colors duration-200 disabled:cursor-default ${
-                              active
-                                ? "bg-navy-900 text-white"
-                                : "text-ink-body hover:bg-surface-muted hover:text-ink"
-                            }`}
-                          >
-                            {key === "resolved" && (
-                              <Icon name="check" className="h-3.5 w-3.5" />
-                            )}
-                            {STATUS_META[key].label}
-                          </button>
-                        </form>
-                      );
-                    })}
-                  </div>
-                </div>
+                {/* Conversation — optimistic send + pending state built in */}
+                <ChatPanel
+                  fill
+                  viewer="admin"
+                  openingMessage={selected.message}
+                  openingAt={new Date(selected.created_at)}
+                  messages={thread}
+                  clientName={selected.name}
+                  enquiryId={selected.id}
+                  action={sendAdminMessageAction}
+                  placeholder="Write a reply to the client…"
+                  submitLabel="Send reply"
+                  composerFooterStart={
+                    <a
+                      href={`mailto:${selected.email}?subject=${encodeURIComponent(
+                        `Re: ${selected.service ?? "your enquiry"} — CA Farm`,
+                      )}`}
+                      className="inline-flex h-9 items-center gap-2 rounded-none border border-line px-3.5 text-xs font-semibold text-ink-body transition-colors duration-200 hover:border-ink/30 hover:text-ink"
+                    >
+                      <Icon name="arrowUpRight" className="h-3.5 w-3.5" />
+                      Reply by email
+                    </a>
+                  }
+                />
               </>
             )}
           </div>
