@@ -4,6 +4,7 @@ import { query } from "../lib/db";
 import { requireAdmin } from "../lib/supabase/guards";
 import { loadReviewStatus } from "../lib/editable-calculators";
 import { markCalculatorReviewedAction } from "./review-actions";
+import { ADMIN_UNREAD_SQL } from "../lib/enquiry-messages";
 import { Icon } from "../components/dashboard-icons";
 import {
   Avatar,
@@ -12,9 +13,7 @@ import {
   Panel,
   SparkBars,
   StatTile,
-  StatusChip,
   timeAgo,
-  type StatusTone,
 } from "../components/dashboard-ui";
 
 export const metadata: Metadata = {
@@ -29,15 +28,9 @@ interface EnquiryRow {
   company: string | null;
   service: string | null;
   message: string;
-  status: string;
   created_at: Date;
+  unread: boolean;
 }
-
-const STATUS_META: Record<string, { label: string; tone: StatusTone }> = {
-  new: { label: "New", tone: "green" },
-  in_progress: { label: "In progress", tone: "dark" },
-  resolved: { label: "Resolved", tone: "muted" },
-};
 
 const dateFmt = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
@@ -71,18 +64,19 @@ export default async function AdminPage() {
   const [enquiriesResult, statsResult, trendResult, clientsResult, reviews] =
     await Promise.all([
       query<EnquiryRow>(
-        `select id, name, email, company, service, message, status, created_at
-           from enquiries
-          order by created_at desc
+        `select e.id, e.name, e.email, e.company, e.service, e.message, e.created_at,
+                ${ADMIN_UNREAD_SQL} as unread
+           from enquiries e
+          order by e.created_at desc
           limit 8`,
       ),
-      query<{ total: number; last7: number; prev7: number; awaiting: number }>(
+      query<{ total: number; last7: number; prev7: number; unread: number }>(
         `select count(*)::int as total,
-                count(*) filter (where created_at >= now() - interval '7 days')::int as last7,
-                count(*) filter (where created_at >= now() - interval '14 days'
-                             and created_at <  now() - interval '7 days')::int as prev7,
-                count(*) filter (where status = 'new')::int as awaiting
-           from enquiries`,
+                count(*) filter (where e.created_at >= now() - interval '7 days')::int as last7,
+                count(*) filter (where e.created_at >= now() - interval '14 days'
+                             and e.created_at <  now() - interval '7 days')::int as prev7,
+                count(*) filter (where ${ADMIN_UNREAD_SQL})::int as unread
+           from enquiries e`,
       ),
       query<{ day: Date; n: number }>(
         `select date_trunc('day', created_at) as day, count(*)::int as n
@@ -97,11 +91,11 @@ export default async function AdminPage() {
     ]);
 
   const rows = enquiriesResult.rows;
-  const { total, last7, prev7, awaiting } = statsResult.rows[0] ?? {
+  const { total, last7, prev7, unread } = statsResult.rows[0] ?? {
     total: 0,
     last7: 0,
     prev7: 0,
-    awaiting: 0,
+    unread: 0,
   };
   const clients = clientsResult.rows[0]?.clients ?? 0;
   const trend = dailySeries(trendResult.rows);
@@ -138,7 +132,9 @@ export default async function AdminPage() {
               </h3>
               <p className="text-xs text-muted">
                 {dueReviews.length}{" "}
-                {dueReviews.length === 1 ? "calculator needs" : "calculators need"}{" "}
+                {dueReviews.length === 1
+                  ? "calculator needs"
+                  : "calculators need"}{" "}
                 checking against Revenue before the next Budget.
               </p>
             </div>
@@ -174,7 +170,7 @@ export default async function AdminPage() {
                       Open
                     </Link>
                     <form action={markCalculatorReviewedAction}>
-                      <input type="hidden" name="key" value={r.key} />
+                      <input type="hidden"  name="key" value={r.key} />
                       <button
                         type="submit"
                         className="inline-flex h-8 cursor-pointer items-center rounded-none border border-primary-500 px-3 text-xs font-semibold text-primary-600 transition-colors duration-200 hover:bg-primary-500 hover:text-white"
@@ -209,9 +205,9 @@ export default async function AdminPage() {
           icon={<Icon name="trendUp" className="h-[18px] w-[18px]" />}
         />
         <StatTile
-          label="Awaiting reply"
-          value={awaiting}
-          hint={awaiting === 0 ? "Inbox clear" : "Marked new in the inbox"}
+          label="Unread"
+          value={unread}
+          hint={unread === 0 ? "Inbox clear" : "New client messages"}
           icon={<Icon name="chat" className="h-[18px] w-[18px]" />}
         />
         <StatTile
@@ -230,9 +226,9 @@ export default async function AdminPage() {
               <h3 className="font-display text-lg font-semibold tracking-tight text-ink">
                 Recent enquiries
               </h3>
-              {awaiting > 0 && (
+              {unread > 0 && (
                 <span className="rounded-none bg-navy-900 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-white">
-                  {awaiting} new
+                  {unread} unread
                 </span>
               )}
             </div>
@@ -254,64 +250,71 @@ export default async function AdminPage() {
                 No enquiries yet
               </p>
               <p className="mt-1 text-sm text-muted">
-                When a visitor sends the contact form, it appears here instantly.
+                When a visitor sends the contact form, it appears here
+                instantly.
               </p>
             </div>
           ) : (
             <>
               <ul className="divide-y divide-line">
-                {rows.map((row) => {
-                  const meta = STATUS_META[row.status] ?? STATUS_META.new;
-                  return (
-                    <li key={row.id}>
-                      <Link
-                        href={`/admin/enquiries?id=${row.id}`}
-                        className="group flex items-start gap-3 px-5 py-3.5 transition-colors duration-150 hover:bg-surface-muted/70"
-                      >
-                        <Avatar
-                          initials={initialsOf(row.name, row.email)}
-                          className="h-9 w-9 text-[11px]"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-3">
-                            <p
-                              className={`truncate text-sm ${
-                                row.status === "new"
-                                  ? "font-semibold text-ink"
-                                  : "font-medium text-ink-body"
-                              }`}
-                            >
-                              {row.name}
-                              {row.company && (
-                                <span className="ml-2 font-normal text-muted">
-                                  · {row.company}
-                                </span>
-                              )}
-                            </p>
-                            <span className="shrink-0 text-[11px] tabular-nums text-muted">
-                              {timeAgo(new Date(row.created_at))}
-                            </span>
-                          </div>
-                          <p className="mt-0.5 line-clamp-1 text-xs leading-5 text-muted">
-                            {row.message}
-                          </p>
-                          <div className="mt-1.5 flex items-center gap-2">
-                            <StatusChip label={meta.label} tone={meta.tone} />
-                            {row.service && (
-                              <span className="truncate text-[11px] font-medium text-muted">
-                                {row.service}
+                {rows.map((row) => (
+                  <li key={row.id}>
+                    <Link
+                      href={`/admin/enquiries?id=${row.id}`}
+                      className="group flex items-start gap-3 px-5 py-3.5 transition-colors duration-150 hover:bg-surface-muted/70"
+                    >
+                      <Avatar
+                        initials={initialsOf(row.name, row.email)}
+                        className="h-9 w-9 text-[11px]"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                          <p
+                            className={`flex min-w-0 items-center gap-2 text-sm ${
+                              row.unread
+                                ? "font-semibold text-ink"
+                                : "font-medium text-ink-body"
+                            }`}
+                          >
+                            {row.unread && (
+                              <span
+                                aria-hidden="true"
+                                className="h-2 w-2 shrink-0 rounded-full bg-primary-500"
+                              />
+                            )}
+                            <span className="truncate">{row.name}</span>
+                            {row.company && (
+                              <span className="shrink-0 font-normal text-muted">
+                                · {row.company}
                               </span>
                             )}
-                          </div>
+                          </p>
+                          <span className="shrink-0 text-[11px] tabular-nums text-muted">
+                            {timeAgo(new Date(row.created_at))}
+                          </span>
                         </div>
-                        <Icon
-                          name="arrowUpRight"
-                          className="mt-1 h-3.5 w-3.5 shrink-0 text-line transition-colors duration-200 group-hover:text-primary-600"
-                        />
-                      </Link>
-                    </li>
-                  );
-                })}
+                        <p
+                          className={`mt-0.5 line-clamp-1 text-xs leading-5 ${
+                            row.unread ? "font-medium text-ink-body" : "text-muted"
+                          }`}
+                        >
+                          {row.message}
+                        </p>
+                        {row.service && (
+                          <div className="mt-1.5">
+                            <span className="truncate text-[11px] font-medium text-muted">
+                              {row.service}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <Icon
+                        name="arrowUpRight"
+                        className="mt-1 h-3.5 w-3.5 shrink-0 text-line transition-colors duration-200 group-hover:text-primary-600"
+                      />
+                    </Link>
+                  </li>
+                ))}
               </ul>
               {total > rows.length && (
                 <div className="border-t border-line px-5 py-3 text-center">
