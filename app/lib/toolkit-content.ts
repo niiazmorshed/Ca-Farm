@@ -80,7 +80,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
     framework: "FRS 102",
     title: "Management accounts template",
     description:
-      "Monthly management pack (P&L, balance sheet and KPIs) for board and lender reporting.",
+      "Monthly management pack: P&L, balance sheet and KPIs, for board and lender reporting.",
   },
   {
     category: "template",
@@ -152,7 +152,7 @@ export const STARTER_RESOURCES: StarterResource[] = [
     format: "PDF",
     title: "TR2: company tax registration walkthrough",
     description:
-      "Registering a new company for corporation tax, VAT and PAYE with the TR2: section by section.",
+      "Registering a new company for corporation tax, VAT and PAYE with the TR2, section by section.",
   },
   {
     category: "tax-form",

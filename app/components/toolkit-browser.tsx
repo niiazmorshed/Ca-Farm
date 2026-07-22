@@ -217,7 +217,7 @@ export function ToolkitBrowser({ uploaded }: { uploaded: ToolkitResource[] }) {
           <section>
             <GroupHeading label="In preparation" />
             <p className="mb-4 -mt-1 text-sm leading-6 text-muted">
-              Being finalised by our team — request a copy and we&apos;ll email it
+              Being finalised by our team. Request a copy and we&apos;ll email it
               to you the moment it&apos;s ready.
             </p>
             <StarterList items={starterItems} />

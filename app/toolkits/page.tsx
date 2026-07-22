@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const notes = [
   {
     title: "Prepared by accountants",
-    body: "Every memo, template and walkthrough is drafted and reviewed by our chartered accountants, to the same standards we apply to client work.",
+    body: "Every memo, template and walkthrough is drafted and reviewed by our chartered accountants, the same standards we apply to client work.",
   },
   {
     title: "Ireland & UK focused",
@@ -38,7 +38,7 @@ export default async function FoundersHubPage() {
           />
         }
         title="Founders Hub"
-        lede="Memos, templates, tax and VAT forms, and step-by-step business setup guides, prepared by our accountants for founders in Ireland and the UK."
+        lede="Memos, templates, tax and VAT forms, and step-by-step business setup guides: practical resources prepared by our accountants for founders in Ireland and the UK."
       />
 
       <Container className="py-16 sm:py-20">

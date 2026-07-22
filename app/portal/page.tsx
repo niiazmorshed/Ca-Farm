@@ -26,7 +26,7 @@ const quickActions = [
     href: "/contact",
     icon: "chat",
     title: "Start an enquiry",
-    body: "Message the team for a same-day reply.",
+    body: "Message the team: same-day reply.",
   },
   {
     href: "/tools/ireland",
@@ -347,7 +347,7 @@ export default async function PortalPage() {
               Need a hand?
             </h3>
             <p className="mt-3 text-sm leading-6 text-muted">
-              Questions about tax, VAT or your accounts? The team replies the
+              Questions about tax, VAT or your accounts: the team replies the
               same working day.
             </p>
             <Link

@@ -124,7 +124,7 @@ export default async function EnquiriesPage({
       <PageHeader
         eyebrow="Messages"
         title="Enquiries"
-        lede="Every client conversation in one place — read, reply and keep the thread going."
+        lede="Every client conversation in one place: read, reply and keep the thread going."
         actions={
           counts.unread > 0 ? (
             <span className="inline-flex items-center gap-2 rounded-none bg-navy-900 px-3.5 py-2 text-xs font-semibold text-white">
@@ -279,7 +279,7 @@ export default async function EnquiriesPage({
             </div>
             {rows.length === 100 && (
               <p className="border-t border-line px-4 py-2.5 text-center text-[11px] text-muted">
-                Showing the latest 100 — narrow with search to see older ones.
+                Showing the latest 100. Narrow with search to see older ones.
               </p>
             )}
           </div>
@@ -382,7 +382,7 @@ export default async function EnquiriesPage({
                   composerFooterStart={
                     <a
                       href={`mailto:${selected.email}?subject=${encodeURIComponent(
-                        `Re: ${selected.service ?? "your enquiry"} — CA Farm`,
+                        `Re: ${selected.service ?? "your enquiry"} - CA Farm`,
                       )}`}
                       className="inline-flex h-9 items-center gap-2 rounded-none border border-line px-3.5 text-xs font-semibold text-ink-body transition-colors duration-200 hover:border-ink/30 hover:text-ink"
                     >
