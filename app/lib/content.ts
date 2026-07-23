@@ -386,6 +386,29 @@ export const serviceCategories: ServiceCategory[] = [
         context:
           "Trading into another country rarely means one new obligation; it usually means several at once. Selling goods or services across the EU can trigger a VAT registration abroad or bring you into the OSS/IOSS regime, and putting people or a fixed place of business on the ground can create a permanent establishment that’s taxable there. Get the structure wrong early and it’s slow and costly to unwind.\n\nFor larger groups there’s Pillar Two on top: a 15% global minimum effective tax rate for groups with consolidated turnover above €750m, now in force across the EU. Ireland keeps its 12.5% headline rate, but big groups pay a top-up to reach 15%. We map the VAT, permanent-establishment, transfer-pricing and treaty questions before you move, then set the structure up and keep it compliant.",
       },
+      {
+        slug: "business-planning",
+        title: "Business Planning & Strategy",
+        blurb:
+          "A plan behind the numbers: business plans, financial models and strategy reviews for the decisions that shape the next few years.",
+        overview:
+          "Ambition needs a plan that holds up under scrutiny, whether it is a board wanting direction, a bank wanting projections, or you wanting to know the growth is fundable. We turn your goals into a costed, defensible plan built on your real numbers, and revisit it as things change.",
+        included: [
+          "Business plans: written to raise finance or steer the business",
+          "Financial models: three-year P&L, balance sheet and cash flow",
+          "Budgets and targets: set, then tracked against actuals",
+          "Scenario planning: best, base and downside cases stress-tested",
+          "Strategy reviews: pricing, margins and growth options weighed",
+          "KPI frameworks: the handful of numbers that actually matter",
+        ],
+        bestFor: [
+          "Founders planning their next growth phase",
+          "Businesses preparing a bank or investor ask",
+          "Owner-managers who want a plan, not just accounts",
+        ],
+        context:
+          "A business plan earns its keep when it is more than a document for the bank. Built properly, it is the model you run the business against: what growth costs, when cash gets tight, which assumptions the whole thing rests on. We build it around your actual accounts rather than a template, so the projections are ones you can defend and act on.\n\nStrategy is where the plan meets the decisions: which products to push, what to charge, when to hire, whether to borrow. We sit with you, pressure-test the options against the numbers, and set a small set of KPIs so you can see early whether the plan is working. As the year unfolds and reality diverges from the forecast, we revisit it rather than filing it away.",
+      },
     ],
   },
   {
@@ -681,23 +704,101 @@ export const serviceCategories: ServiceCategory[] = [
       "A finance director for a few days a month. Forecasts, board packs and funding support, without the salary.",
     overview:
       "Most businesses don’t need a full-time finance director; they need a few hours of a great one, armed with current numbers. We build the forecast, sit in the board meeting, and tell you what the numbers mean for the decision in front of you.",
-    kind: "single",
-    items: [],
-    included: [
-      "Forecasting: cash-flow and P&L, kept current",
-      "CFO sessions: monthly or quarterly, in the room",
-      "Board packs: budgets, KPIs and reporting",
-      "Funding support: loan and investment applications",
-      "Valuations: the business valued when it matters",
-      "Exit planning: succession and sale prepared for",
+    kind: "services",
+    items: [
+      {
+        slug: "cash-flow-forecasting",
+        title: "Cash Flow & Forecasting",
+        blurb:
+          "Rolling cash-flow and P&L forecasts kept current, so you see the squeeze before it arrives.",
+        overview:
+          "Most cash crises are visible months ahead if someone is looking. We build a rolling forecast off your live numbers and keep it current, so you know your runway, your funding gap and your best and worst cases before they land.",
+        included: [
+          "Cash-flow forecast: rolling 12-week and 12-month views",
+          "P&L forecast: revenue, margin and overhead projected",
+          "Scenario modelling: best, base and downside cases",
+          "Runway tracking: how long the cash lasts, updated monthly",
+          "Assumption reviews: the forecast challenged, not just rolled",
+          "Variance analysis: forecast vs actual, explained",
+        ],
+        bestFor: [
+          "Businesses with lumpy or seasonal cash flow",
+          "Companies approaching a funding gap",
+          "Founders scaling and watching the runway",
+        ],
+        context:
+          "A forecast is only useful if it is current and honest. We build yours from live bookkeeping, not a spreadsheet frozen at last year-end, and keep both a short 12-week cash view and a longer 12-month P&L and cash forecast running. That combination shows the immediate squeeze and the bigger trajectory at the same time.\n\nThe value is in the assumptions. We stress-test the ones the business rests on (collection times, pipeline conversion, hiring pace) and show how the numbers behave when they move against you. Each month we compare forecast to actual, explain the variance and update the view, so the forecast stays a decision tool rather than a document.",
+      },
+      {
+        slug: "board-investor-reporting",
+        title: "Board & Investor Reporting",
+        blurb:
+          "Board packs and investor updates your directors and backers actually trust: clear, consistent and on time.",
+        overview:
+          "Boards and investors judge you partly on the quality of your reporting. We produce the monthly or quarterly pack (numbers, KPIs and a plain-English narrative) so every meeting starts from an agreed, credible set of figures.",
+        included: [
+          "Board packs: financials, KPIs and commentary in one document",
+          "Investor updates: consistent monthly or quarterly reporting",
+          "KPI dashboards: the metrics your board actually watches",
+          "Management accounts: P&L, balance sheet and cash, reconciled",
+          "Budget vs actual: performance against plan, explained",
+          "In the room: attendance to talk the board through it",
+        ],
+        bestFor: [
+          "Companies with a board or investors to report to",
+          "Businesses post-raise with reporting obligations",
+          "Founders who want meetings to start from agreed numbers",
+        ],
+        context:
+          "A good board pack does two jobs: it gives directors and investors confidence that the numbers are under control, and it frames the decisions the meeting needs to make. We build a consistent pack (management accounts, the KPIs that matter for your business, budget-versus-actual and a short narrative) so nobody is arguing about the figures before the discussion even starts.\n\nConsistency is what builds trust over time. Reporting the same metrics the same way each period lets your board see trends rather than snapshots, and makes the next raise or refinance easier because the track record is already there. We can prepare the pack, or prepare it and sit in the meeting to talk it through.",
+      },
+      {
+        slug: "fundraising-support",
+        title: "Fundraising & Refinancing Support",
+        blurb:
+          "The numbers, projections and answers lenders and investors need, prepared so a raise or refinance goes smoothly.",
+        overview:
+          "Raising debt or equity is won or lost on the quality of your numbers and how you defend them. We prepare the model, the projections and the supporting analysis, and stand behind them through diligence, so you go in credible and come out funded.",
+        included: [
+          "Financial projections: models built to a funder's standard",
+          "Funding applications: bank, grant and investor submissions",
+          "Business case: the ask costed and justified",
+          "Diligence support: questions from lenders and investors handled",
+          "Cap table and scenarios: dilution and repayment modelled",
+          "Lender liaison: the finance conversation, on your side",
+        ],
+        bestFor: [
+          "Businesses raising debt or equity",
+          "Companies refinancing existing facilities",
+          "Founders heading into diligence",
+        ],
+        context:
+          "Funders back numbers they can trust. Whether it is a bank term loan, a State-backed facility or an equity round, they want projections that hold together, assumptions that are defensible and a business case that shows how their money gets used and repaid. We build that around your real accounts and pressure-test it before it goes out, so weaknesses get found by us rather than by them.\n\nDiligence is where deals slow down or fall over. We prepare the supporting analysis (the cap table, repayment and dilution scenarios, the answers to the questions that always come) and stay in the finance conversation alongside you. The aim is a process that moves quickly because the numbers were right the first time.",
+      },
+      {
+        slug: "valuations-exit",
+        title: "Valuations & Exit Planning",
+        blurb:
+          "What the business is worth, and how to prepare it for a sale or handover when the time comes.",
+        overview:
+          "A business is usually an owner's biggest asset, yet most only find out what it is worth when they are already selling. We value it properly and, if an exit or succession is on the horizon, prepare it so you keep more of the proceeds and the handover goes cleanly.",
+        included: [
+          "Business valuations: for a sale, share transfer or dispute",
+          "Exit readiness: the business prepared to sell well",
+          "Succession planning: handover to family or management",
+          "Tax on exit: retirement and entrepreneur relief planned early",
+          "Deal support: alongside you through the transaction",
+          "Post-exit: the proceeds and your position sorted",
+        ],
+        bestFor: [
+          "Owners thinking about a sale in the next few years",
+          "Family businesses planning succession",
+          "Shareholders needing a valuation",
+        ],
+        context:
+          "Value is not a single number; it depends on why you are asking (a trade sale, a share buyout, a family handover, a dispute) and on how ready the business is to stand on its own. We value it on a basis that fits the purpose and, just as important, tell you what is dragging the value down and what a buyer will want to see.\n\nThe tax on an exit is where preparation pays off. Reliefs such as Retirement Relief and Revised Entrepreneur Relief can materially cut the CGT on a sale, but they reward planning done years ahead, not weeks. We map the timing and the structure early, prepare the business so it sells well, and stay alongside you through the deal so the outcome matches the plan.",
+      },
     ],
-    bestFor: [
-      "Scaling businesses making their first big hires",
-      "Companies raising or refinancing",
-      "Founders who need strategy, not just compliance",
-    ],
-    context:
-      "There’s a stage where a business is too big to run the finances on instinct but too small to justify a full-time finance director on a six-figure salary. What you actually need is a few days a month of someone senior, working from current numbers, building the forecast, sitting in the board meeting, and translating the figures into the decision in front of you.\n\nThat’s the role we fill: cash-flow and P&L forecasting, budgets, KPIs and board packs, and hands-on support when you’re raising or refinancing. You get the judgement of an experienced finance director and the continuity of the same person each month, without the cost or the commitment of the hire.",
   },
   {
     slug: "outsourcing",
@@ -706,23 +807,101 @@ export const serviceCategories: ServiceCategory[] = [
       "Hand us the finance function, bookkeeping through to management accounts, and run lean. We become your back office.",
     overview:
       "Hiring a full finance team is slow and expensive. We run all or part of yours as an extension of your business (bookkeeping, payroll, reporting, controls) for a fraction of the cost of building it in-house.",
-    kind: "single",
-    items: [],
-    included: [
-      "Finance function: run in full or in part, as your back office",
-      "Bookkeeping: transactions processed and reconciled",
-      "Payments: payroll and suppliers paid on time",
-      "Reporting: management accounts every month",
-      "Credit control: invoices chased, cash collected",
-      "Named contact: a dedicated team you actually know",
+    kind: "services",
+    items: [
+      {
+        slug: "outsourced-bookkeeping",
+        title: "Outsourced Bookkeeping",
+        blurb:
+          "Your day-to-day bookkeeping processed and reconciled by us, so the numbers are always current and audit-ready.",
+        overview:
+          "Bookkeeping that falls behind poisons everything downstream: VAT, payroll, decisions. We run it as your back office (transactions processed, accounts reconciled, records kept ROS-ready) so you always have a current, reliable set of books.",
+        included: [
+          "Transaction processing: sales, purchases and expenses coded",
+          "Bank reconciliation: every account reconciled, on schedule",
+          "Cloud accounting: run in Xero, QuickBooks or Sage",
+          "VAT-ready records: kept correct between returns",
+          "Document handling: receipts and invoices captured and filed",
+          "Named contact: a bookkeeper who knows your business",
+        ],
+        bestFor: [
+          "Businesses without an in-house bookkeeper",
+          "Owners doing the books at night",
+          "Companies moving to cloud accounting",
+        ],
+        context:
+          "When the books fall behind, everything built on them wobbles: the VAT return is a scramble, the management accounts are guesswork, and decisions get made on stale numbers. We take the function off your desk and run it properly (coding transactions, reconciling every account, keeping the records ROS-ready) on Xero, QuickBooks or Sage.\n\nBecause we do it continuously rather than in a year-end rush, the books stay current and the surprises disappear. You get a named bookkeeper who knows your business, not a rotating queue, and clean data feeding straight into VAT, payroll, management accounts and the year-end file.",
+      },
+      {
+        slug: "payroll-payments",
+        title: "Payroll & Supplier Payments",
+        blurb:
+          "Staff and suppliers paid accurately and on time, with PAYE and payroll compliance handled end to end.",
+        overview:
+          "Getting people paid, correctly and on time, is non-negotiable, and Irish PAYE runs in real time with Revenue. We run the payroll cycle and, if you want, manage supplier payments too, so the money goes out right and the filings take care of themselves.",
+        included: [
+          "Payroll processing: weekly, fortnightly or monthly runs",
+          "PAYE Modernisation: real-time submissions to Revenue",
+          "Payslips: distributed securely to your team",
+          "Statutory deductions: PAYE, PRSI and USC handled",
+          "Supplier payments: approved runs prepared and made",
+          "Starters and leavers: onboarded and processed correctly",
+        ],
+        bestFor: [
+          "Businesses with employees on payroll",
+          "Companies wanting payments handled hands-off",
+          "Owners tired of the monthly payroll scramble",
+        ],
+        context:
+          "Irish payroll operates under PAYE Modernisation, which means Revenue expects a submission every time you pay staff, not once a year. Get it wrong and the corrections and queries pile up. We run the full cycle (calculations, payslips, PAYE, PRSI and USC, and the real-time submissions) so employees are paid correctly and Revenue is satisfied automatically.\n\nBeyond payroll, we can take on supplier payments too: preparing approved payment runs, keeping to terms and making sure nothing important slips. It is the part of the finance function that has to happen on time every period, run by a team that treats it that way, with a named contact you can reach.",
+      },
+      {
+        slug: "management-accounts",
+        title: "Management Accounts & Reporting",
+        blurb:
+          "Monthly management accounts that tell you how the business is actually doing, not just what it filed.",
+        overview:
+          "Statutory accounts look backwards once a year; management accounts tell you what is happening now. We produce a monthly pack (P&L, balance sheet, cash and the KPIs that matter) reconciled and on time, so you are steering with current numbers.",
+        included: [
+          "Monthly accounts: P&L, balance sheet and cash flow",
+          "KPI reporting: the metrics that drive your business",
+          "Budget vs actual: performance against plan, explained",
+          "Margin analysis: where you make and lose money",
+          "Commentary: a plain-English read on the month",
+          "Reconciled numbers: figures you can rely on",
+        ],
+        bestFor: [
+          "Businesses making decisions between year-ends",
+          "Companies with a board or lender to update",
+          "Owners who want numbers they can act on",
+        ],
+        context:
+          "Waiting for the year-end accounts to see how the business did is like driving by the rear-view mirror. Management accounts close that gap: a monthly, reconciled read on profit, cash and the handful of KPIs that actually move your business, delivered while there is still time to act on it.\n\nWe produce the pack consistently (same format, same metrics, on a set date) with budget-versus-actual and a short commentary, so the numbers come with a read, not just a spreadsheet. It feeds board and lender reporting, and it is the difference between reacting to last year and managing this month.",
+      },
+      {
+        slug: "credit-control",
+        title: "Credit Control & Receivables",
+        blurb:
+          "Invoices chased and cash collected, professionally and persistently, so your money does not sit in someone else's account.",
+        overview:
+          "Profit on paper does not pay wages; collected cash does. We run credit control as your back office (issuing invoices, chasing politely but persistently, and keeping the ledger clean) so your cash comes in on terms.",
+        included: [
+          "Invoicing: raised accurately and issued promptly",
+          "Statements and reminders: sent on a set schedule",
+          "Debtor chasing: followed up by phone and email",
+          "Aged debt reporting: who owes what, and how late",
+          "Terms and credit checks: risk flagged before it bites",
+          "Cash allocation: receipts matched and reconciled",
+        ],
+        bestFor: [
+          "Businesses carrying too much in debtors",
+          "Companies with slow-paying customers",
+          "Owners who hate chasing their own clients",
+        ],
+        context:
+          "Late payment is one of the biggest, quietest drains on a small business: the sale is made, the work is done, but the cash sits in the customer's account instead of yours. A consistent chase process (statements, reminders and follow-up on a schedule) collects far more than the occasional awkward phone call, and it does it without straining the relationship.\n\nWe run it as an extension of your business: issuing invoices promptly, following up politely but persistently, flagging risky accounts before they become bad debts, and keeping the sales ledger reconciled so you always know your real receivables. The point is simple: turn profit on paper into cash in the bank.",
+      },
     ],
-    bestFor: [
-      "Businesses without an in-house finance team",
-      "Companies cutting overhead",
-      "Irish firms scaling fast",
-    ],
-    context:
-      "Building an in-house finance team is slow and expensive: you’re recruiting for several roles, covering holidays and sick leave, and carrying the cost whether the work is there that month or not. Outsourcing the function, or just the parts you don’t want to own, gives you the same output as an extension of your business, scaled to what you actually need.\n\nWe run bookkeeping, payroll, supplier payments, management accounts and credit control, keeping everything ROS-ready and reconciled, with a named contact who knows your business rather than a faceless queue. As you grow, the service grows with you, which is usually cheaper and far less disruptive than hiring, training and replacing a team of your own.",
   },
   {
     slug: "crypto",
@@ -731,23 +910,101 @@ export const serviceCategories: ServiceCategory[] = [
       "Crypto gains, staking, mining and DeFi: calculated, reported and planned. Ahead of the CARF rules landing in 2026.",
     overview:
       "Crypto tax is complex, fast-moving and easy to get wrong, and the days of it going unnoticed are over. In Ireland, disposals are subject to 33% Capital Gains Tax above the €1,270 annual exemption, while income from staking, mining or airdrops can be taxable at your marginal rate. Under the OECD Crypto-Asset Reporting Framework (CARF), exchanges begin collecting data in 2026 and reporting it to Revenue from 2027, so accurate records are no longer optional. We calculate, report and plan it properly.",
-    kind: "single",
-    items: [],
-    included: [
-      "Gains calculation: capital gains across every wallet and exchange",
-      "CGT reporting: filed via ROS / Form CG1 (33%, €1,270 exemption)",
-      "Income vs capital: staking, mining, airdrops and DeFi classified",
-      "CARF readiness: prepared for 2026/27 exchange reporting",
-      "Record reconstruction: portfolios rebuilt and reconciled",
-      "Preliminary tax: payments planned ahead",
+    kind: "services",
+    items: [
+      {
+        slug: "crypto-cgt",
+        title: "Crypto Capital Gains Tax",
+        blurb:
+          "Gains across every wallet and exchange calculated and filed correctly: 33% CGT above the €1,270 exemption.",
+        overview:
+          "Selling, swapping or spending crypto is a disposal for Irish CGT, taxed at 33% on the gain above the €1,270 annual exemption. We pull together every wallet and exchange, calculate the gains properly and file through ROS, so the number is right and defensible.",
+        included: [
+          "Gains calculation: disposals across all wallets and exchanges",
+          "CGT return: filed via ROS or Form CG1",
+          "Exemption and losses: the €1,270 exemption and losses applied",
+          "Cost basis: acquisition costs tracked correctly",
+          "Payment dates: CGT payment deadlines met",
+          "Revenue queries: correspondence handled on your behalf",
+        ],
+        bestFor: [
+          "Investors and traders across multiple exchanges",
+          "Anyone who has sold, swapped or spent crypto",
+          "People facing a Revenue query on crypto",
+        ],
+        context:
+          "Ireland taxes crypto under the ordinary CGT rules, which is what trips people up. A disposal is not just cashing out to euro: swapping one token for another, or spending crypto, is a disposal too, taxable at 33% on the gain above the €1,270 annual exemption. Every wallet and exchange has to be brought together, with the right acquisition cost against each disposal, to get the figure right.\n\nThe deadlines are their own trap: CGT on gains in the first eleven months of the year is due in December, with the return itself the following year. We calculate the gains across your full activity, apply the exemption and any losses, file through ROS and keep you to the payment dates, so the position is clean before Revenue ever asks.",
+      },
+      {
+        slug: "crypto-income",
+        title: "Staking, Mining & DeFi Income",
+        blurb:
+          "Rewards from staking, mining, airdrops and DeFi classified correctly: income tax now, CGT later, kept apart.",
+        overview:
+          "Not all crypto is a capital gain. Staking rewards, mining, airdrops and much of DeFi can be income, taxable at your marginal rate when received, and then a CGT asset afterwards. We classify each stream correctly so you are taxed once, on the right basis.",
+        included: [
+          "Income classification: staking, mining, airdrops and DeFi",
+          "Marginal-rate tax: income valued and reported when received",
+          "CGT on later disposal: the second event tracked separately",
+          "DeFi activity: lending, liquidity and yield untangled",
+          "Record building: reward events captured and valued",
+          "Form 11: crypto income filed with your return",
+        ],
+        bestFor: [
+          "Stakers, miners and yield farmers",
+          "Anyone receiving airdrops or DeFi rewards",
+          "Active DeFi users with tangled histories",
+        ],
+        context:
+          "The hardest part of crypto tax is not the gains; it is telling income from capital. Rewards from staking, mining or airdrops are generally taxable as income at your marginal rate, valued at the moment you receive them. That same crypto then becomes a CGT asset, so disposing of it later is a second, separate taxable event. Miss the distinction and you either overpay or leave a gap Revenue will find.\n\nDeFi makes this harder again: lending, liquidity provision and yield can each be characterised differently, and the transaction history is often a tangle across protocols. We work through the activity, classify each stream on the right basis, value the reward events, and make sure the income goes on your Form 11 and the later disposals are tracked for CGT, so nothing is taxed twice and nothing is missed.",
+      },
+      {
+        slug: "carf-reporting",
+        title: "CARF & DAC8 Reporting Readiness",
+        blurb:
+          "Get your records straight before exchanges start reporting to Revenue under CARF and DAC8 from 2026/27.",
+        overview:
+          "The days of crypto going unnoticed are ending. Under the OECD's CARF and the EU's DAC8, exchanges begin collecting user data in 2026 and reporting it to Revenue from 2027. We get your historic position straight and filed before that data arrives, not after.",
+        included: [
+          "Position review: historic activity assessed for exposure",
+          "Voluntary disclosure: unreported gains regularised properly",
+          "Record readiness: your data aligned with what exchanges report",
+          "Gap analysis: missing years and wallets identified",
+          "Ongoing compliance: a process that keeps you current",
+          "Revenue liaison: disclosures and queries handled",
+        ],
+        bestFor: [
+          "Long-term holders with unreported history",
+          "Anyone unsure their past filings were complete",
+          "Investors wanting to get ahead of CARF",
+        ],
+        context:
+          "The big change in crypto is not a new tax; it is visibility. Under the OECD Crypto-Asset Reporting Framework (CARF) and the EU's DAC8, exchanges begin collecting user data in 2026 and reporting it to Revenue from 2027. Positions that once went unseen will be matched against your returns automatically, so a gap that was invisible becomes a question with your name on it.\n\nGetting ahead of that is far cheaper than being caught by it. We review your historic activity, identify the missing years and wallets, and where there is unreported tax we regularise it properly through a voluntary disclosure, which carries far lighter consequences than a Revenue-initiated intervention. Then we put a process in place so your records stay aligned with what the exchanges will report.",
+      },
+      {
+        slug: "portfolio-reconstruction",
+        title: "Portfolio Reconstruction & Reconciliation",
+        blurb:
+          "Years of scattered wallets and dead exchanges rebuilt into one reconciled history you can actually file from.",
+        overview:
+          "You cannot report what you cannot reconstruct. Where records are scattered across wallets, exchanges and defunct platforms, we rebuild the full transaction history, reconcile it and turn it into a clean basis for tax, once and properly.",
+        included: [
+          "Data gathering: exports from every wallet and exchange",
+          "History reconstruction: transactions rebuilt across platforms",
+          "Reconciliation: balances tied out to holdings",
+          "Missing data: gaps from dead exchanges reconstructed",
+          "Cost basis: acquisition costs established per asset",
+          "Report-ready output: a clean basis for CGT and income",
+        ],
+        bestFor: [
+          "Long-term investors with fragmented records",
+          "Anyone who used exchanges that have shut down",
+          "People starting from a mess of CSVs and wallets",
+        ],
+        context:
+          "Most crypto tax problems are really data problems. After a few years, activity is scattered across current wallets, old exchanges (some of which no longer exist) and a pile of inconsistent CSV exports. Without a reconciled history, any tax figure is a guess, and a guess is exactly what Revenue will not accept.\n\nWe rebuild it: gathering exports from every source, reconstructing the transaction history across platforms, filling gaps left by defunct exchanges, and reconciling the result to your actual holdings so it ties out. What you get back is a single, clean, report-ready history with cost bases established, ready to file CGT and income from with confidence.",
+      },
     ],
-    bestFor: [
-      "Investors and traders with multi-exchange activity",
-      "Businesses accepting or holding digital assets",
-      "Anyone facing CARF reporting or a Revenue query",
-    ],
-    context:
-      "Crypto is taxed in Ireland under the existing rules, not a special regime, which is what trips people up. Disposing of a crypto-asset (selling it, swapping one token for another, or spending it) is a capital gains event, taxed at 33% on the gain above the €1,270 annual exemption. Income from staking, mining or airdrops is treated differently again, and can be taxable at your marginal rate when it’s received. Every wallet and exchange has to be pulled together to get it right.\n\nThe bigger shift is visibility. Under the OECD Crypto-Asset Reporting Framework (CARF), and the EU’s DAC8, exchanges begin collecting user data in 2026 and reporting it to Revenue from 2027, so positions that once went unnoticed no longer will. We reconstruct the records, calculate the gains, classify the income correctly and file through ROS, putting you straight with Revenue before that data reaches them.",
   },
 ];
 
