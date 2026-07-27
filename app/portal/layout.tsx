@@ -5,7 +5,7 @@ import type { DashNavItem } from "../components/dashboard-nav";
 
 export const metadata: Metadata = {
   title: "Client portal",
-  description: "Your CA Farm client area.",
+  description: "Your AIBN Chartered Accountants Ltd client area.",
 };
 
 const navItems: DashNavItem[] = [

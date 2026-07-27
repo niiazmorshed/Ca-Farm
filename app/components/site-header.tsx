@@ -132,15 +132,17 @@ function Avatar({ user, size = 36 }: { user: SessionUser; size?: number }) {
 function Logo({ onClick }: { onClick?: () => void }) {
   return (
     <Link href="/" className="flex items-center gap-2.5" onClick={onClick}>
-      <span className="grid h-9 w-9 place-items-center rounded-none bg-navy-900 font-display text-sm font-semibold text-primary-400">
-        CA
+      <span className="grid h-9 w-9 place-items-center rounded-none bg-navy-900 font-display text-[11px] font-semibold tracking-tight text-primary-400">
+        AIBN
       </span>
       <span className="flex flex-col leading-none">
         <span className="font-display text-lg font-semibold tracking-tight text-ink">
-          CA Farm
+          AIBN
         </span>
-        <span className="mt-0.5 whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.16em] text-muted">
-          Chartered Accountants
+        {/* tracking tightened from 0.16em: "Chartered Accountants Ltd" is 4
+            characters longer and the nav row is already tight at xl. */}
+        <span className="mt-0.5 whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.1em] text-muted">
+          Chartered Accountants Ltd
         </span>
       </span>
     </Link>
