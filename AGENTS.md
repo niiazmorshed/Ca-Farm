@@ -1,4 +1,4 @@
-## CA Farm — Agent Instructions
+## AIBN Chartered Accountants Ltd — Agent Instructions
 
 Persistent rules for repo. Apply **every Agent session** automatically.
 Git push/merge workflow: see `CLAUDE.md`.
@@ -6,7 +6,7 @@ Git push/merge workflow: see `CLAUDE.md`.
 
 ## Project
 
-Marketing site for **CA Farm** — partner-led chartered accountancy practice (audit, tax, bookkeeping, payroll, advisory). UK copy + tone: professional, plain English, no jargon.
+Marketing site for **AIBN Chartered Accountants Ltd** — partner-led chartered accountancy practice (audit, tax, bookkeeping, payroll, advisory). UK copy + tone: professional, plain English, no jargon.
 
 
 

@@ -382,7 +382,7 @@ export default async function EnquiriesPage({
                   composerFooterStart={
                     <a
                       href={`mailto:${selected.email}?subject=${encodeURIComponent(
-                        `Re: ${selected.service ?? "your enquiry"} - CA Farm`,
+                        `Re: ${selected.service ?? "your enquiry"} - AIBN Chartered Accountants Ltd`,
                       )}`}
                       className="inline-flex h-9 items-center gap-2 rounded-none border border-line px-3.5 text-xs font-semibold text-ink-body transition-colors duration-200 hover:border-ink/30 hover:text-ink"
                     >
