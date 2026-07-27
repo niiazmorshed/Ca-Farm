@@ -82,7 +82,7 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
   (`requireUser`, `requireAdmin`, `requireClient`, `getSessionUser`).
 - **Roles** live in `public.profiles.role` (`client` | `admin`). The `handle_new_user`
   signup trigger is **single source of truth**: sets `role='admin'` only when
-  email matches one hardcoded admin address (`idublinfourir@gmail.com`,
+  email matches one hardcoded admin address (`fineanswer2025@gmail.com`,
   case-insensitive), else `client`. Holds for every sign-in path (password
   or Google OAuth); intentionally **no profile UPDATE policy**, so a
   client can't self-promote. Change admin by editing that email in the trigger

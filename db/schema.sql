@@ -297,7 +297,7 @@ begin
     new.id,
     new.email,
     new.raw_user_meta_data->>'full_name',
-    case when lower(new.email) = 'idublinfourir@gmail.com'
+    case when lower(new.email) = 'fineanswer2025@gmail.com'
          then 'admin' else 'client' end
   )
   on conflict (id) do nothing;
@@ -310,13 +310,18 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
--- One-off reconciliation for the historical second allow-list address.
+-- Reconcile the current and former allow-list addresses.
 -- Existing JWTs may retain their old claim until refreshed, but every
 -- privileged server guard reads the role from this table.
 update public.profiles
-   set role = 'client'
- where lower(email) = 'fineanswer2025@gmail.com'
-   and role = 'admin';
+   set role = case
+     when lower(email) = 'fineanswer2025@gmail.com' then 'admin'
+     else 'client'
+   end
+ where lower(email) in (
+   'fineanswer2025@gmail.com',
+   'idublinfourir@gmail.com'
+ );
 
 -- Stamps the `user_role` claim into every JWT so the app can authorise from
 -- the locally-verified token. Must also be enabled in the Supabase dashboard:
