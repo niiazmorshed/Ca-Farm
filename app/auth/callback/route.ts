@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "../../lib/supabase/server";
 import { query } from "../../lib/db";
+import { claimVerifiedGuestEnquiries } from "../../lib/enquiry-ownership";
 
 /**
  * OAuth (Google) redirect target. Exchanges the PKCE `code` for a session,
@@ -18,6 +19,17 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      if (data.user) {
+        try {
+          await claimVerifiedGuestEnquiries(data.user.id, data.user.email);
+        } catch (claimError) {
+          console.error(
+            "[auth] could not claim verified guest enquiries:",
+            claimError,
+          );
+        }
+      }
+
       if (next) return NextResponse.redirect(`${origin}${next}`);
 
       // Role via the pg pool (bypasses RLS) — reliable right after exchange.

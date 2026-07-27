@@ -20,7 +20,8 @@ alter table enquiries add column if not exists status text not null default 'new
   check (status in ('new', 'in_progress', 'resolved'));
 
 -- Links an enquiry to the client account that owns it (null for guest/
--- pre-signup submissions; the portal also matches on email as a fallback).
+-- pre-signup submissions). A verified auth callback may claim matching guest
+-- rows; portal reads and writes use this id exclusively.
 alter table enquiries add column if not exists user_id uuid;
 
 -- Chat read tracking: when each side last opened the thread. A thread is
@@ -41,13 +42,28 @@ create table if not exists enquiry_messages (
   sender         text not null check (sender in ('admin', 'client')),
   -- The auth user who sent it (null tolerated for older/guest rows).
   sender_user_id uuid,
-  body           text not null,
+  body           text not null constraint enquiry_messages_body_length_check
+                   check (char_length(body) <= 4000),
   created_at     timestamptz not null default now()
 );
 
 -- Thread read in chronological order, scoped to one enquiry.
 create index if not exists enquiry_messages_thread_idx
   on enquiry_messages (enquiry_id, created_at asc);
+
+-- Upgrade path: enforce the cap for new writes without rejecting a migration
+-- because of any oversized historical row.
+do $$ begin
+  if not exists (
+    select 1 from pg_constraint
+     where conrelid = 'public.enquiry_messages'::regclass
+       and conname = 'enquiry_messages_body_length_check'
+  ) then
+    alter table public.enquiry_messages
+      add constraint enquiry_messages_body_length_check
+      check (char_length(body) <= 4000) not valid;
+  end if;
+end $$;
 
 -- ── Ireland mortgage comparison ─────────────────────────────────────────────
 -- Lender rate products shown on /tools/ireland, editable in /admin/mortgage-rates
@@ -177,6 +193,57 @@ create table if not exists tax_rates (
   updated_at timestamptz not null default now()
 );
 
+-- ── Shared editable calculator settings ─────────────────────────────────────
+-- One nullable JSONB config per calculator. config may be null when an admin
+-- has reviewed the code defaults without overriding them.
+
+create table if not exists calculator_settings (
+  key         text primary key,
+  config      jsonb,
+  reviewed_at timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
+-- CGT has a singleton config plus an independently editable multiplier table.
+create table if not exists cgt_settings (
+  id          integer primary key default 1 check (id = 1),
+  config      jsonb not null,
+  updated_at  timestamptz not null default now(),
+  reviewed_at timestamptz not null default now()
+);
+
+create table if not exists cgt_multipliers (
+  year_key   text primary key,
+  year_label text not null,
+  sort_order integer not null,
+  multiplier numeric not null,
+  updated_at timestamptz not null default now()
+);
+
+-- Best-effort history for every admin rate change.
+create table if not exists rate_audit (
+  id         bigint generated always as identity primary key,
+  area       text not null,
+  action     text not null,
+  summary    text,
+  details    jsonb,
+  changed_by text,
+  changed_at timestamptz not null default now()
+);
+
+-- Shared, server-side fixed-window throttling for public actions. Identifiers
+-- are SHA-256 hashes; raw email addresses and IPs are never stored.
+create table if not exists request_rate_limits (
+  action       text not null,
+  key_hash     text not null,
+  window_start timestamptz not null,
+  count        integer not null default 1 check (count > 0),
+  primary key (action, key_hash, window_start)
+);
+
+create index if not exists request_rate_limits_window_idx
+  on request_rate_limits (window_start);
+
 -- ── Auth: profiles, roles and the admin allow-list ──────────────────────────
 -- Tracks what is live in Supabase (originally created in the dashboard SQL
 -- editor). Re-runnable. One profile row per auth.users row; `role` drives the
@@ -230,7 +297,7 @@ begin
     new.id,
     new.email,
     new.raw_user_meta_data->>'full_name',
-    case when lower(new.email) in ('idublinfourir@gmail.com', 'fineanswer2025@gmail.com')
+    case when lower(new.email) = 'idublinfourir@gmail.com'
          then 'admin' else 'client' end
   )
   on conflict (id) do nothing;
@@ -242,6 +309,14 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- One-off reconciliation for the historical second allow-list address.
+-- Existing JWTs may retain their old claim until refreshed, but every
+-- privileged server guard reads the role from this table.
+update public.profiles
+   set role = 'client'
+ where lower(email) = 'fineanswer2025@gmail.com'
+   and role = 'admin';
 
 -- Stamps the `user_role` claim into every JWT so the app can authorise from
 -- the locally-verified token. Must also be enabled in the Supabase dashboard:
@@ -311,3 +386,41 @@ do $$ begin
 exception when others then
   raise notice 'skipping toolkits bucket creation: %', sqlerrm;
 end $$;
+
+-- ── Public API boundary ──────────────────────────────────────────────────────
+-- Application data is server-only and reached through the pg owner connection.
+-- RLS with no policy intentionally denies anon/authenticated PostgREST access.
+alter table public.enquiries enable row level security;
+alter table public.enquiry_messages enable row level security;
+alter table public.mortgage_products enable row level security;
+alter table public.mortgage_settings enable row level security;
+alter table public.tax_rates enable row level security;
+alter table public.calculator_settings enable row level security;
+alter table public.cgt_settings enable row level security;
+alter table public.cgt_multipliers enable row level security;
+alter table public.rate_audit enable row level security;
+alter table public.request_rate_limits enable row level security;
+alter table public.toolkit_resources enable row level security;
+
+comment on table public.enquiries is
+  'Server-only customer enquiries. RLS deny-all is intentional; pg owner access bypasses RLS.';
+comment on table public.enquiry_messages is
+  'Server-only customer conversation data. RLS deny-all is intentional; pg owner access bypasses RLS.';
+comment on table public.mortgage_products is
+  'Server-managed calculator rates. RLS deny-all is intentional; pg owner access bypasses RLS.';
+comment on table public.mortgage_settings is
+  'Server-managed calculator settings. RLS deny-all is intentional; pg owner access bypasses RLS.';
+comment on table public.tax_rates is
+  'Server-managed calculator rates. RLS deny-all is intentional; pg owner access bypasses RLS.';
+comment on table public.calculator_settings is
+  'Server-managed calculator settings. RLS deny-all is intentional; pg owner access bypasses RLS.';
+comment on table public.cgt_settings is
+  'Server-managed CGT settings. RLS deny-all is intentional; pg owner access bypasses RLS.';
+comment on table public.cgt_multipliers is
+  'Server-managed CGT multipliers. RLS deny-all is intentional; pg owner access bypasses RLS.';
+comment on table public.rate_audit is
+  'Server-only rate change history. RLS deny-all is intentional; pg owner access bypasses RLS.';
+comment on table public.request_rate_limits is
+  'Hashed server-side action throttles. RLS deny-all is intentional; pg owner access bypasses RLS.';
+comment on table public.toolkit_resources is
+  'Server-managed public toolkit metadata. RLS deny-all is intentional; pg owner access bypasses RLS.';

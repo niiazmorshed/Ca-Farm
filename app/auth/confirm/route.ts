@@ -1,6 +1,7 @@
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "../../lib/supabase/server";
+import { claimVerifiedGuestEnquiries } from "../../lib/enquiry-ownership";
 
 /**
  * Email-confirmation landing route. Supabase links here with a `token_hash`;
@@ -18,6 +19,19 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
     if (!error) {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        try {
+          await claimVerifiedGuestEnquiries(user.id, user.email);
+        } catch (claimError) {
+          console.error(
+            "[auth] could not claim verified guest enquiries:",
+            claimError,
+          );
+        }
+      }
       return NextResponse.redirect(`${origin}${safeNext}`);
     }
   }

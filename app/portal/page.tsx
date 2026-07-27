@@ -51,9 +51,9 @@ const quickActions = [
 export default async function PortalPage() {
   const user = await requireClient();
 
-  // Profile, the client's own enquiries (owned by user_id, with an email
-  // fallback for pre-signup submissions) and a total count — all from the pg
-  // pool and fetched in parallel.
+  // Profile, the client's own enquiries and a total count — all from the pg
+  // pool and fetched in parallel. Guest enquiries are linked to user_id only
+  // at the verified email/OAuth callback boundary.
   const [profileResult, enquiriesResult, countsResult] = await Promise.all([
     query<{ full_name: string | null; role: string; created_at: Date }>(
       "select full_name, role, created_at from public.profiles where id = $1",
@@ -62,16 +62,16 @@ export default async function PortalPage() {
     query<EnquiryRow>(
       `select id, service, message, created_at, client_last_read_at
          from enquiries
-        where user_id = $1 or lower(email) = lower($2)
+        where user_id = $1
         order by created_at desc
         limit 50`,
-      [user.id, user.email ?? ""],
+      [user.id],
     ),
     query<{ total: number }>(
       `select count(*)::int as total
          from enquiries
-        where user_id = $1 or lower(email) = lower($2)`,
-      [user.id, user.email ?? ""],
+        where user_id = $1`,
+      [user.id],
     ),
   ]);
 
@@ -100,7 +100,7 @@ export default async function PortalPage() {
 
   // The client is viewing the portal now — mark their threads read so the cues
   // clear on the next visit.
-  await markClientRead(user.id, user.email ?? "");
+  await markClientRead(user.id);
 
   const firstName = profile?.full_name?.split(" ")[0];
   const initials = initialsOf(profile?.full_name, user.email ?? "");

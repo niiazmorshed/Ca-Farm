@@ -3,10 +3,12 @@
 import { after } from "next/server";
 import { query } from "../lib/db";
 import { createClient } from "../lib/supabase/server";
+import { allowPublicAction } from "../lib/rate-limit";
 
 export interface EnquiryState {
   status: "idle" | "success" | "error";
   errors?: Partial<Record<"name" | "email" | "message", string>>;
+  formError?: string;
   values?: Record<string, string>;
 }
 
@@ -98,6 +100,21 @@ export async function submitEnquiry(
 
   if (Object.keys(errors).length > 0) {
     return { status: "error", errors, values };
+  }
+
+  const allowed = await allowPublicAction({
+    action: "contact",
+    identity: values.email,
+    ip: { max: 10, windowSeconds: 60 * 60 },
+    identityLimit: { max: 5, windowSeconds: 60 * 60 },
+  });
+  if (!allowed) {
+    return {
+      status: "error",
+      formError:
+        "Too many enquiries have been sent recently. Please wait an hour or contact us by email.",
+      values,
+    };
   }
 
   // Stamp the enquiry with the signed-in user's id when a session exists;

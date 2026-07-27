@@ -360,6 +360,11 @@ export function ContactForm() {
           {error}
         </p>
       )}
+      {state.formError && (
+        <p role="alert" className="text-sm text-red-700">
+          {state.formError}
+        </p>
+      )}
 
       <div className="flex flex-col gap-4 border-t border-line pt-5">
         <div className="flex items-center gap-3">

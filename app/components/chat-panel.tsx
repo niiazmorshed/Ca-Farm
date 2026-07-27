@@ -15,6 +15,7 @@ import { useOptimistic, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { Icon } from "./dashboard-icons";
 import type { EnquiryMessage, MessageSender } from "../lib/enquiry-messages";
+import { ENQUIRY_MESSAGE_MAX_LENGTH } from "../lib/enquiry-message-validation";
 
 const time = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
@@ -96,6 +97,7 @@ function ComposerInner({
         name="body"
         rows={2}
         required
+        maxLength={ENQUIRY_MESSAGE_MAX_LENGTH}
         disabled={pending}
         placeholder={placeholder}
         className="w-full resize-none rounded-none border border-line bg-white px-3 py-2 text-sm text-ink outline-none transition-colors duration-200 focus:border-primary-500 focus-visible:ring-2 focus-visible:ring-primary-400/40 disabled:opacity-60"

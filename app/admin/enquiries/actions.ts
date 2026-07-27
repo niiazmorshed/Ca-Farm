@@ -6,6 +6,7 @@
 import { revalidatePath } from "next/cache";
 import { query } from "../../lib/db";
 import { requireAdmin } from "../../lib/supabase/guards";
+import { validateEnquiryReply } from "../../lib/enquiry-message-validation";
 
 /** Admin posts a reply into an enquiry thread. Sending also marks the thread
     read for the admin (they've clearly seen it). */
@@ -14,7 +15,7 @@ export async function sendAdminMessageAction(formData: FormData): Promise<void> 
 
   const id = String(formData.get("id") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
-  if (!/^\d+$/.test(id) || !body) return;
+  if (!/^\d+$/.test(id) || validateEnquiryReply(body)) return;
 
   try {
     await query(

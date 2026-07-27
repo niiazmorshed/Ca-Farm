@@ -34,7 +34,7 @@ export function SignupForm() {
         <p className="text-[15px] leading-7 text-muted">
           We sent a confirmation link to{" "}
           <span className="font-medium text-ink">{state.values?.email}</span>.
-          Click it to activate your account, then sign in.
+          Click it to activate your account and open the client portal.
         </p>
         <Link
           href="/login"
