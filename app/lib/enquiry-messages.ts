@@ -84,12 +84,11 @@ export async function markAdminRead(enquiryId: string): Promise<void> {
   ]);
 }
 
-/** Mark all of a client's enquiry threads read (they just viewed the portal).
-    Matches by account id or email, same as everywhere else. */
-export async function markClientRead(userId: string, email: string): Promise<void> {
+/** Mark all of a client's owned enquiry threads read. */
+export async function markClientRead(userId: string): Promise<void> {
   await query(
     `update enquiries set client_last_read_at = now()
-      where user_id = $1 or lower(email) = lower($2)`,
-    [userId, email],
+      where user_id = $1`,
+    [userId],
   );
 }

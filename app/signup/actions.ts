@@ -1,9 +1,9 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "../lib/supabase/server";
 import { createAdminClient } from "../lib/supabase/admin";
-import { query } from "../lib/db";
+import { allowPublicAction } from "../lib/rate-limit";
 
 export interface SignupState {
   error?: string;
@@ -28,17 +28,31 @@ export async function signup(
   if (password.length < 8)
     return { error: "Password must be at least 8 characters.", values };
 
-  // Create the user already confirmed via the Admin API — sends no email, so
-  // signup works regardless of the project's email-confirmation setting and
-  // never hits the email rate limit. Role is set to 'client' by a DB trigger.
-  const admin = createAdminClient();
-  const { data: created, error: createError } =
-    await admin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: { full_name: fullName },
-    });
+  const allowed = await allowPublicAction({
+    action: "signup",
+    identity: email,
+    ip: { max: 5, windowSeconds: 60 * 60 },
+    identityLimit: { max: 3, windowSeconds: 60 * 60 },
+  });
+  if (!allowed) {
+    return {
+      error:
+        "Too many account creation attempts. Please wait an hour and try again.",
+      values,
+    };
+  }
+
+  const headerStore = await headers();
+  const origin = headerStore.get("origin");
+  const supabase = await createClient();
+  const { data: created, error: createError } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: fullName },
+      ...(origin ? { emailRedirectTo: `${origin}/auth/confirm` } : {}),
+    },
+  });
 
   if (createError) {
     const exists = /already|exists|registered|duplicate/i.test(
@@ -52,23 +66,30 @@ export async function signup(
     };
   }
 
-  // Establish a session for the new user, then route by role.
-  const supabase = await createClient();
-  const { error: signInError } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-  if (signInError) return { error: signInError.message, values };
-
-  let role: string | null = null;
-  const userId = created.user?.id;
-  if (userId) {
-    const { rows } = await query<{ role: string }>(
-      "select role from public.profiles where id = $1",
-      [userId],
+  // Email confirmation is a security boundary: guest enquiries may only be
+  // claimed after this address has been proved. Fail closed if the Supabase
+  // project is accidentally configured to issue a session immediately.
+  if (created.session) {
+    await supabase.auth.signOut();
+    if (created.user?.id) {
+      const { error: deleteError } = await createAdminClient()
+        .auth.admin.deleteUser(created.user.id);
+      if (deleteError) {
+        console.error(
+          "[signup] could not remove insecurely auto-confirmed user:",
+          deleteError,
+        );
+      }
+    }
+    console.error(
+      "[signup] blocked because Supabase email confirmation is disabled",
     );
-    role = rows[0]?.role ?? null;
+    return {
+      error:
+        "Account creation is temporarily unavailable. Please contact the team.",
+      values,
+    };
   }
 
-  redirect(role === "admin" ? "/admin" : "/portal");
+  return { checkEmail: true, values };
 }

@@ -1,5 +1,7 @@
-// Apply db/schema.sql to Supabase: node scripts/db-migrate.mjs
+// Apply db/schema.sql (default) or one migration file to Supabase:
+// node scripts/db-migrate.mjs [db/migrations/<file>.sql]
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { Pool } from "pg";
 
 for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
@@ -7,7 +9,10 @@ for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8
   if (m) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
 }
 
-const sql = readFileSync(new URL("../db/schema.sql", import.meta.url), "utf8");
+const sqlPath = process.argv[2]
+  ? resolve(process.cwd(), process.argv[2])
+  : new URL("../db/schema.sql", import.meta.url);
+const sql = readFileSync(sqlPath, "utf8");
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -22,7 +27,8 @@ try {
     where table_name = 'enquiries'
     order by ordinal_position
   `);
-  console.log("Migration applied. enquiries columns:");
+  console.log(`Migration applied: ${process.argv[2] ?? "db/schema.sql"}`);
+  console.log("enquiries columns:");
   console.table(rows);
 } catch (err) {
   console.error("Migration failed:", err.message);

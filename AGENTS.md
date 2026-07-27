@@ -87,10 +87,12 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
   or Google OAuth); intentionally **no profile UPDATE policy**, so a
   client can't self-promote. Change admin by editing that email in the trigger
   (via migration/MCP).
-- **Signup uses Admin API** (`lib/supabase/admin.ts`, service-role key,
-  `admin.createUser({ email_confirm: true })`) so accounts pre-confirmed — no
-  confirmation email, no email rate-limit, independent of dashboard "Confirm
-  email" toggle. Then signs user in, redirects by role.
+- **Signup requires verified email ownership.** `app/signup/actions.ts` uses
+  normal Supabase `signUp`, returns the form's "Check your email" state, and
+  fails closed (signs out + removes the new user) if the dashboard's "Confirm
+  email" setting is accidentally disabled. `/auth/confirm` verifies the OTP,
+  establishes the session and claims matching guest enquiries. Never restore
+  Admin API `email_confirm: true` signup.
 - **Google OAuth** via `signInWithOAuth` → `/auth/callback` exchanges PKCE
   code. OAuth users get `client` profile from same trigger. Provider
   enabled in Supabase dashboard (not via code/MCP). `redirectTo` =
@@ -108,6 +110,11 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
 - **Role lookups for redirect/gating use `pg`** (login action, `/auth/callback`,
   `requireAdmin`) — reading `profiles.role` via Supabase client right after
   sign-in is unreliable (RLS + session timing), so query `pg` pool by user id.
+- **Enquiry ownership uses `enquiries.user_id` exclusively in the portal.**
+  Matching guest enquiries by email is allowed only in
+  `claimVerifiedGuestEnquiries`, called immediately after a successful email
+  confirmation or Google OAuth exchange. Never add an email fallback to portal
+  reads/actions: an unproved address is not an ownership boundary.
 - **Header auth read SERVER-SIDE**: root layout calls `getSessionUser()`
   (local `getClaims`, no network) and passes `user` (email/name/avatar/role) to
   `<SiteHeader>`; logout is the **server action** in `app/auth/actions.ts` (clears
@@ -116,9 +123,10 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
   own shells (sidebar + topbar); `ChromeGate` hides public header/footer there.
 - **Two data paths by design:** `lib/db.ts` (`pg`) for contact write, admin
   enquiries read, all role lookups; `supabase-js` for auth/session.
-- **RLS deny-all is intentional on 8 tables** — `enquiries`, `rate_audit`,
-  `calculator_settings`, `cgt_settings`, `cgt_multipliers`, `mortgage_settings`,
-  `mortgage_products`, `tax_rates` all keep **RLS enabled with no policy**: the
+- **RLS deny-all is intentional on 11 tables** — `enquiries`,
+  `enquiry_messages`, `rate_audit`, `calculator_settings`, `cgt_settings`,
+  `cgt_multipliers`, `mortgage_settings`, `mortgage_products`, `tax_rates`,
+  `request_rate_limits`, `toolkit_resources` all keep **RLS enabled with no policy**: the
   public Supabase API (anon/`authenticated`) is denied; the server reaches them
   via the `pg` owner connection, which **bypasses RLS**. The security advisor's
   `rls_enabled_no_policy` INFO on these is **expected, not a bug** — leave it.
@@ -173,6 +181,10 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
   blocks form response (best-effort — failures logged, not surfaced). Keys:
   `EmailJs_Gmail_serviceid_KEY`, `EmailJs_Template_KEY`, `EmailJs_PUBLIC_KEY`,
   `EmailJs_Private_KEY`.
+- Public signup and contact submissions use DB-backed fixed-window throttling
+  from `app/lib/rate-limit.ts` (per IP + per normalised email). Only SHA-256
+  identifiers are stored in `request_rate_limits`; never store raw IP/email
+  throttle keys or replace this with per-process memory on serverless.
 - **The template's "To email" field is `{{to_email}}`** — `template_params`
   MUST include `to_email` (+ `to_name`) or EmailJS returns HTTP 422 "recipients
   address is corrupted" and the notification silently never sends (the
