@@ -615,7 +615,7 @@ export function Stats() {
 const testimonials = [
   {
     quote:
-      "CA Farm took our year-end from a three-week scramble to a non-event. The books are just… done.",
+      "AIBN Chartered Accountants Ltd took our year-end from a three-week scramble to a non-event. The books are just… done.",
     name: "Priya Shah",
     role: "Founder, Bloom Studio",
   },

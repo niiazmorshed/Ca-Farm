@@ -48,18 +48,20 @@ function Bubble({
   clientName: string;
 }) {
   const mine = item.sender === viewer;
-  const label = item.sender === "admin" ? "CA Farm" : clientName;
+  // Short mark, not the full legal name: this caption repeats under every
+  // admin message and the full name wraps the bubble column.
+  const label = item.sender === "admin" ? "AIBN" : clientName;
   return (
     <div className={`flex items-end gap-2 ${mine ? "flex-row-reverse" : "flex-row"}`}>
       <span
         aria-hidden="true"
-        className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[10px] font-semibold ${
+        className={`grid h-7 w-7 shrink-0 place-items-center rounded-full font-semibold ${
           item.sender === "admin"
-            ? "bg-navy-900 text-white"
-            : "bg-primary-100 text-primary-700"
+            ? "bg-navy-900 text-[8px] tracking-tight text-white"
+            : "bg-primary-100 text-[10px] text-primary-700"
         }`}
       >
-        {item.sender === "admin" ? "CA" : initials(clientName)}
+        {item.sender === "admin" ? "AIBN" : initials(clientName)}
       </span>
       <div className={`flex max-w-[80%] flex-col ${mine ? "items-end" : "items-start"}`}>
         <div

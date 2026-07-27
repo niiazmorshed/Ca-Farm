@@ -4,7 +4,7 @@ import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
   title: "Client login",
-  description: "Sign in to the CA Farm client area.",
+  description: "Sign in to the AIBN Chartered Accountants Ltd client area.",
 };
 
 const NOTICES: Record<string, string> = {
@@ -25,7 +25,7 @@ export default async function LoginPage({
       <PageHero
         eyebrow="Client area"
         title="Sign in."
-        lede="Access your CA Farm client area. A partner-led practice: your books, in one place."
+        lede="Access your AIBN Chartered Accountants Ltd client area. A partner-led practice: your books, in one place."
         image="tower"
       />
       <Container className="py-16 sm:py-20">

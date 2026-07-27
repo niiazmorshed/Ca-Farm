@@ -1,5 +1,5 @@
 export const site = {
-  name: "CA Farm",
+  name: "AIBN Chartered Accountants Ltd",
   url: "https://cafarm.co",
   email: "hello@cafarm.co",
   phone: "+353 (0)1 234 5678",

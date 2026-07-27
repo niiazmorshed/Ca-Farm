@@ -55,7 +55,7 @@ async function sendEnquiryEmail(values: {
           // or the API rejects with 422 "recipients address is corrupted".
           // This is the firm's monitored inbox; reply_to is the enquirer.
           to_email: "idublinfourir@gmail.com",
-          to_name: "CA Farm",
+          to_name: "AIBN Chartered Accountants Ltd",
           name: values.name,
           email: values.email,
           reply_to: values.email,
