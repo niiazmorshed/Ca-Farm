@@ -429,3 +429,24 @@ comment on table public.request_rate_limits is
   'Hashed server-side action throttles. RLS deny-all is intentional; pg owner access bypasses RLS.';
 comment on table public.toolkit_resources is
   'Server-managed public toolkit metadata. RLS deny-all is intentional; pg owner access bypasses RLS.';
+
+-- ── Founders Hub file requests ──────────────────────────────────────────────
+-- Someone on /toolkits asks for a copy of a resource by email; we log the
+-- request and send them a time-limited download link. The log doubles as a
+-- lead list (who wants what) and as the basis for rate limiting.
+
+create table if not exists toolkit_requests (
+  id          bigint generated always as identity primary key,
+  resource_id bigint not null references toolkit_resources (id) on delete cascade,
+  email       text not null,
+  -- 'sent' once the provider accepted it; 'failed' keeps a record of the attempt.
+  status      text not null default 'sent' check (status in ('sent', 'failed')),
+  error       text,
+  created_at  timestamptz not null default now()
+);
+
+-- Admin list ("newest first") and the per-email rate-limit lookup.
+create index if not exists toolkit_requests_created_at_idx
+  on toolkit_requests (created_at desc);
+create index if not exists toolkit_requests_email_idx
+  on toolkit_requests (lower(email), created_at desc);

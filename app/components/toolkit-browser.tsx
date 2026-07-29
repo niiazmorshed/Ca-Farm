@@ -19,6 +19,7 @@ import {
   type ToolkitResource,
 } from "../lib/toolkit-types";
 import { STARTER_RESOURCES, type StarterResource } from "../lib/toolkit-content";
+import { ResourceRequestForm } from "./resource-request-form";
 
 /* Short tab labels so the strip scans like the calculators one. */
 const TAB_LABELS: Record<ToolkitCategory, string> = {
@@ -118,11 +119,16 @@ function UploadedCard({ resource }: { resource: ToolkitResource }) {
       {resource.description && (
         <p className="mt-2 flex-1 text-sm leading-6 text-muted">{resource.description}</p>
       )}
-      <div className="mt-5 flex items-baseline justify-between gap-3 border-t border-line pt-4">
-        <span className="text-xs text-muted">Added {addedOn(resource.createdAt)}</span>
-        <a href={resource.fileUrl} target="_blank" rel="noopener" className={ctaLink}>
-          {resource.filePath ? "Download" : "Open"} <span aria-hidden="true">→</span>
-        </a>
+      <div className="mt-5 border-t border-line pt-4">
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="text-xs text-muted">Added {addedOn(resource.createdAt)}</span>
+          <a href={resource.fileUrl} target="_blank" rel="noopener" className={ctaLink}>
+            {resource.filePath ? "Download" : "Open"} <span aria-hidden="true">→</span>
+          </a>
+        </div>
+        <div className="mt-3">
+          <ResourceRequestForm resourceId={resource.id} />
+        </div>
       </div>
     </div>
   );
