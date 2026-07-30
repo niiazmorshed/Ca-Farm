@@ -1,7 +1,12 @@
 export const site = {
   name: "AIBN Chartered Accountants Ltd",
-  url: "https://cafarm.co",
-  email: "hello@cafarm.co",
+  // Canonical host. `www` is canonical: the apex 308-redirects to it in Vercel,
+  // so this must carry the www prefix or every canonical URL and sitemap entry
+  // points at a redirect. Drives metadataBase, sitemap.xml and robots.txt.
+  url: "https://www.aibncharteredaccountants.ie",
+  // NOTE: this mailbox needs email forwarding (or a mail plan) configured at the
+  // registrar before launch, or enquiries to it bounce.
+  email: "hello@aibncharteredaccountants.ie",
   phone: "+353 (0)1 234 5678",
   phoneHref: "tel:+35312345678",
   address: ["The Chase, Carmanhall Road", "Sandyford, Dublin 18, D18 Y3X2"],

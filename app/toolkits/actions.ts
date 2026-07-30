@@ -152,7 +152,7 @@ export async function requestResourceAction(
       heading,
       bodyHtml,
       footerNote:
-        "You're receiving this because you requested this resource on cafarm.co. This link expires in 7 days.",
+        `You're receiving this because you requested this resource on ${site.url.replace(/^https?:\/\//, "")}. This link expires in 7 days.`,
     }),
     text,
   });
