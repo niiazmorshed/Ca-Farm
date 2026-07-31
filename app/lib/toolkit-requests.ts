@@ -14,6 +14,8 @@ export interface ToolkitRequest {
   name: string;
   phone: string;
   email: string;
+  /** Requester's organisation website, stored with its scheme. */
+  website: string;
   purpose: string;
   status: RequestStatus;
   sentAt: Date | null;
@@ -26,6 +28,7 @@ interface RequestRow {
   name: string;
   phone: string;
   email: string;
+  website: string;
   purpose: string;
   status: RequestStatus;
   sent_at: Date | null;
@@ -38,6 +41,7 @@ const fromRow = (r: RequestRow): ToolkitRequest => ({
   name: r.name,
   phone: r.phone,
   email: r.email,
+  website: r.website,
   purpose: r.purpose,
   status: r.status,
   sentAt: r.sent_at,
@@ -63,17 +67,19 @@ export async function createRequest(input: {
   name: string;
   phone: string;
   email: string;
+  website: string;
   purpose: string;
 }): Promise<void> {
   await query(
     `insert into toolkit_requests
-       (resource_title, name, phone, email, purpose)
-     values ($1, $2, $3, $4, $5)`,
+       (resource_title, name, phone, email, website, purpose)
+     values ($1, $2, $3, $4, $5, $6)`,
     [
       input.resourceTitle,
       input.name,
       input.phone,
       input.email,
+      input.website,
       input.purpose,
     ],
   );
@@ -82,7 +88,7 @@ export async function createRequest(input: {
 /** Newest first, pending ahead of sent so outstanding work surfaces at the top. */
 export async function getToolkitRequests(limit = 200): Promise<ToolkitRequest[]> {
   const { rows } = await query<RequestRow>(
-    `select id, resource_title, name, phone, email, purpose,
+    `select id, resource_title, name, phone, email, website, purpose,
             status, sent_at, created_at
        from toolkit_requests
       order by (status = 'pending') desc, created_at desc
