@@ -15,9 +15,28 @@ export async function GET(request: NextRequest) {
   const next =
     rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "";
 
+  /* Every failure below lands on the same /login?notice=oauth screen, so the
+     only way to tell them apart afterwards is this log. Grep "[auth] oauth".
+     Never log `code` itself — it is a single-use credential. */
+  const providerError = searchParams.get("error");
+  if (providerError) {
+    console.error("[auth] oauth: provider returned an error", {
+      error: providerError,
+      // Google's own wording; untrusted text, logged but never rendered.
+      description: searchParams.get("error_description"),
+    });
+  }
+
   if (code) {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) {
+      console.error("[auth] oauth: could not exchange the code for a session", {
+        message: error.message,
+        status: error.status,
+        code: error.code,
+      });
+    }
     if (!error) {
       if (data.user) {
         try {
@@ -46,6 +65,14 @@ export async function GET(request: NextRequest) {
         `${origin}${role === "admin" ? "/admin" : "/portal"}`,
       );
     }
+  }
+
+  /* Reached with no `code` and no provider error: usually a refresh or a
+     back-navigation onto this URL after the code was already spent. */
+  if (!code && !providerError) {
+    console.error("[auth] oauth: callback hit with no code and no error", {
+      referer: request.headers.get("referer"),
+    });
   }
 
   return NextResponse.redirect(`${origin}/login?notice=oauth`);
