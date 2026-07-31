@@ -15,6 +15,22 @@ export const TOOLKIT_CATEGORIES = [
 
 export type ToolkitCategory = (typeof TOOLKIT_CATEGORIES)[number]["value"];
 
+/* URL slug for a resource, derived from its title. Resources reachable from the
+   request form come from two places, uploaded rows in toolkit_resources and
+   the static catalogue in toolkit-content.ts, and only the catalogue entries
+   have no id. Deriving the slug from the title gives both a stable, readable
+   URL without adding an id to the catalogue. */
+export function toolkitSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
 export const TOOLKIT_CATEGORY_LABELS: Record<ToolkitCategory, string> =
   Object.fromEntries(
     TOOLKIT_CATEGORIES.map((c) => [c.value, c.label]),

@@ -15,11 +15,11 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   TOOLKIT_CATEGORIES,
+  toolkitSlug,
   type ToolkitCategory,
   type ToolkitResource,
 } from "../lib/toolkit-types";
 import { STARTER_RESOURCES, type StarterResource } from "../lib/toolkit-content";
-import { ResourceRequestForm } from "./resource-request-form";
 
 /* Short tab labels so the strip scans like the calculators one. */
 const TAB_LABELS: Record<ToolkitCategory, string> = {
@@ -105,7 +105,10 @@ function GroupHeading({ label }: { label: string }) {
   );
 }
 
-/* ---------- Available now: real uploaded file, shown as a card ---------- */
+/* ---------- Available now: a resource we hold and can send today ---------- */
+
+/* Both card types lead to the same request form. The file is never linked
+   publicly: a team member reviews the request and emails it over. */
 
 function UploadedCard({ resource }: { resource: ToolkitResource }) {
   return (
@@ -119,16 +122,11 @@ function UploadedCard({ resource }: { resource: ToolkitResource }) {
       {resource.description && (
         <p className="mt-2 flex-1 text-sm leading-6 text-muted">{resource.description}</p>
       )}
-      <div className="mt-5 border-t border-line pt-4">
-        <div className="flex items-baseline justify-between gap-3">
-          <span className="text-xs text-muted">Added {addedOn(resource.createdAt)}</span>
-          <a href={resource.fileUrl} target="_blank" rel="noopener" className={ctaLink}>
-            {resource.filePath ? "Download" : "Open"} <span aria-hidden="true">→</span>
-          </a>
-        </div>
-        <div className="mt-3">
-          <ResourceRequestForm resourceId={resource.id} />
-        </div>
+      <div className="mt-5 flex items-baseline justify-between gap-3 border-t border-line pt-4">
+        <span className="text-xs text-muted">Added {addedOn(resource.createdAt)}</span>
+        <Link href={`/toolkits/request/${toolkitSlug(resource.title)}`} className={ctaLink}>
+          Request a copy <span aria-hidden="true">→</span>
+        </Link>
       </div>
     </div>
   );
@@ -147,7 +145,10 @@ function StarterRow({ resource }: { resource: StarterResource }) {
         </div>
         <p className="mt-1 text-xs leading-5 text-muted">{resource.description}</p>
       </div>
-      <Link href="/contact" className={`${ctaLink} shrink-0`}>
+      <Link
+        href={`/toolkits/request/${toolkitSlug(resource.title)}`}
+        className={`${ctaLink} shrink-0`}
+      >
         Request a copy <span aria-hidden="true">→</span>
       </Link>
     </li>

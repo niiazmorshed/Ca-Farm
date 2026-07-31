@@ -7,7 +7,9 @@
    unreachable — it never 500s. */
 
 import { query } from "./db";
+import { toolkitSlug } from "./toolkit-types";
 import type { ToolkitCategory, ToolkitResource } from "./toolkit-types";
+import { STARTER_RESOURCES } from "./toolkit-content";
 
 export {
   TOOLKIT_CATEGORIES,
@@ -69,4 +71,55 @@ export async function getAllToolkitResources(): Promise<ToolkitResource[]> {
       order by category asc, created_at desc`,
   );
   return rows.map(fromRow);
+}
+
+/* ---------- request-form lookup ---------- */
+
+/** A resource the request form can be opened for. `id` is null for catalogue
+    entries that have no uploaded file yet. */
+export interface RequestableResource {
+  id: string | null;
+  title: string;
+  description: string | null;
+  category: ToolkitCategory;
+  framework: string | null;
+}
+
+/**
+ * Resolve a slug from a "Request a copy" link back to the resource it names.
+ * Uploaded rows win over catalogue entries with the same title, so once a real
+ * file exists the request is attributed to it. Returns null when nothing
+ * matches, which the page turns into a 404 rather than trusting the URL.
+ */
+export async function findRequestableResourceBySlug(
+  slug: string,
+): Promise<RequestableResource | null> {
+  try {
+    const { rows } = await query<ResourceRow>(
+      `select ${SELECT_COLS} from toolkit_resources where active`,
+    );
+    const hit = rows.map(fromRow).find((r) => toolkitSlug(r.title) === slug);
+    if (hit) {
+      return {
+        id: hit.id,
+        title: hit.title,
+        description: hit.description,
+        category: hit.category,
+        framework: hit.framework,
+      };
+    }
+  } catch (err) {
+    // A DB outage should not stop someone requesting a catalogue item.
+    console.error("[toolkits] resource lookup failed, trying catalogue:", err);
+  }
+
+  const starter = STARTER_RESOURCES.find((r) => toolkitSlug(r.title) === slug);
+  if (!starter) return null;
+  return {
+    id: null,
+    title: starter.title,
+    description: starter.description,
+    category: starter.category,
+    framework: starter.framework ?? null,
+  };
 }
