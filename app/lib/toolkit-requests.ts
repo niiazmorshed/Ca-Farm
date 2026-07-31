@@ -10,8 +10,6 @@ export type RequestStatus = "pending" | "sent";
 
 export interface ToolkitRequest {
   id: string;
-  /** Null for catalogue entries with no uploaded file, or a deleted resource. */
-  resourceId: string | null;
   resourceTitle: string;
   name: string;
   phone: string;
@@ -24,7 +22,6 @@ export interface ToolkitRequest {
 
 interface RequestRow {
   id: string;
-  resource_id: string | null;
   resource_title: string;
   name: string;
   phone: string;
@@ -37,7 +34,6 @@ interface RequestRow {
 
 const fromRow = (r: RequestRow): ToolkitRequest => ({
   id: r.id,
-  resourceId: r.resource_id,
   resourceTitle: r.resource_title,
   name: r.name,
   phone: r.phone,
@@ -63,7 +59,6 @@ export async function countRecentRequests(email: string): Promise<number> {
 }
 
 export async function createRequest(input: {
-  resourceId: string | null;
   resourceTitle: string;
   name: string;
   phone: string;
@@ -72,10 +67,9 @@ export async function createRequest(input: {
 }): Promise<void> {
   await query(
     `insert into toolkit_requests
-       (resource_id, resource_title, name, phone, email, purpose)
-     values ($1, $2, $3, $4, $5, $6)`,
+       (resource_title, name, phone, email, purpose)
+     values ($1, $2, $3, $4, $5)`,
     [
-      input.resourceId,
       input.resourceTitle,
       input.name,
       input.phone,
@@ -88,7 +82,7 @@ export async function createRequest(input: {
 /** Newest first, pending ahead of sent so outstanding work surfaces at the top. */
 export async function getToolkitRequests(limit = 200): Promise<ToolkitRequest[]> {
   const { rows } = await query<RequestRow>(
-    `select id, resource_id, resource_title, name, phone, email, purpose,
+    `select id, resource_title, name, phone, email, purpose,
             status, sent_at, created_at
        from toolkit_requests
       order by (status = 'pending') desc, created_at desc

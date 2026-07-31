@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "../../lib/supabase/guards";
-import { getAllToolkitResources, type ToolkitResource } from "../../lib/toolkit-data";
 import {
   countPendingRequests,
   getToolkitRequests,
   type ToolkitRequest,
 } from "../../lib/toolkit-requests";
-import { setRequestStatusAction } from "./actions";
-import { ToolkitsManager } from "./toolkits-manager";
+import { RequestStatusButton } from "./request-status-button";
 
 export const metadata: Metadata = {
   title: "Toolkits",
@@ -24,18 +22,9 @@ const requestedAt = new Intl.DateTimeFormat("en-GB", {
 export default async function AdminToolkitsPage() {
   await requireAdmin();
 
-  let resources: ToolkitResource[] = [];
-  let loadError = false;
-  try {
-    resources = await getAllToolkitResources();
-  } catch (err) {
-    console.error("[toolkits] admin load failed:", err);
-    loadError = true;
-  }
-
-  // The request log is a bonus panel: never let it break the upload manager.
   let requests: ToolkitRequest[] = [];
   let pending = 0;
+  let loadError = false;
   try {
     [requests, pending] = await Promise.all([
       getToolkitRequests(100),
@@ -43,6 +32,7 @@ export default async function AdminToolkitsPage() {
     ]);
   } catch (err) {
     console.error("[toolkits] request log load failed:", err);
+    loadError = true;
   }
 
   return (
@@ -52,19 +42,20 @@ export default async function AdminToolkitsPage() {
           Founders Hub
         </h2>
         <p className="mt-1 text-sm text-muted">
-          Memos, templates, tax forms, VAT forms and business setup guides shown
-          on the{" "}
+          Requests for the memos, templates, tax and VAT forms and setup guides
+          listed on the{" "}
           <a
             href="/toolkits"
             className="font-medium text-primary-600 transition-colors duration-200 hover:text-primary-500"
           >
             public Founders Hub page
           </a>
-          . Uploads go live immediately, no deploy needed.
+          . Nothing is uploaded or emailed by the site: attach the file in your
+          own mailbox, send it to the address below, then mark the request sent.
           {loadError && (
             <>
               {" "}
-              Could not read the toolkit_resources table. Run{" "}
+              Could not read the toolkit_requests table. Run{" "}
               <code className="rounded-none bg-surface-muted px-1.5 py-0.5 text-xs">
                 node scripts/db-migrate.mjs
               </code>{" "}
@@ -74,10 +65,8 @@ export default async function AdminToolkitsPage() {
         </p>
       </header>
 
-      <ToolkitsManager resources={resources} />
-
-      <section className="mt-12">
-        <div className="mb-1 flex flex-wrap items-center gap-2.5">
+      <section>
+        <div className="mb-4 flex flex-wrap items-center gap-2.5">
           <h3 className="font-display text-base font-semibold text-ink">
             Resource requests ({requests.length})
           </h3>
@@ -87,10 +76,6 @@ export default async function AdminToolkitsPage() {
             </span>
           )}
         </div>
-        <p className="mb-4 text-sm text-muted">
-          Nothing is emailed automatically. Send the file to the address below,
-          then mark the request sent. Outstanding requests are listed first.
-        </p>
         {requests.length === 0 ? (
           <p className="rounded-none border border-dashed border-line bg-white p-6 text-center text-sm text-muted">
             No one has requested a resource yet.
@@ -112,7 +97,6 @@ export default async function AdminToolkitsPage() {
                     <p className="mt-0.5 text-xs text-muted">
                       Requested {requestedAt.format(new Date(r.createdAt))}
                       {r.sentAt && ` · sent ${requestedAt.format(new Date(r.sentAt))}`}
-                      {r.resourceId === null && " · no file uploaded yet"}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
@@ -125,20 +109,7 @@ export default async function AdminToolkitsPage() {
                     >
                       {r.status}
                     </span>
-                    <form action={setRequestStatusAction}>
-                      <input type="hidden" name="id" value={r.id} />
-                      <input
-                        type="hidden"
-                        name="status"
-                        value={r.status === "sent" ? "pending" : "sent"}
-                      />
-                      <button
-                        type="submit"
-                        className="inline-flex h-8 cursor-pointer items-center rounded-none border border-line px-3 text-xs font-semibold text-ink-body transition-colors duration-200 hover:border-ink/30 hover:text-ink"
-                      >
-                        {r.status === "sent" ? "Undo" : "Mark sent"}
-                      </button>
-                    </form>
+                    <RequestStatusButton id={r.id} status={r.status} />
                   </div>
                 </div>
 

@@ -45,13 +45,6 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
-  experimental: {
-    serverActions: {
-      // Default is 1 MB — too small for the /admin/toolkits file uploads
-      // (allowlisted document types, 20 MB app-level cap in its actions.ts).
-      bodySizeLimit: "25mb",
-    },
-  },
 };
 
 export default nextConfig;
