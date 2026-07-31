@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Breadcrumbs, Container, PageHero } from "../components/ui";
 import { ContactCta } from "../components/sections";
 import { ToolkitBrowser } from "../components/toolkit-browser";
-import { getToolkitResources } from "../lib/toolkit-data";
 
 export const metadata: Metadata = {
   title: "Founders Hub: memos, templates, tax & VAT forms",
@@ -25,9 +24,7 @@ const notes = [
   },
 ];
 
-export default async function FoundersHubPage() {
-  const uploaded = await getToolkitResources();
-
+export default function FoundersHubPage() {
   return (
     <>
       <PageHero
@@ -43,7 +40,7 @@ export default async function FoundersHubPage() {
 
       <Container className="py-16 sm:py-20">
         <div className="rounded-none border border-line bg-canvas p-6 sm:p-8 lg:p-10">
-          <ToolkitBrowser uploaded={uploaded} />
+          <ToolkitBrowser />
         </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-3">

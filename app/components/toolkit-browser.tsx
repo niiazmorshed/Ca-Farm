@@ -5,11 +5,9 @@
    share one design language — the only difference is these tabs switch a
    category client-side instead of navigating between routes.
 
-   Two clearly-separated groups per tab so real downloads never read as
-   "coming soon":
-     • Available now  — real uploads from /admin/toolkits, shown as cards.
-     • In preparation — the curated catalogue (toolkit-content.ts), shown as a
-       lighter list with a request-a-copy link. */
+   Nothing is downloadable here by design: every entry comes from the catalogue
+   in toolkit-content.ts and links to the request form, and a team member emails
+   the file over by hand. */
 
 import { useState } from "react";
 import Link from "next/link";
@@ -17,7 +15,6 @@ import {
   TOOLKIT_CATEGORIES,
   toolkitSlug,
   type ToolkitCategory,
-  type ToolkitResource,
 } from "../lib/toolkit-types";
 import { STARTER_RESOURCES, type StarterResource } from "../lib/toolkit-content";
 
@@ -76,9 +73,6 @@ function TabInner({ label, active }: { label: string; active: boolean }) {
 
 /* ---------- shared bits ---------- */
 
-const addedOn = (iso: string) =>
-  new Intl.DateTimeFormat("en-IE", { dateStyle: "medium" }).format(new Date(iso));
-
 const ctaLink =
   "whitespace-nowrap text-sm font-semibold text-primary-500 transition-colors duration-200 hover:text-primary-600";
 
@@ -94,45 +88,7 @@ function Badge({ tone, children }: { tone: "framework" | "format"; children: Rea
   );
 }
 
-function GroupHeading({ label }: { label: string }) {
-  return (
-    <div className="mb-4 flex items-center gap-3">
-      <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">
-        {label}
-      </h3>
-      <span className="h-px flex-1 bg-line" aria-hidden="true" />
-    </div>
-  );
-}
-
-/* ---------- Available now: a resource we hold and can send today ---------- */
-
-/* Both card types lead to the same request form. The file is never linked
-   publicly: a team member reviews the request and emails it over. */
-
-function UploadedCard({ resource }: { resource: ToolkitResource }) {
-  return (
-    <div className="flex flex-col rounded-none border border-line bg-surface p-6">
-      <div className="flex items-start justify-between gap-3">
-        <h4 className="font-display text-base font-medium tracking-tight text-ink">
-          {resource.title}
-        </h4>
-        {resource.framework && <Badge tone="framework">{resource.framework}</Badge>}
-      </div>
-      {resource.description && (
-        <p className="mt-2 flex-1 text-sm leading-6 text-muted">{resource.description}</p>
-      )}
-      <div className="mt-5 flex items-baseline justify-between gap-3 border-t border-line pt-4">
-        <span className="text-xs text-muted">Added {addedOn(resource.createdAt)}</span>
-        <Link href={`/toolkits/request/${toolkitSlug(resource.title)}`} className={ctaLink}>
-          Request a copy <span aria-hidden="true">→</span>
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- In preparation: curated catalogue, shown as a light list ---------- */
+/* ---------- catalogue list ---------- */
 
 function StarterRow({ resource }: { resource: StarterResource }) {
   return (
@@ -167,19 +123,16 @@ function StarterList({ items }: { items: StarterResource[] }) {
 
 /* ---------- browser ---------- */
 
-export function ToolkitBrowser({ uploaded }: { uploaded: ToolkitResource[] }) {
-  /* Show any category that has real uploads or curated cards behind it. */
-  const categories = TOOLKIT_CATEGORIES.filter(
-    (c) =>
-      uploaded.some((r) => r.category === c.value) ||
-      STARTER_RESOURCES.some((r) => r.category === c.value),
+export function ToolkitBrowser() {
+  /* Only show a tab that has something behind it. */
+  const categories = TOOLKIT_CATEGORIES.filter((c) =>
+    STARTER_RESOURCES.some((r) => r.category === c.value),
   );
   const [active, setActive] = useState<ToolkitCategory>(
     categories[0]?.value ?? "memo",
   );
 
-  const uploadedItems = uploaded.filter((r) => r.category === active);
-  const starterItems = STARTER_RESOURCES.filter((r) => r.category === active);
+  const items = STARTER_RESOURCES.filter((r) => r.category === active);
 
   return (
     <div>
@@ -208,29 +161,16 @@ export function ToolkitBrowser({ uploaded }: { uploaded: ToolkitResource[] }) {
 
       <p className="text-sm leading-6 text-muted">{CATEGORY_INTROS[active]}</p>
 
-      <div className="mt-8 flex flex-col gap-10">
-        {uploadedItems.length > 0 && (
-          <section>
-            <GroupHeading label="Available now" />
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {uploadedItems.map((resource) => (
-                <UploadedCard key={resource.id} resource={resource} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {starterItems.length > 0 && (
-          <section>
-            <GroupHeading label="In preparation" />
-            <p className="mb-4 -mt-1 text-sm leading-6 text-muted">
-              Being finalised by our team. Request a copy and we&apos;ll email it
-              to you the moment it&apos;s ready.
-            </p>
-            <StarterList items={starterItems} />
-          </section>
-        )}
-      </div>
+      {items.length > 0 && (
+        <section className="mt-8">
+          <p className="mb-4 text-sm leading-6 text-muted">
+            Nothing to download here: tell us which one you need and one of our
+            accountants emails it to you, so you get the current version and can
+            ask us about it.
+          </p>
+          <StarterList items={items} />
+        </section>
+      )}
     </div>
   );
 }

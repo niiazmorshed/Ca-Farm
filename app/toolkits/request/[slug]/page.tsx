@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Breadcrumbs, Container, PageHero } from "../../../components/ui";
 import { ResourceRequestForm } from "../../../components/resource-request-form";
-import { findRequestableResourceBySlug } from "../../../lib/toolkit-data";
+import { findRequestableResourceBySlug } from "../../../lib/toolkit-content";
 import { TOOLKIT_CATEGORY_LABELS } from "../../../lib/toolkit-types";
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export default async function RequestResourcePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const resource = await findRequestableResourceBySlug(slug);
+  const resource = findRequestableResourceBySlug(slug);
   if (!resource) notFound();
 
   return (

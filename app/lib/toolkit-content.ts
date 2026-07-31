@@ -1,10 +1,11 @@
-/* Curated "coming soon" catalogue for the Founders Hub. These render as
-   in-preparation cards (with a Request-a-copy CTA) ALONGSIDE the real files
-   uploaded in /admin/toolkits — so every category reads as a full, professional
-   library even before a file is attached. FRONTEND ONLY: nothing here touches
-   the database. As a real file is uploaded for one of these, remove its entry
-   here so it isn't duplicated. */
+/* The Founders Hub catalogue: every memo, template, tax/VAT form and setup
+   guide the firm offers. This file IS the library — no file is uploaded or
+   hosted anywhere. A visitor requests a copy, and a team member emails it from
+   their own mailbox (see /admin/toolkits). PURE module, no DB imports, so the
+   public browser can import it directly. Adding a resource = adding an entry
+   here. */
 
+import { toolkitSlug } from "./toolkit-types";
 import type { ToolkitCategory, ToolkitFramework } from "./toolkit-types";
 
 export type ResourceFormat = "PDF" | "DOCX" | "XLSX";
@@ -229,3 +230,14 @@ export const STARTER_RESOURCES: StarterResource[] = [
       "The year-end close, step by step: accruals, reconciliations and the file every set of accounts should carry.",
   },
 ];
+
+/**
+ * Resolve a slug from a "Request a copy" link back to the catalogue entry it
+ * names. Returns null when nothing matches, which the request page turns into
+ * a 404 rather than trusting the URL.
+ */
+export function findRequestableResourceBySlug(
+  slug: string,
+): StarterResource | null {
+  return STARTER_RESOURCES.find((r) => toolkitSlug(r.title) === slug) ?? null;
+}

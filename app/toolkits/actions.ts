@@ -10,7 +10,7 @@
    limit, and the request only ever records what was typed in. */
 
 import { revalidatePath } from "next/cache";
-import { findRequestableResourceBySlug } from "../lib/toolkit-data";
+import { findRequestableResourceBySlug } from "../lib/toolkit-content";
 import {
   countRecentRequests,
   createRequest,
@@ -65,7 +65,7 @@ export async function submitResourceRequestAction(
   }
 
   // Resolve the slug server-side rather than trusting a posted title.
-  const resource = await findRequestableResourceBySlug(slug);
+  const resource = findRequestableResourceBySlug(slug);
   if (!resource) {
     return {
       status: "error",
@@ -87,7 +87,6 @@ export async function submitResourceRequestAction(
 
   try {
     await createRequest({
-      resourceId: resource.id,
       resourceTitle: resource.title,
       name,
       phone,

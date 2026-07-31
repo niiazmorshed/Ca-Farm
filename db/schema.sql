@@ -351,11 +351,12 @@ $$;
 
 grant execute on function public.custom_access_token_hook to supabase_auth_admin;
 
--- ── Entrepreneur Toolkits ────────────────────────────────────────────────────
--- Downloadable resources (memos, templates, tax/VAT forms, setup guides) shown
--- on /toolkits, managed in /admin/toolkits. Files live in the public Supabase
--- Storage bucket "toolkits"; rows can also point at an external URL instead
--- (file_path null = nothing to delete from storage).
+-- ── Entrepreneur Toolkits (legacy, no longer written) ───────────────────────
+-- The Founders Hub no longer hosts files: the catalogue lives in
+-- app/lib/toolkit-content.ts and every copy is emailed by hand (see
+-- toolkit_requests below). This table is kept only for the rows already in it
+-- and for the toolkit_requests.resource_id foreign key; the app neither reads
+-- nor writes it. Do not add an upload path back without agreeing it first.
 
 create table if not exists toolkit_resources (
   id          bigint generated always as identity primary key,
@@ -364,7 +365,7 @@ create table if not exists toolkit_resources (
   category    text not null check (category in
     ('memo','template','tax-form','vat-form','guide','other')),
   file_url    text not null,
-  -- Storage object path inside the "toolkits" bucket; null for external links.
+  -- Storage object path from the removed upload path; nothing writes it now.
   file_path   text,
   -- Original filename shown on the download button.
   file_name   text,
@@ -380,17 +381,6 @@ alter table toolkit_resources add column if not exists framework text;
 
 create index if not exists toolkit_resources_category_idx
   on toolkit_resources (category, created_at desc);
-
--- Public bucket for the files. Public buckets serve objects without RLS checks
--- and uploads only happen server-side with the service role. Wrapped so a
--- restricted DB role can still run the rest of this file.
-do $$ begin
-  insert into storage.buckets (id, name, public)
-  values ('toolkits', 'toolkits', true)
-  on conflict (id) do nothing;
-exception when others then
-  raise notice 'skipping toolkits bucket creation: %', sqlerrm;
-end $$;
 
 -- ── Public API boundary ──────────────────────────────────────────────────────
 -- Application data is server-only and reached through the pg owner connection.
@@ -428,7 +418,7 @@ comment on table public.rate_audit is
 comment on table public.request_rate_limits is
   'Hashed server-side action throttles. RLS deny-all is intentional; pg owner access bypasses RLS.';
 comment on table public.toolkit_resources is
-  'Server-managed public toolkit metadata. RLS deny-all is intentional; pg owner access bypasses RLS.';
+  'Legacy toolkit metadata, no longer read or written by the app. RLS deny-all is intentional; pg owner access bypasses RLS.';
 
 -- ── Founders Hub file requests ──────────────────────────────────────────────
 -- Someone on /toolkits fills in the request form for a resource. Nothing is
@@ -437,9 +427,8 @@ comment on table public.toolkit_resources is
 
 create table if not exists toolkit_requests (
   id          bigint generated always as identity primary key,
-  -- Null when the request is for a catalogue entry that has no uploaded file
-  -- yet, or when the resource is later deleted. resource_title always holds
-  -- what the visitor actually asked for.
+  -- Legacy column, always null on new rows: the catalogue has no ids and
+  -- resource_title holds what the visitor actually asked for.
   resource_id bigint references toolkit_resources (id) on delete set null,
   resource_title text not null,
   name        text not null,

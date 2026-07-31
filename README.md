@@ -52,23 +52,27 @@ automatically, and there is no email provider wired into the app.
    from their own mailbox, and clicks **Mark sent**.
 
 Outstanding requests sort to the top and the heading shows a "to send" count.
-Abuse is bounded by a five-per-hour limit per email address.
+Mark sent shows a spinner and then a confirmation, so the click is never
+silent. Abuse is bounded by a five-per-hour limit per email address.
 
-The earlier automated version (Resend API, signed download links) was removed:
-it needed a paid provider and a verified sending domain for no real gain over a
-person attaching the file.
+**There is no upload path, deliberately.** The site never hosts a Founders Hub
+file: no upload form, no storage bucket, no public download link. The catalogue
+on `/toolkits` is `app/lib/toolkit-content.ts` and every copy goes out by hand.
+Two earlier versions were removed — automated email (Resend, signed links) and
+admin file upload (Supabase Storage) — so do not add either back without
+agreeing it first. `toolkit_resources` stays in the database only for its
+existing rows; nothing reads or writes it.
 
 ### 2. Founders Hub documents — 4 of 27 drafted, not in the repo
 
 Four Irish tax memos were drafted from Revenue, gov.ie, DSP and CRO sources and
 fact-checked figure by figure (three critical errors were found and corrected).
-The generated PDFs are **not kept in this repo**: upload them through
-`/admin/toolkits` and Supabase Storage holds them.
+The generated PDFs are **not kept in this repo** — they live wherever the team
+keeps them and get attached to an email by hand.
 
 Still to produce: 11 templates, 4 tax forms, 3 VAT forms and 5 setup guides.
-Their cards show as "in preparation" on `/toolkits`, driven by
-`app/lib/toolkit-content.ts`. When a real file is uploaded for one of them,
-delete its entry from that file so the card is not listed twice.
+Every card on `/toolkits` comes from `app/lib/toolkit-content.ts`; adding a
+resource means adding an entry there.
 
 Any of these documents needs partner review before it goes to a client: they
 carry the firm's name and were not written by a person.

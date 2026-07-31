@@ -198,6 +198,24 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
   drop its fields from the submit. If you add a step, keep this mount-all/
   hide-inactive shape.
 
+### Founders Hub (`/toolkits`)
+
+- **The site never hosts a file.** No upload form, no storage bucket, no public
+  download link — for memos, templates, tax/VAT forms, setup guides or anything
+  else. This is a product decision, not a missing feature: do not add an upload
+  path, a Supabase Storage bucket or a direct download link back.
+- The catalogue **is** `app/lib/toolkit-content.ts` (a pure module, no DB).
+  Adding a resource = adding an entry there. `toolkit-types.ts` holds the
+  categories and the title→slug helper both the browser and the request route
+  use.
+- Fulfilment is manual: visitor requests on `/toolkits/request/[slug]` →
+  row in `toolkit_requests` → a team member emails the file from their own
+  mailbox via `/admin/toolkits` → **Mark sent**
+  (`app/admin/toolkits/request-status-button.tsx`, which shows a pending
+  spinner and a confirmation so the click is never silent).
+- `toolkit_resources` and `toolkit_requests.resource_id` are **legacy**: kept
+  for existing rows, read and written by nothing.
+
 ### Testing
 
 - E2E via **Playwright** lives in `/e2e` (gitignored, installed `--no-save` — not a
