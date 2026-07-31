@@ -39,33 +39,24 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 Things that are built but not finished, so they are not lost.
 
-### 1. Founders Hub "email me a copy" — needs an API key (PARKED)
+### 1. Founders Hub "Request a copy" — how it works
 
-The flow is fully built and deployed, but **it cannot send until a Resend API key
-is configured**. Until then the form tells the visitor it cannot send, rather
-than failing silently.
+Requesting a resource is a **manual fulfilment** flow. Nothing is emailed
+automatically, and there is no email provider wired into the app.
 
-What is already in place:
+1. A visitor clicks "Request a copy" on `/toolkits` and lands on
+   `/toolkits/request/[slug]`.
+2. They submit name, phone, organisation email and what they need it for. The
+   request is stored in `toolkit_requests` and they see a confirmation dialog.
+3. A team member opens `/admin/toolkits`, reads the request, emails the file
+   from their own mailbox, and clicks **Mark sent**.
 
-- `app/lib/email.ts` — Resend transport (REST, no SDK dependency) + email shell
-- `app/toolkits/actions.ts` — validates the address, rate limits, signs a 7 day
-  download link, sends, then logs the request
-- `app/components/resource-request-form.tsx` — the inline email capture on each
-  resource card
-- `toolkit_requests` table + the request log at the bottom of `/admin/toolkits`
+Outstanding requests sort to the top and the heading shows a "to send" count.
+Abuse is bounded by a five-per-hour limit per email address.
 
-To switch it on:
-
-1. Create an account at resend.com and verify the sending domain (cafarm.co).
-2. Add to Vercel (Production + Preview) and to `.env.local`:
-   - `RESEND_API_KEY` (required)
-   - `EMAIL_FROM` (optional, must be on the verified domain)
-   - `EMAIL_REPLY_TO` (optional)
-3. Confirm `SUPABASE_SERVICE_ROLE_KEY` is also set: the signed download links
-   need it, and so do the admin file uploads.
-4. Redeploy. Environment variables only apply to new builds.
-5. Test end to end: request a copy of an uploaded resource and check the log row
-   in `/admin/toolkits` says `sent`.
+The earlier automated version (Resend API, signed download links) was removed:
+it needed a paid provider and a verified sending domain for no real gain over a
+person attaching the file.
 
 ### 2. Founders Hub documents — 4 of 27 drafted, not in the repo
 

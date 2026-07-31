@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "../../lib/supabase/guards";
 import { getAllToolkitResources, type ToolkitResource } from "../../lib/toolkit-data";
-import { getToolkitRequests, type ToolkitRequest } from "../../lib/toolkit-requests";
+import {
+  countPendingRequests,
+  getToolkitRequests,
+  type ToolkitRequest,
+} from "../../lib/toolkit-requests";
+import { setRequestStatusAction } from "./actions";
 import { ToolkitsManager } from "./toolkits-manager";
 
 export const metadata: Metadata = {
@@ -30,8 +35,12 @@ export default async function AdminToolkitsPage() {
 
   // The request log is a bonus panel: never let it break the upload manager.
   let requests: ToolkitRequest[] = [];
+  let pending = 0;
   try {
-    requests = await getToolkitRequests(50);
+    [requests, pending] = await Promise.all([
+      getToolkitRequests(100),
+      countPendingRequests(),
+    ]);
   } catch (err) {
     console.error("[toolkits] request log load failed:", err);
   }
@@ -68,55 +77,109 @@ export default async function AdminToolkitsPage() {
       <ToolkitsManager resources={resources} />
 
       <section className="mt-12">
-        <h3 className="mb-1 font-display text-base font-semibold text-ink">
-          Recent requests ({requests.length})
-        </h3>
-        <p className="mb-3 text-sm text-muted">
-          Who asked for a copy by email, newest first. Failed rows usually mean
-          the email provider rejected the send: check the server logs.
+        <div className="mb-1 flex flex-wrap items-center gap-2.5">
+          <h3 className="font-display text-base font-semibold text-ink">
+            Resource requests ({requests.length})
+          </h3>
+          {pending > 0 && (
+            <span className="rounded-none bg-navy-900 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-white">
+              {pending} to send
+            </span>
+          )}
+        </div>
+        <p className="mb-4 text-sm text-muted">
+          Nothing is emailed automatically. Send the file to the address below,
+          then mark the request sent. Outstanding requests are listed first.
         </p>
         {requests.length === 0 ? (
           <p className="rounded-none border border-dashed border-line bg-white p-6 text-center text-sm text-muted">
-            No one has requested a copy yet.
+            No one has requested a resource yet.
           </p>
         ) : (
-          <div className="overflow-x-auto border border-line bg-white">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="bg-surface-muted">
-                  <th className="px-4 py-2.5 text-left font-semibold text-muted">Email</th>
-                  <th className="px-4 py-2.5 text-left font-semibold text-muted">Resource</th>
-                  <th className="px-4 py-2.5 text-left font-semibold text-muted">When</th>
-                  <th className="px-4 py-2.5 text-left font-semibold text-muted">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {requests.map((r) => (
-                  <tr key={r.id} className="border-t border-line">
-                    <td className="px-4 py-2.5 text-ink">{r.email}</td>
-                    <td className="px-4 py-2.5 text-muted">
-                      {r.resourceTitle ?? "(deleted resource)"}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-muted">
-                      {requestedAt.format(new Date(r.createdAt))}
-                    </td>
-                    <td className="px-4 py-2.5">
-                      <span
-                        className={`rounded-none px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${
-                          r.status === "sent"
-                            ? "bg-secondary-50 text-secondary-600"
-                            : "bg-primary-50 text-primary-600"
-                        }`}
-                        title={r.error ?? undefined}
+          <ul className="flex flex-col gap-3">
+            {requests.map((r) => (
+              <li
+                key={r.id}
+                className={`rounded-none border bg-white p-4 ${
+                  r.status === "pending" ? "border-l-2 border-l-primary-500 border-line" : "border-line"
+                }`}
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-display text-sm font-semibold text-ink">
+                      {r.resourceTitle}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted">
+                      Requested {requestedAt.format(new Date(r.createdAt))}
+                      {r.sentAt && ` · sent ${requestedAt.format(new Date(r.sentAt))}`}
+                      {r.resourceId === null && " · no file uploaded yet"}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span
+                      className={`rounded-none px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${
+                        r.status === "sent"
+                          ? "bg-secondary-50 text-secondary-600"
+                          : "bg-primary-50 text-primary-600"
+                      }`}
+                    >
+                      {r.status}
+                    </span>
+                    <form action={setRequestStatusAction}>
+                      <input type="hidden" name="id" value={r.id} />
+                      <input
+                        type="hidden"
+                        name="status"
+                        value={r.status === "sent" ? "pending" : "sent"}
+                      />
+                      <button
+                        type="submit"
+                        className="inline-flex h-8 cursor-pointer items-center rounded-none border border-line px-3 text-xs font-semibold text-ink-body transition-colors duration-200 hover:border-ink/30 hover:text-ink"
                       >
-                        {r.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        {r.status === "sent" ? "Undo" : "Mark sent"}
+                      </button>
+                    </form>
+                  </div>
+                </div>
+
+                <dl className="mt-3 grid gap-x-6 gap-y-2 border-t border-line pt-3 text-sm sm:grid-cols-3">
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                      Name
+                    </dt>
+                    <dd className="mt-0.5 text-ink">{r.name}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                      Email
+                    </dt>
+                    <dd className="mt-0.5 break-all">
+                      <a
+                        href={`mailto:${r.email}?subject=${encodeURIComponent(r.resourceTitle)}`}
+                        className="font-medium text-primary-600 transition-colors duration-200 hover:text-primary-500"
+                      >
+                        {r.email}
+                      </a>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                      Phone
+                    </dt>
+                    <dd className="mt-0.5 text-ink">{r.phone}</dd>
+                  </div>
+                  <div className="sm:col-span-3">
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                      Purpose
+                    </dt>
+                    <dd className="mt-0.5 whitespace-pre-line leading-6 text-ink-body">
+                      {r.purpose}
+                    </dd>
+                  </div>
+                </dl>
+              </li>
+            ))}
+          </ul>
         )}
       </section>
     </div>

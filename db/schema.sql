@@ -431,22 +431,79 @@ comment on table public.toolkit_resources is
   'Server-managed public toolkit metadata. RLS deny-all is intentional; pg owner access bypasses RLS.';
 
 -- ── Founders Hub file requests ──────────────────────────────────────────────
--- Someone on /toolkits asks for a copy of a resource by email; we log the
--- request and send them a time-limited download link. The log doubles as a
--- lead list (who wants what) and as the basis for rate limiting.
+-- Someone on /toolkits fills in the request form for a resource. Nothing is
+-- sent automatically: a team member reads the request in /admin/toolkits and
+-- emails the file over, then marks it sent. The log doubles as a lead list.
 
 create table if not exists toolkit_requests (
   id          bigint generated always as identity primary key,
-  resource_id bigint not null references toolkit_resources (id) on delete cascade,
+  -- Null when the request is for a catalogue entry that has no uploaded file
+  -- yet, or when the resource is later deleted. resource_title always holds
+  -- what the visitor actually asked for.
+  resource_id bigint references toolkit_resources (id) on delete set null,
+  resource_title text not null,
+  name        text not null,
+  phone       text not null,
   email       text not null,
-  -- 'sent' once the provider accepted it; 'failed' keeps a record of the attempt.
-  status      text not null default 'sent' check (status in ('sent', 'failed')),
-  error       text,
+  purpose     text not null,
+  -- 'pending' until a team member has emailed the file, then 'sent'.
+  status      text not null default 'pending' check (status in ('pending', 'sent')),
+  sent_at     timestamptz,
   created_at  timestamptz not null default now()
 );
 
--- Admin list ("newest first") and the per-email rate-limit lookup.
+-- Upgrade path from the earlier auto-email version of this table, which had
+-- (resource_id not null, email, status sent/failed, error) and no requester
+-- details. Safe to re-run.
+alter table toolkit_requests add column if not exists resource_title text;
+alter table toolkit_requests add column if not exists name    text;
+alter table toolkit_requests add column if not exists phone   text;
+alter table toolkit_requests add column if not exists purpose text;
+alter table toolkit_requests add column if not exists sent_at timestamptz;
+alter table toolkit_requests drop column if exists error;
+
+do $$ begin
+  -- resource_id becomes optional, and must survive its resource being deleted.
+  alter table toolkit_requests alter column resource_id drop not null;
+  alter table toolkit_requests drop constraint if exists toolkit_requests_resource_id_fkey;
+  alter table toolkit_requests add constraint toolkit_requests_resource_id_fkey
+    foreign key (resource_id) references toolkit_resources (id) on delete set null;
+exception when others then
+  raise notice 'toolkit_requests resource_id already relaxed: %', sqlerrm;
+end $$;
+
+-- Backfill the new NOT NULLs before enforcing them, so an existing row from the
+-- old shape cannot block the migration.
+update toolkit_requests set resource_title = coalesce(resource_title, '(unknown)') where resource_title is null;
+update toolkit_requests set name    = coalesce(name, '(not captured)')    where name is null;
+update toolkit_requests set phone   = coalesce(phone, '(not captured)')   where phone is null;
+update toolkit_requests set purpose = coalesce(purpose, '(not captured)') where purpose is null;
+
+do $$ begin
+  alter table toolkit_requests alter column resource_title set not null;
+  alter table toolkit_requests alter column name    set not null;
+  alter table toolkit_requests alter column phone   set not null;
+  alter table toolkit_requests alter column purpose set not null;
+exception when others then
+  raise notice 'toolkit_requests not-null tightening skipped: %', sqlerrm;
+end $$;
+
+-- Status moves from the old send-result values to fulfilment tracking.
+do $$ begin
+  update toolkit_requests set status = 'pending' where status not in ('pending', 'sent');
+  alter table toolkit_requests drop constraint if exists toolkit_requests_status_check;
+  alter table toolkit_requests add constraint toolkit_requests_status_check
+    check (status in ('pending', 'sent'));
+  alter table toolkit_requests alter column status set default 'pending';
+exception when others then
+  raise notice 'toolkit_requests status migration skipped: %', sqlerrm;
+end $$;
+
+-- Admin list ("newest first"), the pending-first view, and the per-email
+-- lookup used for rate limiting.
 create index if not exists toolkit_requests_created_at_idx
   on toolkit_requests (created_at desc);
 create index if not exists toolkit_requests_email_idx
   on toolkit_requests (lower(email), created_at desc);
+create index if not exists toolkit_requests_status_idx
+  on toolkit_requests (status, created_at desc);

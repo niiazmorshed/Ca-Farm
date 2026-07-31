@@ -131,10 +131,7 @@ function Avatar({ user, size = 36 }: { user: SessionUser; size?: number }) {
 
 function Logo({ onClick }: { onClick?: () => void }) {
   return (
-    <Link href="/" className="flex items-center gap-2.5" onClick={onClick}>
-      <span className="grid h-9 w-9 place-items-center rounded-none bg-navy-900 font-display text-[11px] font-semibold tracking-tight text-primary-400">
-        AIBN
-      </span>
+    <Link href="/" className="flex items-center" onClick={onClick}>
       <span className="flex flex-col leading-none">
         <span className="font-display text-lg font-semibold tracking-tight text-ink">
           AIBN

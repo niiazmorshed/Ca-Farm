@@ -1,70 +1,75 @@
 "use server";
 
-/* "Email me a copy": a visitor asks for a Founders Hub resource, we send them a
-   time-limited download link and log the request.
+/* "Request a copy" on the Founders Hub.
 
-   Deliberately public (no auth): this is a lead-capture flow. Abuse is bounded
-   by a per-email hourly rate limit, and by only ever emailing the address that
-   was typed in, never an address supplied by a third party. */
+   A visitor fills in the form and we record who they are and what they want.
+   Nothing is emailed automatically: a team member reads the request in
+   /admin/toolkits and sends the file by hand, then marks it sent.
 
-import { createAdminClient } from "../lib/supabase/admin";
-import { query } from "../lib/db";
-import { site } from "../lib/content";
-import {
-  emailButton,
-  emailShell,
-  isEmailConfigured,
-  sendEmail,
-} from "../lib/email";
+   Deliberately public (no auth). Abuse is bounded by a per-address hourly
+   limit, and the request only ever records what was typed in. */
+
+import { revalidatePath } from "next/cache";
+import { findRequestableResourceBySlug } from "../lib/toolkit-data";
 import {
   countRecentRequests,
-  logRequest,
+  createRequest,
   REQUEST_RATE_LIMIT,
 } from "../lib/toolkit-requests";
 
 export interface RequestState {
   status: "idle" | "sent" | "error";
   message?: string;
+  /** Field-level errors, keyed by input name, so each one renders in place. */
+  errors?: Record<string, string>;
 }
 
-const BUCKET = "toolkits";
-/** Download links stay valid for a week, then quietly expire. */
-const LINK_TTL_SECONDS = 60 * 60 * 24 * 7;
-
-/* Deliberately permissive: the real proof an address is valid is whether the
-   mail arrives. This only rejects obvious nonsense. */
+/* Permissive on purpose: the real test of an address is whether mail arrives.
+   This only rejects obvious nonsense. */
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+/* Digits, spaces and the usual punctuation; 7 to 20 digits once stripped. */
+const PHONE_RE = /^[+()\d][\d\s().-]{5,}$/;
 
-interface ResourceRow {
-  id: string;
-  title: string;
-  description: string | null;
-  file_url: string;
-  file_path: string | null;
-  file_name: string | null;
-}
+const LIMITS = { name: 120, phone: 40, email: 254, purpose: 1000 };
 
-export async function requestResourceAction(
+export async function submitResourceRequestAction(
   _prev: RequestState,
   formData: FormData,
 ): Promise<RequestState> {
-  const resourceId = String(formData.get("resource_id") ?? "").trim();
+  const slug = String(formData.get("slug") ?? "").trim();
+  const name = String(formData.get("name") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
+  const purpose = String(formData.get("purpose") ?? "").trim();
 
-  if (!/^\d+$/.test(resourceId)) {
-    return { status: "error", message: "Something went wrong. Please refresh and try again." };
-  }
-  if (!EMAIL_RE.test(email) || email.length > 254) {
-    return { status: "error", message: "Enter a valid email address." };
+  const errors: Record<string, string> = {};
+
+  if (!name) errors.name = "Please tell us your name.";
+  else if (name.length > LIMITS.name) errors.name = "That name is too long.";
+
+  if (!phone) errors.phone = "Please give us a phone number.";
+  else if (phone.length > LIMITS.phone) errors.phone = "That number is too long.";
+  else if (!PHONE_RE.test(phone) || (phone.replace(/\D/g, "").length < 7))
+    errors.phone = "Enter a valid phone number.";
+
+  if (!email) errors.email = "Please give us an email address.";
+  else if (email.length > LIMITS.email) errors.email = "That address is too long.";
+  else if (!EMAIL_RE.test(email)) errors.email = "Enter a valid email address.";
+
+  if (!purpose) errors.purpose = "Let us know what you need it for.";
+  else if (purpose.length > LIMITS.purpose)
+    errors.purpose = "Please keep this under 1000 characters.";
+
+  if (Object.keys(errors).length > 0) {
+    return { status: "error", message: "Please check the fields below.", errors };
   }
 
-  // Fail fast with an honest message rather than silently logging a request
-  // that can never be delivered.
-  if (!isEmailConfigured()) {
-    console.error("[toolkits] request received but email is not configured");
+  // Resolve the slug server-side rather than trusting a posted title.
+  const resource = await findRequestableResourceBySlug(slug);
+  if (!resource) {
     return {
       status: "error",
-      message: "We can't send emails just yet. Please use the contact form and we'll send it over.",
+      message: "That resource is no longer available. Please go back and pick another.",
     };
   }
 
@@ -72,111 +77,31 @@ export async function requestResourceAction(
     if ((await countRecentRequests(email)) >= REQUEST_RATE_LIMIT) {
       return {
         status: "error",
-        message: "That's a lot of requests in one go. Please try again later.",
+        message: "That is a lot of requests in one go. Please try again later.",
       };
     }
   } catch (err) {
+    // A failed rate-limit read should not block a genuine request.
     console.error("[toolkits] rate-limit check failed:", err);
   }
 
-  let resource: ResourceRow | undefined;
   try {
-    const { rows } = await query<ResourceRow>(
-      `select id, title, description, file_url, file_path, file_name
-         from toolkit_resources
-        where id = $1 and active`,
-      [resourceId],
-    );
-    resource = rows[0];
-  } catch (err) {
-    console.error("[toolkits] resource lookup failed:", err);
-    return { status: "error", message: "Something went wrong. Please try again." };
-  }
-  if (!resource) {
-    return { status: "error", message: "That resource is no longer available." };
-  }
-
-  // Storage-backed files get an expiring signed link; rows that point at an
-  // external URL are sent as-is.
-  let downloadUrl = resource.file_url;
-  if (resource.file_path) {
-    try {
-      const supabase = createAdminClient();
-      const { data, error } = await supabase.storage
-        .from(BUCKET)
-        .createSignedUrl(resource.file_path, LINK_TTL_SECONDS);
-      if (error) throw error;
-      if (data?.signedUrl) downloadUrl = data.signedUrl;
-    } catch (err) {
-      // A public bucket still serves the plain URL, so fall back rather than fail.
-      console.error("[toolkits] could not sign download URL, using public URL:", err);
-    }
-  }
-
-  const heading = `Your copy of “${resource.title}”`;
-  const bodyHtml = `
-    <p style="margin:0 0 12px;font-size:14px;line-height:1.65;color:#2b2f33;">
-      Thanks for your interest. Your download is ready:
-    </p>
-    ${
-      resource.description
-        ? `<p style="margin:0 0 4px;font-size:14px;line-height:1.65;color:#2b2f33;"><strong>${resource.title}</strong></p>
-           <p style="margin:0;font-size:13px;line-height:1.6;color:#62686e;">${resource.description}</p>`
-        : `<p style="margin:0;font-size:14px;line-height:1.65;color:#2b2f33;"><strong>${resource.title}</strong></p>`
-    }
-    ${emailButton(downloadUrl, "Download your copy")}
-    <p style="margin:0;font-size:12px;line-height:1.6;color:#62686e;">
-      If the button doesn't work, paste this into your browser:<br>
-      <a href="${downloadUrl}" style="color:#26890d;word-break:break-all;">${downloadUrl}</a>
-    </p>
-    <p style="margin:18px 0 0;font-size:13px;line-height:1.65;color:#2b2f33;">
-      Questions about how it applies to your business? Just reply to this email.
-    </p>`;
-
-  const text = [
-    `Your copy of "${resource.title}"`,
-    "",
-    "Thanks for your interest. Download your copy here:",
-    downloadUrl,
-    "",
-    "This link expires in 7 days.",
-    "Questions? Just reply to this email.",
-    "",
-    `${site.name}, ${site.address.join(", ")}`,
-  ].join("\n");
-
-  const result = await sendEmail({
-    to: email,
-    subject: `Your copy of ${resource.title}`,
-    html: emailShell({
-      heading,
-      bodyHtml,
-      footerNote:
-        `You're receiving this because you requested this resource on ${site.url.replace(/^https?:\/\//, "")}. This link expires in 7 days.`,
-    }),
-    text,
-  });
-
-  try {
-    await logRequest({
-      resourceId,
+    await createRequest({
+      resourceId: resource.id,
+      resourceTitle: resource.title,
+      name,
+      phone,
       email,
-      status: result.ok ? "sent" : "failed",
-      error: result.ok ? null : result.error,
+      purpose,
     });
   } catch (err) {
-    console.error("[toolkits] could not log request:", err);
-  }
-
-  if (!result.ok) {
+    console.error("[toolkits] could not record request:", err);
     return {
       status: "error",
-      message: "We couldn't send that just now. Please try again, or use the contact form.",
+      message: "Something went wrong saving your request. Please try again.",
     };
   }
 
-  return {
-    status: "sent",
-    message: `Sent. Check ${email} for your download link.`,
-  };
+  revalidatePath("/admin/toolkits");
+  return { status: "sent" };
 }

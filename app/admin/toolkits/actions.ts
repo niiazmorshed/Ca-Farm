@@ -5,6 +5,7 @@ import { query } from "../../lib/db";
 import { requireAdmin } from "../../lib/supabase/guards";
 import { createAdminClient } from "../../lib/supabase/admin";
 import { TOOLKIT_CATEGORIES, TOOLKIT_FRAMEWORKS } from "../../lib/toolkit-types";
+import { setRequestStatus } from "../../lib/toolkit-requests";
 
 export interface ActionState {
   status: "idle" | "saved" | "error";
@@ -205,4 +206,23 @@ export async function deleteResource(
 
   revalidate();
   return { status: "saved", message: "Deleted." };
+}
+
+/** Mark a Founders Hub request sent (or back to pending) once a team member
+    has emailed the file over. The sending itself is manual and off-platform. */
+export async function setRequestStatusAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+
+  const id = String(formData.get("id") ?? "").trim();
+  const status = String(formData.get("status") ?? "").trim();
+  if (!/^\d+$/.test(id) || (status !== "pending" && status !== "sent")) return;
+
+  try {
+    await setRequestStatus(id, status);
+  } catch (err) {
+    console.error("[toolkits] could not update request status:", err);
+    return;
+  }
+
+  revalidate();
 }
