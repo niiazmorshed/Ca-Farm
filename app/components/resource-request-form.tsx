@@ -178,6 +178,25 @@ export function ResourceRequestForm({ slug }: { slug: string }) {
       </Field>
 
       <Field
+        label="Organisation website"
+        name="website"
+        error={errors.website}
+        hint="The site for your company or practice. Typing acme.ie is fine."
+      >
+        <input
+          id="website"
+          name="website"
+          type="text"
+          required
+          inputMode="url"
+          autoComplete="url"
+          maxLength={200}
+          placeholder="acme.ie"
+          className={inputClass}
+        />
+      </Field>
+
+      <Field
         label="What do you need it for?"
         name="purpose"
         error={errors.purpose}

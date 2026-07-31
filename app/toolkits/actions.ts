@@ -30,7 +30,32 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 /* Digits, spaces and the usual punctuation; 7 to 20 digits once stripped. */
 const PHONE_RE = /^[+()\d][\d\s().-]{5,}$/;
 
-const LIMITS = { name: 120, phone: 40, email: 254, purpose: 1000 };
+const LIMITS = { name: 120, phone: 40, email: 254, website: 200, purpose: 1000 };
+
+/**
+ * Normalise an organisation website. People type "acme.ie" far more often than
+ * "https://acme.ie", so the scheme is optional on the way in and always present
+ * on the way out. Only http(s) is ever returned — the admin list renders this
+ * as a clickable link, so a `javascript:` or `data:` value must never survive.
+ * Returns null when it is not a usable address.
+ */
+function normaliseWebsite(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  let url: URL;
+  try {
+    url = new URL(withScheme);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+  // A bare word ("acme") is a typo rather than a site: require a dotted host.
+  if (!/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i.test(url.hostname)) return null;
+
+  return url.toString();
+}
 
 export async function submitResourceRequestAction(
   _prev: RequestState,
@@ -40,6 +65,7 @@ export async function submitResourceRequestAction(
   const name = String(formData.get("name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
+  const website = String(formData.get("website") ?? "").trim();
   const purpose = String(formData.get("purpose") ?? "").trim();
 
   const errors: Record<string, string> = {};
@@ -55,6 +81,16 @@ export async function submitResourceRequestAction(
   if (!email) errors.email = "Please give us an email address.";
   else if (email.length > LIMITS.email) errors.email = "That address is too long.";
   else if (!EMAIL_RE.test(email)) errors.email = "Enter a valid email address.";
+
+  let normalisedWebsite = "";
+  if (!website) errors.website = "Please give us your organisation's website.";
+  else if (website.length > LIMITS.website)
+    errors.website = "That address is too long.";
+  else {
+    const parsed = normaliseWebsite(website);
+    if (!parsed) errors.website = "Enter a valid website address, e.g. acme.ie";
+    else normalisedWebsite = parsed;
+  }
 
   if (!purpose) errors.purpose = "Let us know what you need it for.";
   else if (purpose.length > LIMITS.purpose)
@@ -91,6 +127,7 @@ export async function submitResourceRequestAction(
       name,
       phone,
       email,
+      website: normalisedWebsite,
       purpose,
     });
   } catch (err) {

@@ -141,6 +141,28 @@ export default async function AdminToolkitsPage() {
                   </div>
                   <div className="sm:col-span-3">
                     <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                      Website
+                    </dt>
+                    <dd className="mt-0.5 break-all">
+                      {/* New rows are normalised to http(s) by the request
+                          action; rows captured before this field existed hold
+                          a placeholder, so only link what is actually a URL. */}
+                      {/^https?:\/\//.test(r.website) ? (
+                        <a
+                          href={r.website}
+                          target="_blank"
+                          rel="noopener noreferrer nofollow"
+                          className="font-medium text-primary-600 transition-colors duration-200 hover:text-primary-500"
+                        >
+                          {r.website}
+                        </a>
+                      ) : (
+                        <span className="text-muted">{r.website}</span>
+                      )}
+                    </dd>
+                  </div>
+                  <div className="sm:col-span-3">
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted">
                       Purpose
                     </dt>
                     <dd className="mt-0.5 whitespace-pre-line leading-6 text-ink-body">

@@ -434,6 +434,10 @@ create table if not exists toolkit_requests (
   name        text not null,
   phone       text not null,
   email       text not null,
+  -- Requester's organisation website, stored with its scheme (https://…). The
+  -- default only ever catches a deploy running older code (see the 20260731
+  -- migration); the app always supplies a real value.
+  website     text not null default '(not captured)',
   purpose     text not null,
   -- 'pending' until a team member has emailed the file, then 'sent'.
   status      text not null default 'pending' check (status in ('pending', 'sent')),
@@ -449,6 +453,7 @@ alter table toolkit_requests add column if not exists name    text;
 alter table toolkit_requests add column if not exists phone   text;
 alter table toolkit_requests add column if not exists purpose text;
 alter table toolkit_requests add column if not exists sent_at timestamptz;
+alter table toolkit_requests add column if not exists website text not null default '(not captured)';
 alter table toolkit_requests drop column if exists error;
 
 do $$ begin
@@ -473,6 +478,7 @@ do $$ begin
   alter table toolkit_requests alter column name    set not null;
   alter table toolkit_requests alter column phone   set not null;
   alter table toolkit_requests alter column purpose set not null;
+  alter table toolkit_requests alter column website set not null;
 exception when others then
   raise notice 'toolkit_requests not-null tightening skipped: %', sqlerrm;
 end $$;
