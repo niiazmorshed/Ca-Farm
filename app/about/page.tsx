@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Container, Eyebrow, PageHero, SectionHeading } from "../components/ui";
-import { ContactCta, Stats } from "../components/sections";
+import { ContactCta } from "../components/sections";
 import { Reveal } from "../components/reveal";
 import { ClipReveal } from "../components/clip-reveal";
 import { team, values } from "../lib/content";
@@ -134,7 +134,6 @@ export default function AboutPage() {
         </Container>
       </section>
 
-      <Stats />
       <ContactCta />
     </>
   );

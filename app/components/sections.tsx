@@ -2,7 +2,6 @@ import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 import { Button, Container, Eyebrow, SectionHeading } from "./ui";
 import { Reveal } from "./reveal";
-import { CountUp } from "./count-up";
 import { ClipReveal } from "./clip-reveal";
 import { Accordion } from "./accordion";
 import { HeroVideo } from "./hero-video";
@@ -555,39 +554,6 @@ export function Process() {
             </li>
           ))}
         </ol>
-        </Reveal>
-      </Container>
-    </section>
-  );
-}
-
-/* ---------- stats ---------- */
-
-const stats = [
-  { value: "20+", label: "years in practice" },
-  { value: "500+", label: "businesses served" },
-  { value: "€40m+", label: "saved for clients in tax" },
-  { value: "98%", label: "client retention" },
-];
-
-export function Stats() {
-  return (
-    <section className="bg-navy-900 text-white">
-      <Container className="py-16 sm:py-20">
-        <Reveal>
-        <dl className="grid grid-cols-1 gap-px overflow-hidden border border-white/15 bg-white/15 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="flex flex-col gap-2 bg-navy-900 px-6 py-8 text-center"
-            >
-              <dd className="order-1 font-display text-4xl font-medium tracking-tight text-primary-300 sm:text-5xl">
-                <CountUp value={stat.value} />
-              </dd>
-              <dt className="order-2 text-sm text-white/65">{stat.label}</dt>
-            </div>
-          ))}
-        </dl>
         </Reveal>
       </Container>
     </section>
