@@ -2,9 +2,9 @@ import Link from "next/link";
 import { serviceCategories, site } from "../lib/content";
 import { images } from "../lib/images";
 
+/* Pricing link hidden site-wide for now — see app/_pricing. */
 const firmLinks = [
   { label: "Services", href: "/services" },
-  { label: "Pricing", href: "/pricing" },
   { label: "About the firm", href: "/about" },
   { label: "Client stories", href: "/#testimonials" },
   { label: "FAQ", href: "/#faq" },

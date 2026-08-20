@@ -7,8 +7,9 @@ import { serviceCategories, site } from "../lib/content";
 import { CALCULATOR_TOOLS } from "./calculator-tabs";
 import type { SessionUser } from "../lib/supabase/guards";
 
+/* Pricing is hidden site-wide while the fee model is being decided; restore
+   { href: "/pricing", label: "Pricing" } here to bring it back. */
 const secondaryLinks = [
-  { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];

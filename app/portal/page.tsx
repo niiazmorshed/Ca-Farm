@@ -34,12 +34,7 @@ const quickActions = [
     title: "Tax calculators",
     body: "Income tax, VAT, CT and more.",
   },
-  {
-    href: "/pricing",
-    icon: "banknotes",
-    title: "Plans & pricing",
-    body: "See what's included at each tier.",
-  },
+  // Plans & pricing card is hidden while the fee model is being decided.
   {
     href: "/portal/settings",
     icon: "settings",
