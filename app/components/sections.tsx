@@ -55,28 +55,12 @@ export function Hero() {
             Partner-led tax, audit and advisory across Ireland, with AI doing
             the heavy lifting.
           </p>
-          <div className="animate-fade-up mt-10 flex flex-col gap-3 [animation-delay:220ms] sm:flex-row">
+          <div className="animate-fade-up mt-10 flex flex-col items-start gap-3 [animation-delay:220ms] sm:flex-row sm:items-center sm:gap-4">
             <Button href="/contact">Book a free consultation</Button>
             <Button href="/services/ai" variant="outlineLight">
               See how we use AI
             </Button>
           </div>
-          <ul className="animate-fade-up mt-12 grid max-w-2xl grid-cols-3 gap-px overflow-hidden border border-white/15 bg-white/15 [animation-delay:290ms]">
-            {[
-              ["20+", "years in practice"],
-              ["500+", "clients served"],
-              ["€40m+", "saved in tax"],
-            ].map(([value, label]) => (
-              <li key={label} className="bg-navy-900 px-5 py-5">
-                <span className="block font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                  {value}
-                </span>
-                <span className="mt-1 block text-xs leading-5 text-white/60 sm:text-sm">
-                  {label}
-                </span>
-              </li>
-            ))}
-          </ul>
         </div>
       </Container>
     </section>

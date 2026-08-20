@@ -70,7 +70,7 @@ const buttonVariants: Record<ButtonVariant, string> = {
   outline:
     "border border-ink/20 text-ink hover:border-ink/40 hover:bg-ink/5 focus-visible:outline-ink/40",
   outlineLight:
-    "border border-white/30 text-white hover:border-white/60 hover:bg-white/10 focus-visible:outline-white/60",
+    "border border-white/30 bg-white/5 text-white backdrop-blur-sm hover:border-white/60 hover:bg-white/15 focus-visible:outline-white/60",
 };
 
 export function Button({
