@@ -7,7 +7,6 @@ import {
   AiBand,
   Industries,
   Process,
-  Stats,
   Testimonials,
   Faq,
   ContactCta,
@@ -40,7 +39,6 @@ export default function Home() {
         reverse
       />
       <Process />
-      <Stats />
       <Testimonials />
       <Faq />
       <ContactCta />
