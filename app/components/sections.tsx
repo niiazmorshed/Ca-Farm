@@ -509,8 +509,10 @@ const steps = [
     description: "A free 30 minutes on where you stand. No pitch.",
   },
   {
-    title: "Fixed-fee proposal",
-    description: "Clear scope, fixed monthly fee. No surprises.",
+    // Fee wording hidden for now; was "Fixed-fee proposal" /
+    // "Clear scope, fixed monthly fee. No surprises."
+    title: "Written proposal",
+    description: "Clear scope, agreed upfront. No surprises.",
   },
   {
     title: "Painless onboarding",
@@ -629,11 +631,14 @@ const faqs = [
     answer:
       "Not hard at all, for you. You sign one letter of engagement; we contact your previous accountant, collect handover records and pick up mid-year without missing a deadline.",
   },
+  /* Pricing FAQ hidden while the fee model is being decided — restore this
+     entry when pricing goes back up:
   {
     question: "How does your pricing work?",
     answer:
       "A fixed monthly fee, scoped upfront based on your size and what you need. No hourly billing, and the scope is reviewed together once a year, not whenever we feel like it.",
   },
+  */
   {
     question: "Which accounting software do you support?",
     answer:

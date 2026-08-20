@@ -27,7 +27,8 @@ Commands: `npm run dev` · `npm run build` · `npm run lint`
 
 ```
 app/
-  page.tsx, about/, contact/, pricing/, services/   # marketing routes
+  page.tsx, about/, contact/, services/   # marketing routes
+  _pricing/          # hidden route — see "Hidden for now" below
   login/, signup/, portal/, admin/, auth/{confirm,callback}/  # auth routes
   components/      # UI, layout, sections + motion primitives
   lib/content.ts   # site config, services, pricing, copy data
@@ -47,6 +48,27 @@ proxy.ts           # (Next 16 middleware) refreshes session + gates /portal, /ad
 - **Reusable UI** (`Button`, `Card`, etc.) → `app/components/ui.tsx`.
 - **Page sections** (Hero, Faq, etc.) → `app/components/sections.tsx`.
 - **Server actions** → colocate with route (e.g. `app/contact/actions.ts`).
+
+
+## Hidden for now (since 2026-08-20)
+
+Pricing is hidden site-wide until the fee model is decided. Nothing was
+deleted — every item is a comment-out or a reversible rename, so unhiding
+means undoing exactly this list. Don't re-add pricing links or fee claims
+elsewhere while this stands.
+
+| What | Where | How it was hidden |
+| --- | --- | --- |
+| `/pricing` route | `app/pricing/` → `app/_pricing/` | Underscore-prefixed folders are private in the App Router, so the route no longer resolves. The page, `PricingTable` and `pricingTiers`/`pricingAddons` in `app/lib/content.ts` are untouched. |
+| Header nav link | `app/components/site-header.tsx` (`secondaryLinks`) | Entry removed; restore `{ href: "/pricing", label: "Pricing" }`. Covers desktop nav and mobile menu — both render the same array. |
+| Footer link | `app/components/site-footer.tsx` (`firmLinks`) | Entry removed; restore `{ label: "Pricing", href: "/pricing" }`. |
+| Sitemap URL | `app/sitemap.ts` | `"/pricing"` removed from `staticPages`. |
+| Portal quick-link card | `app/portal/page.tsx` | "Plans & pricing" card removed. |
+| Pricing FAQ | `app/components/sections.tsx` (`faqs`) | "How does your pricing work?" commented out in place. |
+| Process step wording | `app/components/sections.tsx` (`steps`) | "Fixed-fee proposal" / "Clear scope, fixed monthly fee. No surprises." → "Written proposal" / "Clear scope, agreed upfront. No surprises."; original in a comment. |
+| Contact next-steps bullet | `app/contact/page.tsx` (`nextSteps`) | "A fixed-fee proposal in writing" reworded to drop the fee claim; original in a comment. |
+
+Whenever anything else gets hidden rather than deleted, add a row here.
 
 
 ## Conventions
